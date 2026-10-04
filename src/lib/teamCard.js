@@ -17,7 +17,7 @@ const MONO = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
 // The card always uses the dark look, like the game's UI.
 const C = {
   bg: '#0e1119',
-  panel: '#161a25',
+  panel: 'rgba(22, 26, 37, 0.9)',
   panel2: '#1f2432',
   line: '#2b3242',
   fg: '#e7eaf2',
@@ -130,6 +130,36 @@ function drawRank(ctx, rank, x, centerY, size) {
   ctx.restore();
 }
 
+// Tilted pink rounded bands with dashed inner tracks, matching the app's backdrop.
+const BANDS = [
+  { y: -40, x: -120, h: 170, a: 1 },
+  { y: 150, x: -420, h: 110, a: 0.7 },
+  { y: 310, x: -60, h: 190, a: 1 },
+  { y: 500, x: -480, h: 120, a: 0.6 },
+  { y: 660, x: -180, h: 160, a: 0.8 },
+];
+function drawBands(ctx) {
+  ctx.save();
+  ctx.translate(CARD_W / 2, CARD_H / 2);
+  ctx.rotate((-12 * Math.PI) / 180);
+  ctx.translate(-CARD_W / 2, -CARD_H / 2);
+  for (const b of BANDS) {
+    const w = CARD_W * 1.6;
+    ctx.globalAlpha = b.a;
+    ctx.fillStyle = 'rgba(194, 24, 91, 0.16)';
+    roundRect(ctx, b.x, b.y, w, b.h, b.h / 2);
+    ctx.fill();
+    ctx.setLineDash([10, 8]);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(232, 72, 140, 0.24)';
+    const inset = 22;
+    roundRect(ctx, b.x + 90, b.y + inset, w - 180, b.h - inset * 2, (b.h - inset * 2) / 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+
 async function ensureFonts() {
   if (!document.fonts?.load) return;
   try {
@@ -164,6 +194,9 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   canvas.height = CARD_H * scale;
   const ctx = canvas.getContext('2d');
   ctx.scale(scale, scale);
+  // Best resampling when portraits are scaled onto the card.
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
 
   // Background
   const g = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
@@ -171,6 +204,8 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   g.addColorStop(1, C.bg);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, CARD_W, CARD_H);
+
+  drawBands(ctx);
 
   // Element stripe
   const order = ['cosmos', 'anima', 'incantation', 'chaos', 'psyche', 'lakshana'];
