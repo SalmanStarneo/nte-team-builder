@@ -78,6 +78,22 @@ export const GLOSSARY = [
     text: 'Bonus effects unlocked alongside Awakenings, such as higher skill levels or a team-wide stat bonus.',
   },
   {
+    term: 'Ascension',
+    category: 'Characters',
+    text: 'Raising a character’s level cap. Six ascensions take the cap from 20 to 80, each costing Beetle Coin, a tier of the character’s material family and their Anomaly Hunt boss drop.',
+    related: ['Anomaly Hunt', 'Beetle Coin'],
+  },
+  {
+    term: 'Beetle Coin',
+    category: 'Characters',
+    text: 'The currency spent on ascensions, skill upgrades and Arc upgrades. Taking one character from cap 20 to 80 costs 525,000.',
+  },
+  {
+    term: 'Material family',
+    category: 'Characters',
+    text: 'Each character ascends with one of four families (Whispers, Silhouette, Numeral or Delusions), used in three tiers as the level cap rises.',
+  },
+  {
     term: 'Base stats',
     category: 'Characters',
     text: 'A character’s HP, ATK and DEF before gear. This app lists Level 1 values; all characters start with 5% Crit Rate and 50% Crit DMG.',
@@ -142,6 +158,11 @@ export const GLOSSARY = [
     term: 'Beyond the Rails',
     category: 'Modes',
     text: 'Endgame challenge mode. Most stages require two teams with no character in common, and stages have elemental weaknesses.',
+  },
+  {
+    term: 'Anomaly Hunt',
+    category: 'Modes',
+    text: 'Boss fights that drop the character-specific material needed for ascension, such as Tear of the Sea from Sea Prisoner.',
   },
   {
     term: 'Hethereau',

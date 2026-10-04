@@ -5,6 +5,7 @@ import { ARCS, ARC_BY_ID, RECOMMENDED } from '../data/arcs.js';
 import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
+import AscensionPlanner from './AscensionPlanner.jsx';
 
 const fmt = (n) => n.toLocaleString('en-US');
 
@@ -108,6 +109,8 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
           ))}
         </ul>
       </section>
+
+      <AscensionPlanner key={c.id} character={c} />
 
       {presets.length > 0 && (
         <section>
