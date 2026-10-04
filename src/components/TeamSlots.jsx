@@ -40,15 +40,15 @@ export default function TeamSlots({ team, selected, onSelect, dispatch }) {
               <span className="slot__meta">{c.roles.join(' · ')}</span>
               <span className="slot__gear">
                 <span className={arc ? 'gear-chip gear-chip--on' : 'gear-chip'} title={arc?.name ?? 'No Arc'}>
-                  {arc ? arc.name : 'No Arc'}
+                  <span className="gear-chip__name">{arc ? arc.name : 'No Arc'}</span>
                   {arc && arcTag(arc, c) && (
-                    <span className="chip-tag"> · {arcTag(arc, c) === 'sig' ? 'Sig' : 'Rec'}</span>
+                    <span className="chip-tag">· {arcTag(arc, c) === 'sig' ? 'Sig' : 'Rec'}</span>
                   )}
                 </span>
                 <span className="slot__gear-row">
                   <span className={cart ? 'gear-chip gear-chip--on' : 'gear-chip'} title={cart?.name ?? 'No Cartridge'}>
-                    {cart ? cart.name.split(':')[0] : 'No set'}
-                    {cart && cartridgesFor(c).includes(cart.id) && <span className="chip-tag"> · Rec</span>}
+                    <span className="gear-chip__name">{cart ? cart.name.split(':')[0] : 'No set'}</span>
+                    {cart && cartridgesFor(c).includes(cart.id) && <span className="chip-tag">· Rec</span>}
                   </span>
                   <span
                     className={gear.dupes ? 'gear-chip gear-chip--on' : 'gear-chip'}

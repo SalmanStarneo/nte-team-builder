@@ -126,7 +126,7 @@ export default function Roster({ members, analysis, usage, dispatch }) {
                     {c.upcoming && <span className="card__tag">Upcoming</span>}
                     {others && (
                       <span className="card__tag card__tag--used" title={`Also in ${others.join(', ')}`}>
-                        In {others.join(', ')}
+                        {others.length === 1 ? `In ${others[0]}` : `In ${others.length} other teams`}
                       </span>
                     )}
                   </span>

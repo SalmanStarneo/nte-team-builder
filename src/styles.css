@@ -350,7 +350,7 @@ button {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
-@media (max-width: 520px) {
+@media (max-width: 720px) {
   .slots {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -384,6 +384,7 @@ button {
 .slot__btn {
   position: relative;
   width: 100%;
+  grid-template-columns: minmax(0, 1fr);
   min-height: 150px;
   display: grid;
   justify-items: center;
@@ -432,15 +433,19 @@ button {
   display: grid;
   gap: 4px;
   width: 100%;
+  min-width: 0;
   margin-top: 6px;
 }
 .slot__gear-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   justify-content: center;
+  min-width: 0;
 }
 .gear-chip {
   min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -539,7 +544,7 @@ button {
   justify-self: center;
   width: 100%;
 }
-.cycle svg {
+.cycle > svg {
   display: block;
   width: 100%;
   height: auto;
@@ -2048,4 +2053,103 @@ th[aria-sort='descending'] .th-btn {
   border-radius: 6px;
   background: var(--bg);
   color: var(--fg);
+}
+
+/* ---------- Responsive guards ---------- */
+/* Grid and flex children default to min-width:auto, which lets long content
+   (tab strips, nav, chips) push the page wider than the screen. */
+.masthead > *,
+.masthead__row > *,
+.bench > *,
+.side > *,
+.page > *,
+.tabs > *,
+.tabs__edit > *,
+.analysis__grid > *,
+.loadout__grid > * {
+  min-width: 0;
+}
+.nav {
+  flex: 0 1 auto;
+}
+@media (max-width: 959px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.roster > *,
+.share > *,
+.analysis > * {
+  min-width: 0;
+}
+/* Gear chips: the name truncates, the Sig/Rec tag always stays visible. */
+.gear-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.gear-chip__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gear-chip .chip-tag {
+  flex: none;
+  white-space: nowrap;
+}
+
+.gear-chip .chip-tag {
+  margin-left: 0.3em;
+}
+@media (max-width: 520px) {
+  /* Navigation and team actions fill the row, each sized to its label. */
+  .nav {
+    display: flex;
+    width: 100%;
+  }
+  .nav__link {
+    flex: 1 1 auto;
+    padding: 7px 6px;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  .tabs__actions {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 6px;
+  }
+  .tabs__actions > .btn,
+  .tabs__actions > .confirm {
+    flex: 1 1 auto;
+  }
+  .tabs__actions .btn {
+    padding: 7px 6px;
+    font-size: 0.8rem;
+  }
+  .tabs__actions .confirm {
+    display: flex;
+    gap: 6px;
+  }
+  .tabs__actions .confirm .btn {
+    flex: 1 1 auto;
+  }
+  .type-tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+  .type-tab {
+    padding: 8px 10px;
+  }
+  .team-name {
+    font-size: 1.4rem;
+  }
+}
+
+.card__tag--used {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
