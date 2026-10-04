@@ -92,6 +92,31 @@ function pill(ctx, x, y, text, { bg, fg, font = `700 12px ${MONO}`, padX = 8, h 
   return w;
 }
 
+// Rank letter with the game's gradient and white outline.
+const RANK_GRADIENTS = {
+  S: ['#ffe46b', '#ff9a3c', '#ff3f8e'],
+  A: ['#ff6fd8', '#d84bff', '#9b45ff'],
+  B: ['#b14cff', '#7b7cff', '#4fd8ff'],
+};
+function drawRank(ctx, rank, x, baseline, size) {
+  const stops = RANK_GRADIENTS[rank] ?? ['#c9cfdc', '#a0a8b8', '#7d869a'];
+  ctx.save();
+  ctx.font = `italic 800 ${size}px ${DISPLAY}`;
+  ctx.textAlign = 'left';
+  // Span the cap height so the top colour shows on the letter itself.
+  const g = ctx.createLinearGradient(x, baseline - size * 0.72, x + size * 0.15, baseline);
+  g.addColorStop(0, stops[0]);
+  g.addColorStop(0.45, stops[1]);
+  g.addColorStop(1, stops[2]);
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#ffffff';
+  ctx.strokeText(rank, x, baseline);
+  ctx.fillStyle = g;
+  ctx.fillText(rank, x, baseline);
+  ctx.restore();
+}
+
 async function ensureFonts() {
   if (!document.fonts?.load) return;
   try {
@@ -234,7 +259,13 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     ctx.fillText(wrap(ctx, c.name, cw - 24, 1)[0], cx, top + 176);
     ctx.font = `500 13px ${MONO}`;
     ctx.fillStyle = el;
-    ctx.fillText(`${ELEMENT_BY_ID[c.element].name.toUpperCase()}  \u00b7  ${c.rarity}`, cx, top + 199);
+    const elName = ELEMENT_BY_ID[c.element].name.toUpperCase();
+    const elW = ctx.measureText(elName).width;
+    ctx.textAlign = 'left';
+    const startX = cx - (elW + 26) / 2;
+    ctx.fillText(elName, startX, top + 199);
+    drawRank(ctx, c.rarity, startX + elW + 10, top + 202, 22);
+    ctx.textAlign = 'center';
     ctx.fillStyle = C.muted;
     ctx.font = `500 14px ${BODY}`;
     ctx.fillText(c.roles.join(' \u00b7 '), cx, top + 220);
