@@ -1,12 +1,10 @@
-# Character portraits
+# Character icons
 
-Put one image per character here. The app picks them up automatically;
-any character without an image keeps showing initials.
+One icon per character, named by the character's `id` in `src/data/characters.js`
+(for example `nanally.webp`, `zero.webp`, `akane.webp`). The app loads them
+automatically and falls back to initials if a file is missing.
 
-- **File name:** the character's `id` from `src/data/characters.js`, e.g. `nanally.webp`, `zero.webp`, `akane.webp`
-- **Format:** `.webp` (convert PNG/JPG with squoosh.app or any image tool)
-- **Size:** square, 256×256 px is plenty; keep each under ~40 KB
-- **Crop:** head and shoulders, face near the top (the circle crops from the top)
+- Format: WebP, 256×256, transparent background
+- New characters: add `<id>.webp` here when they are added to the roster
 
-Game art belongs to Hotta Studio / Perfect World. Use official promotional
-images or your own in-game screenshots, and keep the "not affiliated" note in the app.
+Character art © Hotta Studio / Perfect World Games. See `NOTICE.md`.
