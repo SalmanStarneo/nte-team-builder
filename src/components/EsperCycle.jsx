@@ -44,7 +44,11 @@ export default function EsperCycle({ elementCounts, reactions, trios }) {
           const [nx, ny] = point(i, R + 34);
           const count = elementCounts[el.id] || 0;
           return (
-            <g key={el.id} className={count ? 'station station--on' : 'station'}>
+            <g
+              key={el.id}
+              className={count ? 'station station--on' : 'station'}
+              style={{ '--glow': `var(--elb-${el.id})` }}
+            >
               <circle cx={x} cy={y} r="17" style={count ? { stroke: `var(--elb-${el.id})` } : undefined} />
               <ElementGlyph
                 element={el.id}
