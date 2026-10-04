@@ -101,7 +101,7 @@ export const CHARACTERS = [
   },
   {
     id: 'akane', name: 'Akane Rin', rarity: 'S', element: 'lakshana', roles: ['Damage'],
-    arcType: 'Liquid', faction: null, ability: null,
+    arcType: 'Liquid', faction: 'Tamamochi Street Resident Association', ability: null,
     tags: ['Main DPS'], stats: null, upcoming: true,
   },
   // A-rank
