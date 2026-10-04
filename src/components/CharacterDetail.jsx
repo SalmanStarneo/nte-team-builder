@@ -1,6 +1,7 @@
 import { ELEMENTS, ELEMENT_BY_ID, PAIR_REACTIONS, TRIO_REACTIONS } from '../data/elements.js';
 import { PRESETS } from '../data/presets.js';
 import { CHARACTER_BY_ID } from '../data/characters.js';
+import { ARCS } from '../data/arcs.js';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 
@@ -13,6 +14,8 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
   const reactions = PAIR_REACTIONS.filter((r) => r.elements.includes(c.element));
   const trios = TRIO_REACTIONS.filter((r) => r.elements.includes(c.element));
   const presets = PRESETS.filter((p) => p.members.includes(c.id));
+  const signature = ARCS.find((a) => a.signature === c.id);
+  const arcCount = ARCS.filter((a) => a.type === c.arcType).length;
 
   return (
     <article className="detail" style={{ '--el': element.color }} aria-labelledby="detail-name">
@@ -20,7 +23,7 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
         <Portrait character={c} size="xl" />
         <div className="detail__title">
           <p className="eyebrow">
-            <ElementGlyph element={c.element} size={14} /> {element.name} · {c.rarity}-rank · {c.role}
+            <ElementGlyph element={c.element} size={14} /> {element.name} · {c.rarity}-rank · {c.roles.join(' · ')}
           </p>
           <h2 id="detail-name" className="detail__name">{c.name}</h2>
           {c.tags?.length > 0 && (
@@ -34,7 +37,8 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
 
       <div className="detail__grid">
         <dl className="facts">
-          <div><dt>Arc type</dt><dd>{c.arcType}</dd></div>
+          <div><dt>Arc type</dt><dd>{c.arcType} <span className="muted">· {arcCount} Arcs</span></dd></div>
+          {signature && <div><dt>Signature Arc</dt><dd>{signature.name}</dd></div>}
           <div><dt>Faction</dt><dd>{c.faction ?? '—'}</dd></div>
           <div><dt>Esper ability</dt><dd>{c.ability ?? '—'}</dd></div>
           {c.upcoming && <div><dt>Status</dt><dd>Upcoming</dd></div>}

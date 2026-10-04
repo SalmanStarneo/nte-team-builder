@@ -1,14 +1,23 @@
 import { TEAM_SIZE } from './analyze.js';
+import { MODULE_SLOTS } from '../data/gear.js';
 
 // All team changes go through this reducer, so the rules live in one place.
-// State shape: { teams: [{ id, name, members: [id|null x4] }], activeId, notice }
+// State shape: { teams: [{ id, name, members: [id|null x4], loadouts }], activeId, notice }
+// loadouts: { [characterId]: { arc, cartridge, modules: [{ type, stat } | null x4] } }
+// Loadouts are per team, so one character can be geared differently in two teams.
 
 let counter = 0;
 export const newId = () => `t${Date.now().toString(36)}${(counter++).toString(36)}`;
 const emptyMembers = () => Array(TEAM_SIZE).fill(null);
 
-export function makeTeam(name, members = emptyMembers()) {
-  return { id: newId(), name, members: [...members] };
+export function makeTeam(name, members = emptyMembers(), loadouts = {}) {
+  return { id: newId(), name, members: [...members], loadouts: structuredClone(loadouts) };
+}
+
+export const emptyLoadout = () => ({ arc: null, cartridge: null, modules: Array(MODULE_SLOTS).fill(null) });
+
+export function loadoutOf(team, charId) {
+  return team.loadouts?.[charId] ?? emptyLoadout();
 }
 
 export function initialState(saved) {
@@ -57,7 +66,7 @@ export function teamsReducer(state, action) {
     }
 
     case 'duplicate': {
-      const team = makeTeam(`${active.name} copy`, active.members);
+      const team = makeTeam(`${active.name} copy`, active.members, active.loadouts);
       return { ...state, teams: [...state.teams, team], activeId: team.id, notice: null };
     }
 
@@ -113,6 +122,15 @@ export function teamsReducer(state, action) {
         ...updateActive(state, (t) => ({ ...t, name: action.name, members: [...action.members] })),
         notice: `Loaded ${action.name} into this team.`,
       };
+
+    case 'setLoadout':
+      return updateActive(state, (t) => ({
+        ...t,
+        loadouts: {
+          ...t.loadouts,
+          [action.charId]: { ...loadoutOf(t, action.charId), ...action.patch },
+        },
+      }));
 
     case 'notice':
       return { ...state, notice: action.text };

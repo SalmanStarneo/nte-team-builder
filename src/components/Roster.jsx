@@ -28,7 +28,7 @@ export default function Roster({ members, analysis, usage, dispatch }) {
   const list = CHARACTERS.filter((c) => {
     if (c.upcoming && !showUpcoming) return false;
     if (element !== 'all' && c.element !== element) return false;
-    if (role !== 'all' && c.role !== role) return false;
+    if (role !== 'all' && !c.roles.includes(role)) return false;
     if (rarity !== 'all' && c.rarity !== rarity) return false;
     if (query && !c.name.toLowerCase().includes(query.trim().toLowerCase())) return false;
     return true;
@@ -118,7 +118,7 @@ export default function Roster({ members, analysis, usage, dispatch }) {
                       {c.name}
                       <span className={`rank rank--${c.rarity}`}>{c.rarity}</span>
                     </span>
-                    <span className="card__role">{c.role}</span>
+                    <span className="card__role">{c.roles.join(' · ')}</span>
                     {gains.length > 0 && (
                       <span className="card__gain">+ {gains.map((g) => g.name).join(', ')}</span>
                     )}

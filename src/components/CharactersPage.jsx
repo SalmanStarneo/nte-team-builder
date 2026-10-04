@@ -10,7 +10,7 @@ const COLUMNS = [
   { id: 'name', label: 'Character', get: (c) => c.name },
   { id: 'element', label: 'Element', get: (c) => ELEMENTS.findIndex((e) => e.id === c.element) },
   { id: 'rarity', label: 'Rank', get: (c) => c.rarity },
-  { id: 'role', label: 'Role', get: (c) => c.role },
+  { id: 'role', label: 'Roles', get: (c) => c.roles.join(', ') },
   { id: 'arcType', label: 'Arc type', get: (c) => c.arcType },
   { id: 'hp', label: 'HP', get: (c) => c.stats?.hp, numeric: true },
   { id: 'atk', label: 'ATK', get: (c) => c.stats?.atk, numeric: true },
@@ -42,7 +42,7 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
     const col = COLUMNS.find((c) => c.id === sort.id);
     return CHARACTERS.filter((c) => {
       if (element !== 'all' && c.element !== element) return false;
-      if (role !== 'all' && c.role !== role) return false;
+      if (role !== 'all' && !c.roles.includes(role)) return false;
       if (rarity !== 'all' && c.rarity !== rarity) return false;
       if (arcType !== 'all' && c.arcType !== arcType) return false;
       if (query && !c.name.toLowerCase().includes(query.trim().toLowerCase())) return false;
@@ -162,7 +162,7 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                   </span>
                 </td>
                 <td><span className={`rank rank--${c.rarity}`}>{c.rarity}</span></td>
-                <td>{c.role}</td>
+                <td>{c.roles.join(', ')}</td>
                 <td>{c.arcType}</td>
                 <td className="num">{c.stats ? c.stats.hp.toLocaleString('en-US') : '—'}</td>
                 <td className="num">{c.stats?.atk ?? '—'}</td>

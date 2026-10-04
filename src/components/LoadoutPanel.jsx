@@ -1,0 +1,161 @@
+import { ARC_BY_ID, arcsFor } from '../data/arcs.js';
+import { CARTRIDGES, CARTRIDGE_BY_ID, MODULE_STATS, MODULE_TYPES } from '../data/gear.js';
+import { ELEMENT_BY_ID } from '../data/elements.js';
+import Portrait from './Portrait.jsx';
+
+// Gear editor for one team member: Arc, Cartridge set and Console modules.
+export default function LoadoutPanel({ character: c, loadout, onChange, onClose }) {
+  const arcs = arcsFor(c);
+  const arc = loadout.arc && ARC_BY_ID[loadout.arc];
+  const cart = loadout.cartridge && CARTRIDGE_BY_ID[loadout.cartridge];
+  const ranks = ['S', 'A', 'B'].filter((r) => arcs.some((a) => a.rarity === r));
+
+  function setModule(i, patch) {
+    const modules = loadout.modules.map((m, j) => {
+      if (j !== i) return m;
+      const next = { type: 'II', stat: MODULE_STATS[0], ...m, ...patch };
+      return next.type ? next : null;
+    });
+    onChange({ modules });
+  }
+
+  return (
+    <section
+      className="loadout"
+      style={{ '--el': ELEMENT_BY_ID[c.element].color }}
+      aria-labelledby="loadout-title"
+    >
+      <header className="loadout__head">
+        <Portrait character={c} size="md" />
+        <div>
+          <p className="eyebrow">Loadout</p>
+          <h2 id="loadout-title" className="loadout__name">{c.name}</h2>
+        </div>
+        <button className="btn btn--quiet loadout__close" onClick={onClose} aria-label="Close loadout">
+          Done
+        </button>
+      </header>
+
+      <div className="loadout__grid">
+        {/* Arc */}
+        <div className="gear-block">
+          <label className="mini-title" htmlFor="gear-arc">
+            Arc <span>{c.arcType} only</span>
+          </label>
+          <select
+            id="gear-arc"
+            value={loadout.arc ?? ''}
+            onChange={(e) => onChange({ arc: e.target.value || null })}
+          >
+            <option value="">No Arc</option>
+            {ranks.map((r) => (
+              <optgroup key={r} label={`${r}-rank`}>
+                {arcs
+                  .filter((a) => a.rarity === r)
+                  .map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.signature === c.id ? '★ ' : ''}
+                      {a.name} · {a.atk} ATK
+                    </option>
+                  ))}
+              </optgroup>
+            ))}
+          </select>
+          {arc ? (
+            <div className="gear-card">
+              <div className="gear-card__top">
+                <span className={`rank rank--${arc.rarity}`}>{arc.rarity}</span>
+                <b>{arc.name}</b>
+                {arc.signature === c.id && <span className="sig">Signature</span>}
+              </div>
+              <dl className="gear-stats">
+                <div><dt>Base ATK</dt><dd>{arc.atk}</dd></div>
+                <div><dt>Secondary</dt><dd>{arc.sub}</dd></div>
+              </dl>
+              <p>{arc.passive}</p>
+            </div>
+          ) : (
+            <p className="muted small">
+              {arcs.some((a) => a.signature === c.id)
+                ? '★ marks this character’s signature Arc.'
+                : `${arcs.length} ${c.arcType} Arcs available.`}
+            </p>
+          )}
+        </div>
+
+        {/* Cartridge */}
+        <div className="gear-block">
+          <label className="mini-title" htmlFor="gear-cart">Cartridge set</label>
+          <select
+            id="gear-cart"
+            value={loadout.cartridge ?? ''}
+            onChange={(e) => onChange({ cartridge: e.target.value || null })}
+          >
+            <option value="">No set</option>
+            {CARTRIDGES.map((s) => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+          {cart ? (
+            <div className="gear-card">
+              <div className="gear-card__top"><b>{cart.name}</b></div>
+              <dl className="gear-bonus">
+                <div><dt>2-piece</dt><dd>{cart.two}</dd></div>
+                <div><dt>4-piece</dt><dd>{cart.four}</dd></div>
+              </dl>
+            </div>
+          ) : (
+            <p className="muted small">Set bonuses activate with 2 and 4 matching pieces.</p>
+          )}
+        </div>
+
+        {/* Modules */}
+        <div className="gear-block gear-block--wide">
+          <p className="mini-title">Console modules</p>
+          <ol className="modules">
+            {loadout.modules.map((m, i) => (
+              <li key={i} className={m ? 'module module--on' : 'module'}>
+                <span className="module__cells" aria-hidden="true">
+                  {Array.from({ length: 4 }, (_, k) => (
+                    <span
+                      key={k}
+                      className={
+                        m && k < MODULE_TYPES.find((t) => t.id === m.type).cells ? 'cell cell--on' : 'cell'
+                      }
+                    />
+                  ))}
+                </span>
+                <label className="sr-only" htmlFor={`mod-type-${i}`}>Module {i + 1} size</label>
+                <select
+                  id={`mod-type-${i}`}
+                  value={m?.type ?? ''}
+                  onChange={(e) => setModule(i, { type: e.target.value || null })}
+                >
+                  <option value="">Empty</option>
+                  {MODULE_TYPES.map((t) => (
+                    <option key={t.id} value={t.id}>{t.label} ({t.cells} cells)</option>
+                  ))}
+                </select>
+                <label className="sr-only" htmlFor={`mod-stat-${i}`}>Module {i + 1} main stat</label>
+                <select
+                  id={`mod-stat-${i}`}
+                  value={m?.stat ?? ''}
+                  disabled={!m}
+                  onChange={(e) => setModule(i, { stat: e.target.value })}
+                >
+                  {!m && <option value="">Main stat</option>}
+                  {MODULE_STATS.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </li>
+            ))}
+          </ol>
+          <p className="muted small">
+            Records each module’s size and main stat. Interactive Console grid placement is coming next.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}

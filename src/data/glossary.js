@@ -59,7 +59,7 @@ export const GLOSSARY = [
   {
     term: 'Role',
     category: 'Characters',
-    text: 'The in-game role label: Damage (deals most of the team’s damage), Buff (strengthens allies) or Survival (heals, shields or keeps the team alive).',
+    text: 'Damage (deals most of the team’s damage), Buff (strengthens allies) or Survival (heals, shields or keeps the team alive). Many characters cover more than one role; the first listed is their in-game role.',
   },
   {
     term: 'Main DPS',
@@ -95,7 +95,7 @@ export const GLOSSARY = [
     term: 'Arc type',
     also: 'Arc compatibility',
     category: 'Gear',
-    text: 'Each character is compatible with one of five Arc types: Solid, Liquid, Gas, Plasma or Condensate (some sources call it Synthesis). Matching the type is required to equip an Arc.',
+    text: 'Each character is compatible with one of five Arc types: Solid, Liquid, Gas, Plasma or Synthesis (some sources call it Condensate). Matching the type is required to equip an Arc.',
   },
   {
     term: 'Console',

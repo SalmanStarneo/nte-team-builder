@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useReducer } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import { CHARACTER_BY_ID, DATA_VERSION } from './data/characters.js';
 import { analyzeTeam, usageInOtherTeams } from './lib/analyze.js';
 import { navigate, useHashRoute, VIEWS } from './lib/route.js';
 import { decodeTeam } from './lib/share.js';
 import { loadState, saveState } from './lib/storage.js';
-import { initialState, teamsReducer } from './lib/teamsReducer.js';
+import { initialState, loadoutOf, teamsReducer } from './lib/teamsReducer.js';
 import Analysis from './components/Analysis.jsx';
 import CharactersPage from './components/CharactersPage.jsx';
+import LoadoutPanel from './components/LoadoutPanel.jsx';
 import GlossaryPage from './components/GlossaryPage.jsx';
 import Portrait from './components/Portrait.jsx';
 import Roster from './components/Roster.jsx';
@@ -18,6 +19,11 @@ export default function App() {
   const [state, dispatch] = useReducer(teamsReducer, null, () => initialState(loadState()));
   const route = useHashRoute();
   const active = state.teams.find((t) => t.id === state.activeId);
+
+  // Which team slot's loadout is open. Closes when switching teams.
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  useEffect(() => setSelectedSlot(null), [state.activeId]);
+  const selectedChar = selectedSlot != null ? CHARACTER_BY_ID[active.members[selectedSlot]] : null;
 
   const analysis = useMemo(() => analyzeTeam(active.members), [active.members]);
   const usage = useMemo(() => usageInOtherTeams(state.teams, state.activeId), [state.teams, state.activeId]);
@@ -87,7 +93,26 @@ export default function App() {
               </p>
             )}
 
-            <TeamSlots members={active.members} dispatch={dispatch} />
+            <TeamSlots
+              team={active}
+              selected={selectedChar ? selectedSlot : null}
+              onSelect={setSelectedSlot}
+              dispatch={dispatch}
+            />
+
+            {selectedChar ? (
+              <LoadoutPanel
+                key={selectedChar.id}
+                character={selectedChar}
+                loadout={loadoutOf(active, selectedChar.id)}
+                onChange={(patch) => dispatch({ type: 'setLoadout', charId: selectedChar.id, patch })}
+                onClose={() => setSelectedSlot(null)}
+              />
+            ) : (
+              active.members.some(Boolean) && (
+                <p className="hint">Select a team member to equip an Arc, Cartridge set and modules.</p>
+              )
+            )}
 
             <p className="notice" role="status" aria-live="polite">
               {state.notice}

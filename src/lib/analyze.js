@@ -28,7 +28,8 @@ export function analyzeTeam(memberIds) {
   const trios = TRIO_REACTIONS.filter((r) => r.elements.every((e) => present.has(e)));
 
   const roleCounts = { Damage: 0, Buff: 0, Survival: 0 };
-  for (const m of members) roleCounts[m.role] += 1;
+  // A character counts towards every role they cover.
+  for (const m of members) for (const r of m.roles) roleCounts[r] += 1;
 
   // Elements with no neighbour in the team can't take part in any reaction.
   const isolated = [...present].filter(

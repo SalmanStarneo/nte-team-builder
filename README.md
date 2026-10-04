@@ -11,6 +11,8 @@ Plan squads, browse every character, see which elemental reactions they trigger 
 ## Features
 
 - **Multiple saved teams.** Create, rename, duplicate and delete as many four-character teams as you need. Characters already used in another team are flagged, which helps when planning two-team endgame content.
+- **Loadouts.** Equip each team member with an Arc (filtered to their Arc type, signature Arcs marked), a Cartridge set with its 2- and 4-piece bonuses, and Console modules. Loadouts are saved per team.
+- **Multi-role characters.** Characters list every role they cover, such as Hotori as Buff and Damage, and role coverage counts all of them.
 - **Live synergy analysis.** An interactive Esper Cycle diagram highlights every pair and trio reaction the team can trigger, alongside role coverage and composition warnings.
 - **Roster with smart hints.** Filter by element, role and rank. Each character card shows which new reactions it would add to the current team.
 - **Community presets.** Load well-known team archetypes as a starting point.
@@ -56,7 +58,7 @@ Every push to `main` is built and published to GitHub Pages by `.github/workflow
 
 ```
 src/
-  data/          game data: elements, reactions, characters, presets, glossary
+  data/          game data: elements, characters, Arcs, Cartridges, presets, glossary
   lib/           team analysis, state, routing, share codes, storage
   components/    React UI components
   App.jsx        application shell
