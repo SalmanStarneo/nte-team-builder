@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ARCS, RECOMMENDED } from '../data/arcs.js';
 import { ARC_TYPES, CHARACTERS, CHARACTER_BY_ID } from '../data/characters.js';
 import Portrait from './Portrait.jsx';
+import RankBadge from './RankBadge.jsx';
 
 const RANKS = ['S', 'A', 'B'];
 const RANK_ORDER = { S: 0, A: 1, B: 2 };
@@ -108,7 +109,7 @@ export default function ArcsPage({ arcType }) {
             return (
               <li key={a.id} className="arc-card">
                 <div className="arc-card__top">
-                  <span className={`rank rank--${a.rarity}`}>{a.rarity}</span>
+                  <RankBadge rank={a.rarity} size={22} />
                   <h3 className="arc-card__name">{a.name}</h3>
                   {type === 'all' && <span className="arc-card__type">{a.type}</span>}
                 </div>

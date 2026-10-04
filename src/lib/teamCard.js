@@ -92,28 +92,41 @@ function pill(ctx, x, y, text, { bg, fg, font = `700 12px ${MONO}`, padX = 8, h 
   return w;
 }
 
-// Rank letter with the game's gradient and white outline.
+// Rank badge matching RankBadge.jsx: dark disc, heavy italic gradient letter,
+// white outline drawn under the fill.
+const RANK_FONT = '"Inter", "Arial Black", "Segoe UI Black", sans-serif';
 const RANK_GRADIENTS = {
-  S: ['#ffe46b', '#ff9a3c', '#ff3f8e'],
-  A: ['#ff6fd8', '#d84bff', '#9b45ff'],
-  B: ['#b14cff', '#7b7cff', '#4fd8ff'],
+  S: ['#ffe866', '#ff9d3a', '#ff3d8f'],
+  A: ['#ff7ad9', '#e04cff', '#9c46ff'],
+  B: ['#c35bff', '#7f7dff', '#47d9ff'],
 };
-function drawRank(ctx, rank, x, baseline, size) {
-  const stops = RANK_GRADIENTS[rank] ?? ['#c9cfdc', '#a0a8b8', '#7d869a'];
+function drawRank(ctx, rank, x, centerY, size) {
+  const stops = RANK_GRADIENTS[rank] ?? ['#d7dbe4', '#a9b0bf', '#7d869a'];
+  const r = size / 2;
+  const cx = x + r;
   ctx.save();
-  ctx.font = `italic 800 ${size}px ${DISPLAY}`;
-  ctx.textAlign = 'left';
-  // Span the cap height so the top colour shows on the letter itself.
-  const g = ctx.createLinearGradient(x, baseline - size * 0.72, x + size * 0.15, baseline);
+  ctx.beginPath();
+  ctx.arc(cx, centerY, r, 0, Math.PI * 2);
+  ctx.fillStyle = '#141826';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  const fs = size * 0.69;
+  ctx.font = `italic 900 ${fs}px ${RANK_FONT}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  const base = centerY + fs * 0.36;
+  const g = ctx.createLinearGradient(cx - r * 0.3, centerY - r, cx + r * 0.3, centerY + r);
   g.addColorStop(0, stops[0]);
-  g.addColorStop(0.45, stops[1]);
+  g.addColorStop(0.5, stops[1]);
   g.addColorStop(1, stops[2]);
   ctx.lineJoin = 'round';
-  ctx.lineWidth = 3;
+  ctx.lineWidth = size * 0.075;
   ctx.strokeStyle = '#ffffff';
-  ctx.strokeText(rank, x, baseline);
+  ctx.strokeText(rank, cx + 0.5, base);
   ctx.fillStyle = g;
-  ctx.fillText(rank, x, baseline);
+  ctx.fillText(rank, cx + 0.5, base);
   ctx.restore();
 }
 
@@ -124,6 +137,7 @@ async function ensureFonts() {
       document.fonts.load(`800 64px ${DISPLAY}`),
       document.fonts.load(`600 20px ${BODY}`),
       document.fonts.load(`500 12px ${MONO}`),
+      document.fonts.load(`italic 900 16px ${RANK_FONT}`),
     ]);
   } catch {
     /* fall back to system fonts */
@@ -262,9 +276,9 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     const elName = ELEMENT_BY_ID[c.element].name.toUpperCase();
     const elW = ctx.measureText(elName).width;
     ctx.textAlign = 'left';
-    const startX = cx - (elW + 26) / 2;
+    const startX = cx - (elW + 32) / 2;
     ctx.fillText(elName, startX, top + 199);
-    drawRank(ctx, c.rarity, startX + elW + 10, top + 202, 22);
+    drawRank(ctx, c.rarity, startX + elW + 8, top + 194, 24);
     ctx.textAlign = 'center';
     ctx.fillStyle = C.muted;
     ctx.font = `500 14px ${BODY}`;

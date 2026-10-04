@@ -5,6 +5,7 @@ import { navigate } from '../lib/route.js';
 import CharacterDetail from './CharacterDetail.jsx';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
+import RankBadge from './RankBadge.jsx';
 
 const COLUMNS = [
   { id: 'name', label: 'Character', get: (c) => c.name },
@@ -161,7 +162,7 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                     {ELEMENT_BY_ID[c.element].name}
                   </span>
                 </td>
-                <td><span className={`rank rank--${c.rarity}`}>{c.rarity}</span></td>
+                <td><RankBadge rank={c.rarity} size={22} /></td>
                 <td>{c.roles.join(', ')}</td>
                 <td>{c.arcType}</td>
                 <td className="num">{c.stats ? c.stats.hp.toLocaleString('en-US') : '—'}</td>

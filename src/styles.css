@@ -862,32 +862,27 @@ button {
   font-weight: 600;
   overflow-wrap: anywhere;
 }
-/* Rank letters in the game's style: heavy slanted letter, gradient fill,
-   thin white outline. */
-.rank {
+/* Rank badges (see RankBadge.jsx): dark disc, heavy italic gradient letter
+   with a white outline drawn under the fill. */
+.rank-badge {
   display: inline-block;
-  padding: 0 0.12em;
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.15rem;
+  flex: none;
+  vertical-align: middle;
+}
+.rank-badge__disc {
+  fill: #141826;
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 1;
+}
+.rank-badge__letter {
+  font-family: 'Inter', 'Arial Black', 'Segoe UI Black', system-ui, sans-serif;
+  font-weight: 900;
   font-style: italic;
-  line-height: 1;
-  transform: skewX(-8deg);
-  color: transparent;
-  background: linear-gradient(170deg, #c9cfdc, #7d869a);
-  -webkit-background-clip: text;
-  background-clip: text;
-  filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff)
-    drop-shadow(0 -1px 0 #fff) drop-shadow(0 1px 1.5px rgba(10, 12, 20, 0.55));
-}
-.rank--S {
-  background-image: linear-gradient(170deg, #ffe46b 0%, #ff9a3c 45%, #ff3f8e 100%);
-}
-.rank--A {
-  background-image: linear-gradient(170deg, #ff6fd8 0%, #d84bff 55%, #9b45ff 100%);
-}
-.rank--B {
-  background-image: linear-gradient(170deg, #b14cff 0%, #7b7cff 50%, #4fd8ff 100%);
+  font-size: 22px;
+  stroke: #ffffff;
+  stroke-width: 2.4px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
 }
 .card__role {
   font-size: 0.78rem;

@@ -2,6 +2,7 @@ import { ARC_BY_ID, arcTag, arcsFor } from '../data/arcs.js';
 import { CARTRIDGES, CARTRIDGE_BY_ID, MODULE_STATS, MODULE_TYPES, cartridgesFor } from '../data/gear.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import Portrait from './Portrait.jsx';
+import RankBadge from './RankBadge.jsx';
 
 // Gear editor for one team member: Arc, Cartridge set and Console modules.
 export default function LoadoutPanel({ character: c, loadout, onChange, onClose }) {
@@ -74,7 +75,7 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose 
           {arc ? (
             <div className="gear-card">
               <div className="gear-card__top">
-                <span className={`rank rank--${arc.rarity}`}>{arc.rarity}</span>
+                <RankBadge rank={arc.rarity} size={22} />
                 <b>{arc.name}</b>
                 {arcTagNow && <span className={`arc-tag arc-tag--${arcTagNow}`}>{TAG_LABEL[arcTagNow]}</span>}
               </div>
