@@ -1,7 +1,7 @@
 import { ELEMENTS, ELEMENT_BY_ID, PAIR_REACTIONS, TRIO_REACTIONS } from '../data/elements.js';
 import { PRESETS } from '../data/presets.js';
 import { CHARACTER_BY_ID } from '../data/characters.js';
-import { ARCS } from '../data/arcs.js';
+import { ARCS, ARC_BY_ID, RECOMMENDED } from '../data/arcs.js';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 
@@ -39,6 +39,12 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
         <dl className="facts">
           <div><dt>Arc type</dt><dd>{c.arcType} <span className="muted">· {arcCount} Arcs</span></dd></div>
           {signature && <div><dt>Signature Arc</dt><dd>{signature.name}</dd></div>}
+          {RECOMMENDED[c.id]?.length > 0 && (
+            <div>
+              <dt>Recommended Arcs</dt>
+              <dd>{RECOMMENDED[c.id].map((id) => ARC_BY_ID[id].name).join(', ')}</dd>
+            </div>
+          )}
           <div><dt>Faction</dt><dd>{c.faction ?? '—'}</dd></div>
           <div><dt>Esper ability</dt><dd>{c.ability ?? '—'}</dd></div>
           {c.upcoming && <div><dt>Status</dt><dd>Upcoming</dd></div>}

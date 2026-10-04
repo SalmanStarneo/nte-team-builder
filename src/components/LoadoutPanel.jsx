@@ -1,4 +1,4 @@
-import { ARC_BY_ID, arcsFor } from '../data/arcs.js';
+import { ARC_BY_ID, arcTag, arcsFor } from '../data/arcs.js';
 import { CARTRIDGES, CARTRIDGE_BY_ID, MODULE_STATS, MODULE_TYPES } from '../data/gear.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import Portrait from './Portrait.jsx';
@@ -8,7 +8,20 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose 
   const arcs = arcsFor(c);
   const arc = loadout.arc && ARC_BY_ID[loadout.arc];
   const cart = loadout.cartridge && CARTRIDGE_BY_ID[loadout.cartridge];
-  const ranks = ['S', 'A', 'B'].filter((r) => arcs.some((a) => a.rarity === r));
+  const TAG_LABEL = { sig: 'Signature', rec: 'Recommended' };
+  const picks = arcs.filter((a) => arcTag(a, c));
+  const others = arcs.filter((a) => !arcTag(a, c));
+  const ranks = ['S', 'A', 'B'].filter((r) => others.some((a) => a.rarity === r));
+  const arcOption = (a) => {
+    const tag = arcTag(a, c);
+    return (
+      <option key={a.id} value={a.id}>
+        {a.name}
+        {tag ? ` (${tag === 'sig' ? 'Sig' : 'Rec'})` : ''} · {a.rarity} · {a.atk} ATK
+      </option>
+    );
+  };
+  const arcTagNow = arc ? arcTag(arc, c) : null;
 
   function setModule(i, patch) {
     const modules = loadout.modules.map((m, j) => {
@@ -48,16 +61,10 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose 
             onChange={(e) => onChange({ arc: e.target.value || null })}
           >
             <option value="">No Arc</option>
+            {picks.length > 0 && <optgroup label="Signature & recommended">{picks.map(arcOption)}</optgroup>}
             {ranks.map((r) => (
               <optgroup key={r} label={`${r}-rank`}>
-                {arcs
-                  .filter((a) => a.rarity === r)
-                  .map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.signature === c.id ? '★ ' : ''}
-                      {a.name} · {a.atk} ATK
-                    </option>
-                  ))}
+                {others.filter((a) => a.rarity === r).map(arcOption)}
               </optgroup>
             ))}
           </select>
@@ -66,7 +73,7 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose 
               <div className="gear-card__top">
                 <span className={`rank rank--${arc.rarity}`}>{arc.rarity}</span>
                 <b>{arc.name}</b>
-                {arc.signature === c.id && <span className="sig">Signature</span>}
+                {arcTagNow && <span className={`arc-tag arc-tag--${arcTagNow}`}>{TAG_LABEL[arcTagNow]}</span>}
               </div>
               <dl className="gear-stats">
                 <div><dt>Base ATK</dt><dd>{arc.atk}</dd></div>
@@ -75,11 +82,26 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose 
               <p>{arc.passive}</p>
             </div>
           ) : (
-            <p className="muted small">
-              {arcs.some((a) => a.signature === c.id)
-                ? '★ marks this character’s signature Arc.'
-                : `${arcs.length} ${c.arcType} Arcs available.`}
-            </p>
+            <div className="arc-picks">
+              {picks.length > 0 ? (
+                picks.map((a) => {
+                  const tag = arcTag(a, c);
+                  return (
+                    <button
+                      key={a.id}
+                      type="button"
+                      className="arc-pick"
+                      onClick={() => onChange({ arc: a.id })}
+                    >
+                      <span className={`arc-tag arc-tag--${tag}`}>{tag === 'sig' ? 'Sig' : 'Rec'}</span>
+                      {a.name}
+                    </button>
+                  );
+                })
+              ) : (
+                <p className="muted small">{arcs.length} {c.arcType} Arcs available.</p>
+              )}
+            </div>
           )}
         </div>
 
