@@ -15,7 +15,16 @@ npm run dev     # starts the dev server, open the URL it prints
 
 To open it on your phone while developing, run `npm run dev -- --host` and visit the "Network" URL from your phone on the same Wi-Fi.
 
-`npm run build` creates a production version in `dist/`, ready to host for free on Vercel, Netlify or GitHub Pages.
+`npm run build` creates a production version in `dist/`.
+
+## Live site
+
+Every push to `main` builds and publishes the app to GitHub Pages
+(`.github/workflows/deploy.yml`):
+
+**https://salmanstarneo.github.io/nte-team-builder/**
+
+One-time setup: in the repo, go to **Settings → Pages** and set **Source** to **GitHub Actions**.
 
 ## How the project is organised
 
