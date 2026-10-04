@@ -45,7 +45,7 @@ export const ARCS = [
   arc('The Rain That Shook the World', 'S', 'Solid', 512, 'Crit Rate 22%', 'Cosmos DMG up on Redirect Skill and Ultimate.', 'zero'),
   arc('The Wrong Gate', 'S', 'Liquid', 570, 'ATK 30%', 'Anima DMG up; healing boosts allies’ DMG.'),
   arc('Voice of the Voyager', 'S', 'Plasma', 570, 'Crit Rate 24%', 'Support Skill Crit DMG up; stacks Ultimate Crit DMG.', 'linko'),
-  arc("What's Desired", 'S', 'Synthesis', 570, 'Crit Rate 24%', 'Lakshana DMG up; Crit DMG up after Redirect Skill or Ultimate.'),
+  arc("What's Desired", 'S', 'Synthesis', 570, 'Crit Rate 24%', 'Lakshana DMG up; Crit DMG up after Redirect Skill or Ultimate.', 'chaos'),
   arc('Your Happiness is Priceless', 'S', 'Solid', 512, 'DEF 38.5%', 'HP up; random heal or shield after Ultimate.'),
   arc('Youthful Fantasy', 'S', 'Liquid', 570, 'ATK 30%', 'Break Intensity up; summons Black Tome for Chaos DMG.', 'daffodill'),
   // A-rank
