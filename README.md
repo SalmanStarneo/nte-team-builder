@@ -18,6 +18,7 @@ Plan squads, browse every character, see which elemental reactions they trigger 
 - **Community presets.** Load well-known team archetypes as a starting point.
 - **Team codes.** Copy a compact code to share a team; paste a code to import one. Links ending in `#nte1~…` import the team automatically.
 - **Character index.** A sortable, filterable table of every Esper with rank, element, role, Arc type and base stats. Each character has a detail view with faction, Esper ability, reactions and featured teams.
+- **Arcs.** All Arcs with tabs for each Arc type (Solid, Liquid, Gas, Plasma, Condensate), rank filter, search, and the characters each Arc is the signature of or recommended for.
 - **Glossary.** Searchable definitions of game terms, from the Esper Cycle and reactions to Arcs, the Console and endgame modes.
 - **Light and dark themes**, following your system setting. Element colours match the in-game Esper Cycle.
 

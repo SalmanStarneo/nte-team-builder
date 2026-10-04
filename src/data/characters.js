@@ -1,6 +1,6 @@
 // Character roster. Update this file when a new patch adds characters.
 // Sources (Oct 2026): neverness.gg and Icy Veins character lists (rank, element,
-// role, arc type; Icy Veins calls Synthesis "Condensate"); Dexerto wiki profiles (faction, Esper ability, role tags,
+// role, arc type; some sources call Condensate "Synthesis"); Dexerto wiki profiles (faction, Esper ability, role tags,
 // Level 1 base stats). Fields set to null are not yet published by those sources.
 //
 // roles: the in-game role comes first; extra roles reflect what community
@@ -8,7 +8,7 @@
 // "upcoming: true" hides a character unless the "Show upcoming" filter is on.
 export const DATA_VERSION = '1.4';
 
-export const ARC_TYPES = ['Solid', 'Liquid', 'Gas', 'Plasma', 'Synthesis'];
+export const ARC_TYPES = ['Solid', 'Liquid', 'Gas', 'Plasma', 'Condensate'];
 
 const stats = (hp, atk, def) => ({ hp, atk, def, critRate: 5, critDmg: 50 });
 
@@ -16,7 +16,7 @@ export const CHARACTERS = [
   // S-rank
   {
     id: 'baicang', name: 'Baicang', rarity: 'S', element: 'incantation', roles: ['Damage'],
-    arcType: 'Synthesis', faction: 'Bureau of Anomaly Control, ETD-4', ability: 'Verdict and Autumn',
+    arcType: 'Condensate', faction: 'Bureau of Anomaly Control, ETD-4', ability: 'Verdict and Autumn',
     tags: ['Main DPS', 'DoT'], stats: stats(1370, 81, 66),
   },
   {
@@ -26,7 +26,7 @@ export const CHARACTERS = [
   },
   {
     id: 'chaos', name: 'Chaos', rarity: 'S', element: 'lakshana', roles: ['Damage'],
-    arcType: 'Synthesis', faction: 'ETD-6', ability: null,
+    arcType: 'Condensate', faction: 'ETD-6', ability: null,
     tags: ['Main DPS'], stats: null,
   },
   {
@@ -46,8 +46,8 @@ export const CHARACTERS = [
   },
   {
     id: 'fadia', name: 'Fadia', rarity: 'S', element: 'psyche', roles: ['Survival', 'Damage'],
-    arcType: 'Synthesis', faction: 'Bureau of Anomaly Control, ETD-4', ability: 'Lilith',
-    tags: ['DMG Redirection'], stats: stats(1410, 75, 75),
+    arcType: 'Condensate', faction: 'Bureau of Anomaly Control, ETD-4', ability: 'Lilith',
+    tags: ['Survival'], stats: stats(1410, 75, 75),
   },
   {
     id: 'hathor', name: 'Hathor', rarity: 'S', element: 'lakshana', roles: ['Damage', 'Buff'],
@@ -62,7 +62,7 @@ export const CHARACTERS = [
   {
     id: 'iroi', name: 'Iroi', rarity: 'S', element: 'anima', roles: ['Survival', 'Buff'],
     arcType: 'Liquid', faction: null, ability: null,
-    tags: ['Healing', 'Team ATK Buff'], stats: null,
+    tags: ['Survival', 'Team ATK Buff'], stats: null,
   },
   {
     id: 'jiuyuan', name: 'Jiuyuan', rarity: 'S', element: 'anima', roles: ['Damage', 'Survival'],
@@ -91,7 +91,7 @@ export const CHARACTERS = [
   },
   {
     id: 'shinku', name: 'Shinku', rarity: 'S', element: 'cosmos', roles: ['Damage'],
-    arcType: 'Synthesis', faction: null, ability: null,
+    arcType: 'Condensate', faction: null, ability: null,
     tags: ['Main DPS'], stats: null,
   },
   {
@@ -107,8 +107,8 @@ export const CHARACTERS = [
   // A-rank
   {
     id: 'adler', name: 'Adler', rarity: 'A', element: 'incantation', roles: ['Survival'],
-    arcType: 'Synthesis', faction: 'Eibon Antique Shop', ability: 'Ayatana',
-    tags: ['Shield', 'DoT'], stats: stats(1180, 55, 82),
+    arcType: 'Condensate', faction: 'Eibon Antique Shop', ability: 'Ayatana',
+    tags: ['Survival', 'DoT'], stats: stats(1180, 55, 82),
   },
   {
     id: 'aurelia', name: 'Aurelia', rarity: 'A', element: 'psyche', roles: ['Damage'],
@@ -118,7 +118,7 @@ export const CHARACTERS = [
   {
     id: 'edgar', name: 'Edgar', rarity: 'A', element: 'cosmos', roles: ['Survival'],
     arcType: 'Liquid', faction: 'Eibon Antique Shop', ability: "Finnegan's Vigil",
-    tags: ['Healing'], stats: stats(1350, 53, 68),
+    tags: ['Survival'], stats: stats(1350, 53, 68),
   },
   {
     id: 'haniel', name: 'Haniel', rarity: 'A', element: 'psyche', roles: ['Buff', 'Damage'],

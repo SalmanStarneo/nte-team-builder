@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
 
-// Tiny hash router: #builder, #characters, #character-<id>, #glossary.
+// Tiny hash router: #builder, #characters, #character-<id>, #arcs,
+// #arcs-<type>, #glossary.
 // Hashes stay plain tokens so links work everywhere the app is hosted.
 export const VIEWS = [
   { id: 'builder', label: 'Team Builder' },
   { id: 'characters', label: 'Characters' },
+  { id: 'arcs', label: 'Arcs' },
   { id: 'glossary', label: 'Glossary' },
 ];
 
 export function parseHash(hash) {
   const h = (hash || '').replace(/^#/, '');
   if (h.startsWith('character-')) return { view: 'characters', characterId: h.slice(10) };
+  if (h.startsWith('arcs-')) return { view: 'arcs', arcType: h.slice(5) };
   if (VIEWS.some((v) => v.id === h)) return { view: h, characterId: null };
   return { view: 'builder', characterId: null };
 }

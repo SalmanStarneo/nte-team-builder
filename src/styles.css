@@ -1529,3 +1529,135 @@ th[aria-sort='descending'] .th-btn {
 .cell--on {
   background: var(--el);
 }
+
+/* ---------- Arcs page ---------- */
+.type-tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+}
+.type-tab {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  color: var(--muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+.type-tab span {
+  font: 500 0.72rem var(--font-mono);
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+.type-tab:hover {
+  color: var(--fg);
+}
+.type-tab[aria-selected='true'] {
+  color: var(--fg);
+  border-bottom-color: var(--accent);
+}
+.wielders {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.wielders .mini-title {
+  margin: 0;
+}
+.wielders ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.wielder {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.wielder:hover {
+  border-color: var(--fg);
+}
+.filters--row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+.arc-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 10px;
+}
+.arc-card {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.arc-card__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.arc-card__name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  min-width: 0;
+}
+.arc-card__type {
+  margin-left: auto;
+  font: 500 0.7rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.arc-card__passive {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.arc-card__users {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.arc-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.arc-user--recs a {
+  display: inline-flex;
+}

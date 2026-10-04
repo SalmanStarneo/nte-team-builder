@@ -6,6 +6,7 @@ import { decodeTeam } from './lib/share.js';
 import { loadState, saveState } from './lib/storage.js';
 import { initialState, loadoutOf, teamsReducer } from './lib/teamsReducer.js';
 import Analysis from './components/Analysis.jsx';
+import ArcsPage from './components/ArcsPage.jsx';
 import CharactersPage from './components/CharactersPage.jsx';
 import LoadoutPanel from './components/LoadoutPanel.jsx';
 import GlossaryPage from './components/GlossaryPage.jsx';
@@ -79,6 +80,8 @@ export default function App() {
       {route.view === 'characters' && (
         <CharactersPage characterId={route.characterId} activeTeam={active} onAdd={addFromIndex} />
       )}
+
+      {route.view === 'arcs' && <ArcsPage arcType={route.arcType} />}
 
       {route.view === 'glossary' && <GlossaryPage />}
 

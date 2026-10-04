@@ -95,7 +95,7 @@ export const GLOSSARY = [
     term: 'Arc type',
     also: 'Arc compatibility',
     category: 'Gear',
-    text: 'Each character is compatible with one of five Arc types: Solid, Liquid, Gas, Plasma or Synthesis (some sources call it Condensate). Matching the type is required to equip an Arc.',
+    text: 'Each character is compatible with one of five Arc types: Solid, Liquid, Gas, Plasma or Condensate (some sources call it Synthesis). Matching the type is required to equip an Arc.',
   },
   {
     term: 'Console',
