@@ -1,5 +1,5 @@
 import { ARC_BY_ID, arcTag, arcsFor } from '../data/arcs.js';
-import { CARTRIDGES, CARTRIDGE_BY_ID, MODULE_STATS, MODULE_TYPES } from '../data/gear.js';
+import { CARTRIDGES, CARTRIDGE_BY_ID, MODULE_STATS, MODULE_TYPES, cartridgesFor } from '../data/gear.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import Portrait from './Portrait.jsx';
 
@@ -22,6 +22,9 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose 
     );
   };
   const arcTagNow = arc ? arcTag(arc, c) : null;
+  const recSets = cartridgesFor(c);
+  const otherSets = CARTRIDGES.filter((s) => !recSets.includes(s.id));
+  const cartIsRec = cart && recSets.includes(cart.id);
 
   function setModule(i, patch) {
     const modules = loadout.modules.map((m, j) => {
@@ -114,20 +117,42 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose 
             onChange={(e) => onChange({ cartridge: e.target.value || null })}
           >
             <option value="">No set</option>
-            {CARTRIDGES.map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
+            <optgroup label="Recommended">
+              {recSets.map((id) => (
+                <option key={id} value={id}>{CARTRIDGE_BY_ID[id].name} (Rec)</option>
+              ))}
+            </optgroup>
+            <optgroup label="Other sets">
+              {otherSets.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </optgroup>
           </select>
           {cart ? (
             <div className="gear-card">
-              <div className="gear-card__top"><b>{cart.name}</b></div>
+              <div className="gear-card__top">
+                <b>{cart.name}</b>
+                {cartIsRec && <span className="arc-tag arc-tag--rec">Recommended</span>}
+              </div>
               <dl className="gear-bonus">
                 <div><dt>2-piece</dt><dd>{cart.two}</dd></div>
                 <div><dt>4-piece</dt><dd>{cart.four}</dd></div>
               </dl>
             </div>
           ) : (
-            <p className="muted small">Set bonuses activate with 2 and 4 matching pieces.</p>
+            <>
+              <div className="arc-picks">
+                {recSets.map((id) => (
+                  <button key={id} type="button" className="arc-pick" onClick={() => onChange({ cartridge: id })}>
+                    <span className="arc-tag arc-tag--rec">Rec</span>
+                    {CARTRIDGE_BY_ID[id].name}
+                  </button>
+                ))}
+              </div>
+              <p className="muted small">
+                Recommended for {c.name}’s element and roles. Bonuses activate with 2 and 4 matching pieces.
+              </p>
+            </>
           )}
         </div>
 

@@ -20,6 +20,40 @@ export const CARTRIDGES = [
 
 export const CARTRIDGE_BY_ID = Object.fromEntries(CARTRIDGES.map((c) => [c.id, c]));
 
+// Recommended Cartridge sets, worked out from each character's element and
+// roles (no guide publishes a full per-character list yet):
+//   Damage   -> the set that boosts their element's DMG
+//   Buff     -> Speedy Hedgehog (team ATK after Ultimate)
+//   Survival -> by how they protect the team: healing, shields or HP
+// The character's first role decides which set is listed first.
+const ELEMENT_SET = {
+  cosmos: 'lost-radiance',
+  anima: 'fireflies-and-the-forest',
+  incantation: 'crimson-twin-butterflies',
+  chaos: 'diabolos',
+  psyche: 'devils-blood-curse',
+  lakshana: 'street-boxer',
+};
+
+const SURVIVAL_SET = {
+  heal: 'theas-night-tavern',
+  shield: 'kingdoms-guard',
+  hp: 'tiny-big-adventure',
+};
+
+// How each Survival character keeps the team alive.
+const SURVIVAL_STYLE = { adler: 'shield', edgar: 'heal', iroi: 'heal', fadia: 'hp' };
+
+export function cartridgesFor(character) {
+  const sets = [];
+  for (const role of character.roles) {
+    if (role === 'Damage') sets.push(ELEMENT_SET[character.element]);
+    if (role === 'Buff') sets.push('speedy-hedgehog', ELEMENT_SET[character.element]);
+    if (role === 'Survival') sets.push(SURVIVAL_SET[SURVIVAL_STYLE[character.id] ?? 'hp']);
+  }
+  return [...new Set(sets)];
+}
+
 // Modules are Tetris-like pieces placed on the Console. Size is the number of cells.
 export const MODULE_TYPES = [
   { id: 'II', label: 'Type II', cells: 2 },

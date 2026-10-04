@@ -1,6 +1,6 @@
 import { CHARACTER_BY_ID } from '../data/characters.js';
 import { ARC_BY_ID, arcTag } from '../data/arcs.js';
-import { CARTRIDGE_BY_ID } from '../data/gear.js';
+import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import { loadoutOf } from '../lib/teamsReducer.js';
 import Portrait from './Portrait.jsx';
@@ -49,6 +49,7 @@ export default function TeamSlots({ team, selected, onSelect, dispatch }) {
                 <span className="slot__gear-row">
                   <span className={cart ? 'gear-chip gear-chip--on' : 'gear-chip'} title={cart?.name ?? 'No Cartridge'}>
                     {cart ? cart.name.split(':')[0] : 'No set'}
+                    {cart && cartridgesFor(c).includes(cart.id) && <span className="chip-tag"> · Rec</span>}
                   </span>
                   <span className={moduleCount ? 'gear-chip gear-chip--on' : 'gear-chip'}>
                     {moduleCount}/4 mod

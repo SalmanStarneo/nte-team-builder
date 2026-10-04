@@ -43,7 +43,7 @@ export const ARCS = [
   arc('Tears Beneath the Mask', 'S', 'Gas', 512, 'ATK 27.5%', 'Ultimate debuffs enemies, lowering their DMG.'),
   arc('The Last Rose', 'S', 'Liquid', 570, 'Crit Rate 24%', 'ATK up; Chaos Thorn stacks build Crit DMG from DoT.', 'lacrimosa'),
   arc('The Rain That Shook the World', 'S', 'Solid', 512, 'Crit Rate 22%', 'Cosmos DMG up on Redirect Skill and Ultimate.', 'zero'),
-  arc('The Wrong Gate', 'S', 'Liquid', 570, 'ATK 30%', 'Anima DMG up; healing boosts allies’ DMG.'),
+  arc('The Wrong Gate', 'S', 'Liquid', 570, 'ATK 30%', 'Anima DMG up; healing boosts allies’ DMG.', 'iroi'),
   arc('Voice of the Voyager', 'S', 'Plasma', 570, 'Crit Rate 24%', 'Support Skill Crit DMG up; stacks Ultimate Crit DMG.', 'linko'),
   arc("What's Desired", 'S', 'Condensate', 570, 'Crit Rate 24%', 'Lakshana DMG up; Crit DMG up after Redirect Skill or Ultimate.', 'chaos'),
   arc('Your Happiness is Priceless', 'S', 'Solid', 512, 'DEF 38.5%', 'HP up; random heal or shield after Ultimate.'),

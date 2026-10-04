@@ -2,6 +2,7 @@ import { ELEMENTS, ELEMENT_BY_ID, PAIR_REACTIONS, TRIO_REACTIONS } from '../data
 import { PRESETS } from '../data/presets.js';
 import { CHARACTER_BY_ID } from '../data/characters.js';
 import { ARCS, ARC_BY_ID, RECOMMENDED } from '../data/arcs.js';
+import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 
@@ -55,6 +56,10 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
           )}
           <div><dt>Faction</dt><dd>{c.faction ?? '—'}</dd></div>
           <div><dt>Esper ability</dt><dd>{c.ability ?? '—'}</dd></div>
+          <div>
+            <dt>Recommended Cartridges</dt>
+            <dd>{cartridgesFor(c).map((id) => CARTRIDGE_BY_ID[id].name).join(', ')}</dd>
+          </div>
           {c.upcoming && <div><dt>Status</dt><dd>Upcoming</dd></div>}
         </dl>
 
