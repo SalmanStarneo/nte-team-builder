@@ -12,6 +12,7 @@ Plan squads, browse every character, see which elemental reactions they trigger 
 
 - **Multiple saved teams.** Create, rename, duplicate and delete as many four-character teams as you need. Characters already used in another team are flagged, which helps when planning two-team endgame content.
 - **Loadouts.** Equip each team member with an Arc (filtered to their Arc type, signature Arcs marked), a Cartridge set with its 2- and 4-piece bonuses, and Console modules. Loadouts are saved per team.
+- **Duplicates and awakenings.** Set how many duplicates each team member has (0 to 6) and turn on any awakenings up to that number, in any order. Arcs track duplicate copies too (up to +4). Character pages list all six awakenings.
 - **Multi-role characters.** Characters list every role they cover, such as Hotori as Buff and Damage, and role coverage counts all of them.
 - **Live synergy analysis.** An interactive Esper Cycle diagram highlights every pair and trio reaction the team can trigger, alongside role coverage and composition warnings.
 - **Roster with smart hints.** Filter by element, role and rank. Each character card shows which new reactions it would add to the current team.

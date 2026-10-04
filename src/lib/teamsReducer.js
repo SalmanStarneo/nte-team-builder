@@ -1,9 +1,12 @@
 import { TEAM_SIZE } from './analyze.js';
 import { MODULE_SLOTS } from '../data/gear.js';
+import { MAX_ARC_DUPES, MAX_DUPES } from '../data/awakenings.js';
 
 // All team changes go through this reducer, so the rules live in one place.
 // State shape: { teams: [{ id, name, members: [id|null x4], loadouts }], activeId, notice }
-// loadouts: { [characterId]: { arc, cartridge, modules: [{ type, stat } | null x4] } }
+// loadouts: { [characterId]: { arc, arcDupes, cartridge, modules: [{ type, stat } | null x4],
+//   dupes, awakenings: ['A4', 'A1', ...] } }
+// dupes = extra copies (0 = one copy). Up to `dupes` awakenings may be on, in any order.
 // Loadouts are per team, so one character can be geared differently in two teams.
 
 let counter = 0;
@@ -14,10 +17,18 @@ export function makeTeam(name, members = emptyMembers(), loadouts = {}) {
   return { id: newId(), name, members: [...members], loadouts: structuredClone(loadouts) };
 }
 
-export const emptyLoadout = () => ({ arc: null, cartridge: null, modules: Array(MODULE_SLOTS).fill(null) });
+export const emptyLoadout = () => ({
+  arc: null,
+  arcDupes: 0,
+  cartridge: null,
+  modules: Array(MODULE_SLOTS).fill(null),
+  dupes: 0,
+  awakenings: [],
+});
 
 export function loadoutOf(team, charId) {
-  return team.loadouts?.[charId] ?? emptyLoadout();
+  // Merge with defaults so loadouts saved before new fields existed still work.
+  return { ...emptyLoadout(), ...(team.loadouts?.[charId] ?? {}) };
 }
 
 export function initialState(saved) {
@@ -131,6 +142,47 @@ export function teamsReducer(state, action) {
           [action.charId]: { ...loadoutOf(t, action.charId), ...action.patch },
         },
       }));
+
+    case 'setDupes': {
+      const dupes = Math.max(0, Math.min(MAX_DUPES, action.dupes));
+      return updateActive(state, (t) => {
+        const cur = loadoutOf(t, action.charId);
+        // Fewer copies than active awakenings: keep the ones chosen first.
+        const awakenings = cur.awakenings.slice(0, dupes);
+        return { ...t, loadouts: { ...t.loadouts, [action.charId]: { ...cur, dupes, awakenings } } };
+      });
+    }
+
+    case 'setArcDupes': {
+      const arcDupes = Math.max(0, Math.min(MAX_ARC_DUPES, action.arcDupes));
+      return updateActive(state, (t) => ({
+        ...t,
+        loadouts: { ...t.loadouts, [action.charId]: { ...loadoutOf(t, action.charId), arcDupes } },
+      }));
+    }
+
+    case 'toggleAwakening': {
+      const t0 = state.teams.find((t) => t.id === state.activeId);
+      const cur = loadoutOf(t0, action.charId);
+      const on = cur.awakenings.includes(action.id);
+      if (!on && cur.awakenings.length >= cur.dupes) {
+        return {
+          ...state,
+          notice:
+            cur.dupes === 0
+              ? 'Add a duplicate first: each one unlocks an awakening.'
+              : `All ${cur.dupes} awakening slot${cur.dupes > 1 ? 's are' : ' is'} in use. Turn one off or add a duplicate.`,
+        };
+      }
+      const awakenings = on ? cur.awakenings.filter((x) => x !== action.id) : [...cur.awakenings, action.id];
+      return {
+        ...updateActive(state, (t) => ({
+          ...t,
+          loadouts: { ...t.loadouts, [action.charId]: { ...cur, awakenings } },
+        })),
+        notice: null,
+      };
+    }
 
     case 'notice':
       return { ...state, notice: action.text };

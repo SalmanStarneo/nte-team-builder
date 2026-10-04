@@ -70,7 +70,7 @@ export const GLOSSARY = [
     term: 'Awakening',
     also: 'A1 to A6',
     category: 'Characters',
-    text: 'Upgrades unlocked with duplicate copies of a character. Each of the six levels adds a new effect to their kit.',
+    text: 'Six optional upgrades (A1 to A6) for a character. Each duplicate copy unlocks one awakening slot, and you can turn on any awakenings up to that number, in any order or none at all.',
   },
   {
     term: 'Resonance',

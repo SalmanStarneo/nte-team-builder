@@ -3,9 +3,11 @@ import { CARTRIDGES, CARTRIDGE_BY_ID, MODULE_STATS, MODULE_TYPES, cartridgesFor 
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
+import { AWAKENINGS, MAX_ARC_DUPES, MAX_DUPES } from '../data/awakenings.js';
 
 // Gear editor for one team member: Arc, Cartridge set and Console modules.
-export default function LoadoutPanel({ character: c, loadout, onChange, onClose }) {
+export default function LoadoutPanel({ character: c, loadout, onChange, onClose, dispatch }) {
+  const awakenings = AWAKENINGS[c.id];
   const arcs = arcsFor(c);
   const arc = loadout.arc && ARC_BY_ID[loadout.arc];
   const cart = loadout.cartridge && CARTRIDGE_BY_ID[loadout.cartridge];
@@ -54,6 +56,60 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose 
       </header>
 
       <div className="loadout__grid">
+        {/* Duplicates and awakenings */}
+        <div className="gear-block gear-block--wide">
+          <div className="awaken-head">
+            <label className="mini-title" htmlFor="gear-dupes">
+              Duplicates <span>{loadout.awakenings.length}/{loadout.dupes} awakenings on</span>
+            </label>
+            <div className="stepper" role="group" aria-label="Duplicate copies">
+              {Array.from({ length: MAX_DUPES + 1 }, (_, n) => (
+                <button
+                  key={n}
+                  type="button"
+                  className="stepper__btn"
+                  aria-pressed={loadout.dupes === n}
+                  title={n === 0 ? 'No duplicates: one copy' : `${n} duplicate${n > 1 ? 's' : ''}`}
+                  onClick={() => dispatch({ type: 'setDupes', charId: c.id, dupes: n })}
+                >
+                  {n === 0 ? '0' : `+${n}`}
+                </button>
+              ))}
+            </div>
+          </div>
+          {awakenings ? (
+            <ul className="awaken-pick">
+              {awakenings.map((w) => {
+                const on = loadout.awakenings.includes(w.id);
+                const full = !on && loadout.awakenings.length >= loadout.dupes;
+                return (
+                  <li key={w.id}>
+                    <button
+                      type="button"
+                      className={`awaken-btn${on ? ' is-on' : ''}${full ? ' is-locked' : ''}`}
+                      aria-pressed={on}
+                      onClick={() => dispatch({ type: 'toggleAwakening', charId: c.id, id: w.id })}
+                    >
+                      <span className="awaken-id">{w.id}</span>
+                      <span className="awaken-body">
+                        <b>{w.name}</b>
+                        <span>{w.effect}</span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="muted small">Awakenings will be added once they’re published.</p>
+          )}
+          <p className="muted small">
+            {loadout.dupes === 0
+              ? 'Add duplicates to unlock awakenings. Each one lets you turn on any awakening, in any order.'
+              : `${loadout.dupes - loadout.awakenings.length} of ${loadout.dupes} slot${loadout.dupes > 1 ? 's' : ''} free. Pick any awakenings, in any order.`}
+          </p>
+        </div>
+
         {/* Arc */}
         <div className="gear-block">
           <label className="mini-title" htmlFor="gear-arc">
@@ -72,6 +128,22 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose 
               </optgroup>
             ))}
           </select>
+          {arc && (
+            <label className="arc-dupes">
+              <span>Arc copies</span>
+              <select
+                id="gear-arc-dupes"
+                value={loadout.arcDupes}
+                onChange={(e) => dispatch({ type: 'setArcDupes', charId: c.id, arcDupes: Number(e.target.value) })}
+              >
+                {Array.from({ length: MAX_ARC_DUPES + 1 }, (_, n) => (
+                  <option key={n} value={n}>
+                    {n === 0 ? '1 copy (base)' : n === MAX_ARC_DUPES ? `+${n} duplicates (max)` : `+${n} duplicate${n > 1 ? 's' : ''}`}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           {arc ? (
             <div className="gear-card">
               <div className="gear-card__top">

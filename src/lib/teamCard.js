@@ -266,6 +266,22 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     ctx.lineWidth = 4;
     ctx.stroke();
 
+    // Awakenings badge, top-right corner
+    const gearAw = loadoutOf(team, c.id);
+    const awText = gearAw.awakenings.length
+      ? [...gearAw.awakenings].sort().join(' ')
+      : gearAw.dupes
+        ? `+${gearAw.dupes}`
+        : 'A0';
+    ctx.font = `700 12px ${MONO}`;
+    const awW = ctx.measureText(awText).width + 16;
+    pill(ctx, x + cw - 12 - awW, top + 16, awText, {
+      bg: gearAw.awakenings.length ? el : C.panel2,
+      fg: gearAw.awakenings.length ? C.bg : C.muted,
+      font: `700 12px ${MONO}`,
+      h: 22,
+    });
+
     // Name and element
     ctx.textAlign = 'center';
     ctx.fillStyle = C.fg;
@@ -300,11 +316,16 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     ctx.lineTo(gx + gw, gy - 12);
     ctx.stroke();
 
-    const gearRow = (label, value, tag) => {
+    const gearRow = (label, value, tag, extra) => {
       ctx.fillStyle = C.muted;
       ctx.font = `500 11px ${MONO}`;
       ctx.fillText(label, gx, gy + 4);
       let lx = gx + ctx.measureText(label).width + 8;
+      if (extra) {
+        ctx.fillStyle = C.fg;
+        ctx.fillText(extra, lx, gy + 4);
+        lx += ctx.measureText(extra).width + 8;
+      }
       if (tag) {
         pill(ctx, lx, gy - 9, tag === 'sig' ? 'SIG' : 'REC', {
           bg: tag === 'sig' ? C.sig : '#2a3150',
@@ -320,7 +341,7 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
       lines.forEach((ln, k) => ctx.fillText(ln, gx, gy + 24 + k * 19));
       gy += 30 + lines.length * 19;
     };
-    gearRow('ARC', arc?.name, arc ? arcTag(arc, c) : null);
+    gearRow('ARC', arc?.name, arc ? arcTag(arc, c) : null, arc && gear.arcDupes ? `+${gear.arcDupes}` : null);
     gearRow('CARTRIDGE', cart?.name, cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null);
   });
 

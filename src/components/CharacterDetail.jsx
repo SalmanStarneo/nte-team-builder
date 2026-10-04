@@ -7,6 +7,7 @@ import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import AscensionPlanner from './AscensionPlanner.jsx';
 import StatIcon from './StatIcon.jsx';
+import { AWAKENINGS } from '../data/awakenings.js';
 
 const fmt = (n) => n.toLocaleString('en-US');
 
@@ -119,6 +120,30 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
             </li>
           ))}
         </ul>
+      </section>
+
+      <section>
+        <h3 className="mini-title">Awakenings</h3>
+        {AWAKENINGS[c.id] ? (
+          <>
+            <ol className="awaken-list">
+              {AWAKENINGS[c.id].map((w) => (
+                <li key={w.id}>
+                  <span className="awaken-id">{w.id}</span>
+                  <span className="awaken-body">
+                    <b>{w.name}</b>
+                    <span>{w.effect}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+            <p className="muted small">
+              Each duplicate unlocks one awakening of your choice, in any order.
+            </p>
+          </>
+        ) : (
+          <p className="muted small">Awakenings will be added once they’re published.</p>
+        )}
       </section>
 
       <AscensionPlanner key={c.id} character={c} />

@@ -22,7 +22,6 @@ export default function TeamSlots({ team, selected, onSelect, dispatch }) {
         const gear = loadoutOf(team, c.id);
         const arc = gear.arc && ARC_BY_ID[gear.arc];
         const cart = gear.cartridge && CARTRIDGE_BY_ID[gear.cartridge];
-        const moduleCount = gear.modules.filter(Boolean).length;
         const isSelected = selected === index;
         return (
           <li
@@ -51,8 +50,15 @@ export default function TeamSlots({ team, selected, onSelect, dispatch }) {
                     {cart ? cart.name.split(':')[0] : 'No set'}
                     {cart && cartridgesFor(c).includes(cart.id) && <span className="chip-tag"> · Rec</span>}
                   </span>
-                  <span className={moduleCount ? 'gear-chip gear-chip--on' : 'gear-chip'}>
-                    {moduleCount}/4 mod
+                  <span
+                    className={gear.dupes ? 'gear-chip gear-chip--on' : 'gear-chip'}
+                    title={gear.awakenings.length ? `Awakenings: ${gear.awakenings.join(', ')}` : 'No awakenings'}
+                  >
+                    {gear.awakenings.length
+                      ? [...gear.awakenings].sort().join(' ')
+                      : gear.dupes
+                        ? `+${gear.dupes} · none on`
+                        : 'A0'}
                   </span>
                 </span>
               </span>
