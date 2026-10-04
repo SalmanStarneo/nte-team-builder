@@ -4,7 +4,7 @@ An unofficial, fan-made team planner for **Neverness to Everness (NTE)**.
 
 **Live app: https://salmanstarneo.github.io/nte-team-builder/**
 
-Plan squads, see which elemental reactions they trigger on the Esper Cycle, and share teams with a short code. Works in any modern browser on desktop and mobile, with no account or installation.
+Plan squads, browse every character, see which elemental reactions they trigger on the Esper Cycle, and share teams with a short code. Works in any modern browser on desktop and mobile, with no account or installation.
 
 > NTE Team Builder is not affiliated with, endorsed by, or sponsored by Hotta Studio or Perfect World Games. See [Legal](#legal).
 
@@ -15,7 +15,9 @@ Plan squads, see which elemental reactions they trigger on the Esper Cycle, and 
 - **Roster with smart hints.** Filter by element, role and rank. Each character card shows which new reactions it would add to the current team.
 - **Community presets.** Load well-known team archetypes as a starting point.
 - **Team codes.** Copy a compact code to share a team; paste a code to import one. Links ending in `#nte1~…` import the team automatically.
-- **Light and dark themes**, following your system setting.
+- **Character index.** A sortable, filterable table of every Esper with rank, element, role, Arc type and base stats. Each character has a detail view with faction, Esper ability, reactions and featured teams.
+- **Glossary.** Searchable definitions of game terms, from the Esper Cycle and reactions to Arcs, the Console and endgame modes.
+- **Light and dark themes**, following your system setting. Element colours match the in-game Esper Cycle.
 
 ## Reaction model
 
@@ -54,8 +56,8 @@ Every push to `main` is built and published to GitHub Pages by `.github/workflow
 
 ```
 src/
-  data/          game data: elements, reactions, characters, presets
-  lib/           team analysis, state management, share codes, storage
+  data/          game data: elements, reactions, characters, presets, glossary
+  lib/           team analysis, state, routing, share codes, storage
   components/    React UI components
   App.jsx        application shell
   styles.css     styles and theme tokens

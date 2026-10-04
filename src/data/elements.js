@@ -1,13 +1,13 @@
 // The six elements, in Esper Cycle order. Each element reacts with its two
 // neighbours on the ring (index - 1 and index + 1, wrapping around).
-// Colors are this app's own choices, not official game assets.
+// Colours match the in-game Esper Cycle; values are theme tokens in styles.css.
 export const ELEMENTS = [
-  { id: 'cosmos', name: 'Cosmos', color: '#5a6cf0' },
-  { id: 'anima', name: 'Anima', color: '#22a97c' },
-  { id: 'incantation', name: 'Incantation', color: '#d39a1c' },
-  { id: 'chaos', name: 'Chaos', color: '#e0465c' },
-  { id: 'psyche', name: 'Psyche', color: '#9b6cf2' },
-  { id: 'lakshana', name: 'Lakshana', color: '#1aa5bd' },
+  { id: 'cosmos', name: 'Cosmos', color: 'var(--el-cosmos)' },
+  { id: 'anima', name: 'Anima', color: 'var(--el-anima)' },
+  { id: 'incantation', name: 'Incantation', color: 'var(--el-incantation)' },
+  { id: 'chaos', name: 'Chaos', color: 'var(--el-chaos)' },
+  { id: 'psyche', name: 'Psyche', color: 'var(--el-psyche)' },
+  { id: 'lakshana', name: 'Lakshana', color: 'var(--el-lakshana)' },
 ];
 
 export const ELEMENT_BY_ID = Object.fromEntries(ELEMENTS.map((e) => [e.id, e]));
