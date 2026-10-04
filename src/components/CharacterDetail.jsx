@@ -42,7 +42,12 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
           {RECOMMENDED[c.id]?.length > 0 && (
             <div>
               <dt>Recommended Arcs</dt>
-              <dd>{RECOMMENDED[c.id].map((id) => ARC_BY_ID[id].name).join(', ')}</dd>
+              <dd>
+                {RECOMMENDED[c.id]
+                  .filter((id) => ARC_BY_ID[id].signature !== c.id)
+                  .map((id) => ARC_BY_ID[id].name)
+                  .join(', ')}
+              </dd>
             </div>
           )}
           <div><dt>Faction</dt><dd>{c.faction ?? '—'}</dd></div>

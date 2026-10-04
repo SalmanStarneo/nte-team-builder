@@ -2,7 +2,8 @@
 // Sources (Oct 2026): neverness.gg Arc list (type, rarity, stats) and Icy Veins
 // weapon pages for Arcs added after that list. Passives are short summaries;
 // check in-game text for exact values.
-// "signature" links an Arc to the character it was released with.
+// "signature" links an Arc to the character whose kit its passive is built
+// around. Signatures cross-checked against GameWith's top pick per character.
 
 const arc = (name, rarity, type, atk, sub, passive, signature = null) => ({
   id: name.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
@@ -19,34 +20,34 @@ export const ARCS = [
   // S-rank
   arc('Blow up the Crowd', 'S', 'Solid', 512, 'ATK 27.5%', 'Raises ATK while off-field; Basic Attacks boost Psyche DMG.'),
   arc('Blushing Mirage', 'S', 'Synthesis', 570, 'Crit Rate 24%', 'ATK +20%. After Ultimate, Cosmos DMG +32% and ignores 12% DEF for 20s.', 'shinku'),
-  arc('Camellia Society', 'S', 'Synthesis', 666, 'Crit Rate 12%', 'Crit DMG stacks as HP drops; triggers Silent Garden attacks.'),
-  arc('Contemplative Cat', 'S', 'Gas', 512, 'Crit DMG 44%', 'Cosmos DMG rises with Fons held, up to 10 stacks.'),
+  arc('Camellia Society', 'S', 'Synthesis', 666, 'Crit Rate 12%', 'Crit DMG stacks as HP drops; triggers Silent Garden attacks.', 'baicang'),
+  arc('Contemplative Cat', 'S', 'Gas', 512, 'Crit DMG 44%', 'Cosmos DMG rises with Fons held, up to 10 stacks.', 'chiz'),
   arc('Crime and Punishment', 'S', 'Gas', 570, 'Crit Rate 24%', 'Psyche DMG +20% and Cycle Intensity up. After Ultimate, team Crit DMG up.', 'blackbird'),
-  arc('Day Off', 'S', 'Solid', 512, 'Charge Efficiency 33%', 'ATK up; defeating enemies restores Ultimate Energy.'),
-  arc('Eternal Waltz', 'S', 'Synthesis', 424, 'HP 41.25%', 'Max HP up; Mental DMG up after Ultimate.'),
+  arc('Day Off', 'S', 'Solid', 512, 'Charge Efficiency 33%', 'ATK up; Eclipse restores Ultimate Energy on kills. Free from the Eclipse side quest; built for Esper Zero.'),
+  arc('Eternal Waltz', 'S', 'Synthesis', 424, 'HP 41.25%', 'Max HP up; Mental DMG up after Ultimate.', 'fadia'),
   arc('Far Side of the Moon', 'S', 'Liquid', 570, 'Crit DMG 48%', 'Crit Rate +16%; stacking Basic Attack and Redirect Skill DMG.', 'akane'),
   arc('Fluff of Fearlessness', 'S', 'Solid', 512, 'Crit Rate 22%', 'ATK up for 10s after Ultimate.'),
   arc('Fluff of Ferocity', 'S', 'Synthesis', 512, 'ATK 27.5%', 'Crit DMG stacks on critical hits, up to 10.'),
   arc('Fluff of Finesse', 'S', 'Gas', 512, 'ATK 27.5%', 'DMG up for 10s after a Critical Dodge, up to 3 stacks.'),
   arc('Fluff of Fleetness', 'S', 'Liquid', 512, 'Crit DMG 44%', 'ATK stacks each second on-field, up to 5.'),
   arc('Fluff of Fortitude', 'S', 'Plasma', 512, 'ATK 27.5%', 'DMG up; more against enemies below 50% HP.'),
-  arc("Good Boy's Grand Adventure", 'S', 'Gas', 474, 'ATK 45%', 'Charge Efficiency and team ATK up after Ultimate.'),
+  arc("Good Boy's Grand Adventure", 'S', 'Gas', 474, 'ATK 45%', 'Charge Efficiency and team ATK up after Ultimate.', 'sakiri'),
   arc("Hethereau's Keeper", 'S', 'Solid', 512, 'ATK 27.5%', 'ATK and Boss DMG up; summons Officer Whisker.'),
-  arc('Marching Beyond Time', 'S', 'Solid', 570, 'Crit Rate 24%', 'ATK up; Wastetime stacks raise Ultimate Crit DMG.'),
-  arc('Raging Flames', 'S', 'Plasma', 666, 'Crit DMG 24%', 'Stacking Redirect Skill DMG after Ultimate.'),
+  arc('Marching Beyond Time', 'S', 'Solid', 570, 'Crit Rate 24%', 'ATK up; Wastetime stacks raise Ultimate Crit DMG.', 'hotori'),
+  arc('Raging Flames', 'S', 'Plasma', 666, 'Crit DMG 24%', 'Stacking Redirect Skill DMG after Ultimate.', 'hathor'),
   arc('Ravenous Blade', 'S', 'Gas', 570, 'Crit Rate 24%', 'Crit Rate +16%; stacking Crit DMG when dealing Incantation DMG.', 'zankou'),
-  arc('Ready-Ready', 'S', 'Plasma', 570, 'Crit Rate 24%', 'ATK and Basic Attack DMG up; Tiger Talismans add Boss DMG.'),
-  arc('Reality Refuge', 'S', 'Solid', 570, 'ATK 30%', 'Anima DMG up; Attachment DMG doubled after Ultimate.'),
+  arc('Ready-Ready', 'S', 'Plasma', 570, 'Crit Rate 24%', 'ATK and Basic Attack DMG up; Tiger Talismans add Boss DMG.', 'nanally'),
+  arc('Reality Refuge', 'S', 'Solid', 570, 'ATK 30%', 'Anima DMG up; Attachment DMG doubled after Ultimate.', 'jiuyuan'),
   arc('Song of the Whale', 'S', 'Plasma', 512, 'ATK 27.5%', 'ATK and DMG vs Broken enemies up; heals on Broken kills.'),
   arc('Stellar Veil', 'S', 'Plasma', 512, 'ATK 27.5%', 'Psyche DMG up; Crit DMG stacks on Psyche hits.'),
   arc('Tears Beneath the Mask', 'S', 'Gas', 512, 'ATK 27.5%', 'Ultimate debuffs enemies, lowering their DMG.'),
-  arc('The Last Rose', 'S', 'Liquid', 570, 'Crit Rate 24%', 'ATK up; Chaos Thorn stacks build Crit DMG from DoT.'),
+  arc('The Last Rose', 'S', 'Liquid', 570, 'Crit Rate 24%', 'ATK up; Chaos Thorn stacks build Crit DMG from DoT.', 'lacrimosa'),
   arc('The Rain That Shook the World', 'S', 'Solid', 512, 'Crit Rate 22%', 'Cosmos DMG up on Redirect Skill and Ultimate.', 'zero'),
   arc('The Wrong Gate', 'S', 'Liquid', 570, 'ATK 30%', 'Anima DMG up; healing boosts allies’ DMG.'),
   arc('Voice of the Voyager', 'S', 'Plasma', 570, 'Crit Rate 24%', 'Support Skill Crit DMG up; stacks Ultimate Crit DMG.', 'linko'),
   arc("What's Desired", 'S', 'Synthesis', 570, 'Crit Rate 24%', 'Lakshana DMG up; Crit DMG up after Redirect Skill or Ultimate.'),
   arc('Your Happiness is Priceless', 'S', 'Solid', 512, 'DEF 38.5%', 'HP up; random heal or shield after Ultimate.'),
-  arc('Youthful Fantasy', 'S', 'Liquid', 570, 'ATK 30%', 'Break Intensity up; summons Black Tome for Chaos DMG.'),
+  arc('Youthful Fantasy', 'S', 'Liquid', 570, 'ATK 30%', 'Break Intensity up; summons Black Tome for Chaos DMG.', 'daffodill'),
   // A-rank
   arc('A Time Will Come', 'A', 'Synthesis', 475, 'Crit Rate 20%', 'ATK, DEF and HP up with 3+ different Esper types in the team.'),
   arc('Call of the Twisted City', 'A', 'Liquid', 395, 'HP 37.5%', 'Healing Bonus up for 10s after Redirect Skill.'),
