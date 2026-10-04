@@ -16,10 +16,12 @@ Plan squads, browse every character, see which elemental reactions they trigger 
 - **Live synergy analysis.** An interactive Esper Cycle diagram highlights every pair and trio reaction the team can trigger, alongside role coverage and composition warnings.
 - **Roster with smart hints.** Filter by element, role and rank. Each character card shows which new reactions it would add to the current team.
 - **Community presets.** Load well-known team archetypes as a starting point.
+- **Team images.** Export any team as a 1200×675 card with portraits, gear and reactions, then save it, copy it to the clipboard, or share it from a phone.
 - **Team codes.** Copy a compact code to share a team; paste a code to import one. Links ending in `#nte1~…` import the team automatically.
 - **Character index.** A sortable, filterable table of every Esper with rank, element, role, Arc type and base stats. Each character has a detail view with faction, Esper ability, reactions and featured teams.
 - **Arcs.** All Arcs with tabs for each Arc type (Solid, Liquid, Gas, Plasma, Condensate), rank filter, search, and the characters each Arc is the signature of or recommended for.
 - **Glossary.** Searchable definitions of game terms, from the Esper Cycle and reactions to Arcs, the Console and endgame modes.
+- **Display size.** Scales automatically on large screens, with a manual size picker (90% to 140%) saved per browser.
 - **Light and dark themes**, following your system setting. Element colours match the in-game Esper Cycle.
 
 ## Reaction model

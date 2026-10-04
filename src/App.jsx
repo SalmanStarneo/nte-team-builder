@@ -2,12 +2,14 @@ import { useEffect, useMemo, useReducer, useState } from 'react';
 import { CHARACTER_BY_ID, DATA_VERSION } from './data/characters.js';
 import { analyzeTeam, usageInOtherTeams } from './lib/analyze.js';
 import { navigate, useHashRoute, VIEWS } from './lib/route.js';
+import { SCALE_OPTIONS, useDisplayScale } from './lib/displayScale.js';
 import { decodeTeam } from './lib/share.js';
 import { loadState, saveState } from './lib/storage.js';
 import { initialState, loadoutOf, teamsReducer } from './lib/teamsReducer.js';
 import Analysis from './components/Analysis.jsx';
 import ArcsPage from './components/ArcsPage.jsx';
 import CharactersPage from './components/CharactersPage.jsx';
+import ExportDialog from './components/ExportDialog.jsx';
 import LoadoutPanel from './components/LoadoutPanel.jsx';
 import GlossaryPage from './components/GlossaryPage.jsx';
 import Portrait from './components/Portrait.jsx';
@@ -19,11 +21,13 @@ import TeamTabs from './components/TeamTabs.jsx';
 export default function App() {
   const [state, dispatch] = useReducer(teamsReducer, null, () => initialState(loadState()));
   const route = useHashRoute();
+  const display = useDisplayScale();
   const active = state.teams.find((t) => t.id === state.activeId);
 
   // Which team slot's loadout is open. Closes when switching teams.
   const [selectedSlot, setSelectedSlot] = useState(null);
   useEffect(() => setSelectedSlot(null), [state.activeId]);
+  const [exporting, setExporting] = useState(false);
   const selectedChar = selectedSlot != null ? CHARACTER_BY_ID[active.members[selectedSlot]] : null;
 
   const analysis = useMemo(() => analyzeTeam(active.members), [active.members]);
@@ -72,9 +76,25 @@ export default function App() {
             ))}
           </nav>
         </div>
-        <p className="masthead__meta">
-          Unofficial fan project · Game data v{DATA_VERSION} · Not affiliated with Hotta Studio
-        </p>
+        <div className="masthead__meta-row">
+          <p className="masthead__meta">
+            Unofficial fan project · Game data v{DATA_VERSION} · Not affiliated with Hotta Studio
+          </p>
+          <label className="display-size">
+            <span>Display size</span>
+            <select
+              id="display-size"
+              value={display.setting}
+              onChange={(e) => display.setSetting(e.target.value)}
+            >
+              {SCALE_OPTIONS.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.id === 'auto' ? `Auto (${Math.round(display.scale * 100)}%)` : o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
       </header>
 
       {route.view === 'characters' && (
@@ -88,7 +108,12 @@ export default function App() {
       {route.view === 'builder' && (
         <main className="layout">
           <div className="bench">
-            <TeamTabs teams={state.teams} activeId={state.activeId} dispatch={dispatch} />
+            <TeamTabs
+              teams={state.teams}
+              activeId={state.activeId}
+              dispatch={dispatch}
+              onExport={() => setExporting(true)}
+            />
 
             {state.isExample && (
               <p className="banner">
@@ -143,6 +168,8 @@ export default function App() {
           </div>
         </main>
       )}
+
+      {exporting && <ExportDialog team={active} onClose={() => setExporting(false)} />}
 
       <footer className="foot">
         Element reactions follow the Esper Cycle: each element reacts with its two neighbours.

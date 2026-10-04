@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 // The list of saved teams plus actions for the one being edited.
-export default function TeamTabs({ teams, activeId, dispatch }) {
+export default function TeamTabs({ teams, activeId, dispatch, onExport }) {
   const active = teams.find((t) => t.id === activeId);
   const [confirming, setConfirming] = useState(false);
 
@@ -41,6 +41,13 @@ export default function TeamTabs({ teams, activeId, dispatch }) {
           onChange={(e) => dispatch({ type: 'rename', name: e.target.value })}
         />
         <div className="tabs__actions">
+          <button
+            className="btn btn--primary"
+            onClick={onExport}
+            disabled={!active.members.some(Boolean)}
+          >
+            Export image
+          </button>
           <button className="btn btn--quiet" onClick={() => dispatch({ type: 'duplicate' })}>
             Duplicate
           </button>

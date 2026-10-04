@@ -189,7 +189,8 @@ button {
   .side {
     position: sticky;
     top: calc(env(safe-area-inset-top, 0px) + 12px);
-    max-height: calc(100vh - 24px);
+    /* Divide by the display scale so the panel still fits the window. */
+    max-height: calc((100vh - 24px) / var(--zoom, 1));
     overflow-y: auto;
     padding-right: 4px;
   }
@@ -1660,4 +1661,85 @@ th[aria-sort='descending'] .th-btn {
 }
 .arc-user--recs a {
   display: inline-flex;
+}
+
+/* ---------- Display size ---------- */
+.masthead__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.display-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.display-size select {
+  padding: 3px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 0.8rem;
+}
+
+/* ---------- Export dialog ---------- */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: color-mix(in srgb, #05070c 70%, transparent);
+  backdrop-filter: blur(4px);
+}
+.dialog {
+  width: min(960px, 100%);
+  max-height: calc((100vh - 32px) / var(--zoom, 1));
+  overflow: auto;
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+.dialog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.dialog__preview {
+  display: grid;
+  place-items: center;
+  min-height: 200px;
+  border-radius: 8px;
+  background: var(--bg);
+  overflow: hidden;
+}
+.dialog__preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.dialog__actions a.btn {
+  text-decoration: none;
+}
+.dialog__status {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
