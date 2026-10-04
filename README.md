@@ -1,85 +1,98 @@
 # NTE Team Builder
 
-A fan-made team builder for **Neverness to Everness**. Build as many 4-character teams as you like, see which Esper Cycle reactions each one triggers, and share teams with friends using a short code.
+An unofficial, fan-made team planner for **Neverness to Everness (NTE)**.
 
-Not affiliated with Hotta Studio or Perfect World.
+**Live app: https://salmanstarneo.github.io/nte-team-builder/**
 
-## Run it
+Plan squads, see which elemental reactions they trigger on the Esper Cycle, and share teams with a short code. Works in any modern browser on desktop and mobile, with no account or installation.
 
-You need [Node.js](https://nodejs.org) 18 or newer.
+> NTE Team Builder is not affiliated with, endorsed by, or sponsored by Hotta Studio or Perfect World Games. See [Legal](#legal).
+
+## Features
+
+- **Multiple saved teams.** Create, rename, duplicate and delete as many four-character teams as you need. Characters already used in another team are flagged, which helps when planning two-team endgame content.
+- **Live synergy analysis.** An interactive Esper Cycle diagram highlights every pair and trio reaction the team can trigger, alongside role coverage and composition warnings.
+- **Roster with smart hints.** Filter by element, role and rank. Each character card shows which new reactions it would add to the current team.
+- **Community presets.** Load well-known team archetypes as a starting point.
+- **Team codes.** Copy a compact code to share a team; paste a code to import one. Links ending in `#nte1~…` import the team automatically.
+- **Light and dark themes**, following your system setting.
+
+## Reaction model
+
+The six elements form a ring: Cosmos, Anima, Incantation, Chaos, Psyche and Lakshana. Each element reacts with its two neighbours:
+
+| Elements | Reaction | Type |
+| --- | --- | --- |
+| Cosmos + Anima | Blossom | Amplify |
+| Anima + Incantation | Hexed | Weaken |
+| Incantation + Chaos | Scorch | Amplify |
+| Chaos + Psyche | Nova | Control |
+| Psyche + Lakshana | Stain | Weaken |
+| Lakshana + Cosmos | Remora | Control |
+| Lakshana + Cosmos + Anima | Charge | Trio |
+| Incantation + Chaos + Psyche | Discord | Trio |
+
+The model is validated against published community team compositions. Game data is compiled from public community sources and may lag behind new patches; corrections are welcome via [issues](https://github.com/SalmanStarneo/nte-team-builder/issues).
+
+## Running locally
+
+Requires [Node.js](https://nodejs.org) 18 or newer.
 
 ```bash
-npm install     # downloads React and Vite into node_modules/
-npm run dev     # starts the dev server, open the URL it prints
+npm install
+npm run dev        # development server
+npm run build      # production build in dist/
 ```
 
-To open it on your phone while developing, run `npm run dev -- --host` and visit the "Network" URL from your phone on the same Wi-Fi.
+Use `npm run dev -- --host` to open the development server from a phone on the same network.
 
-`npm run build` creates a production version in `dist/`.
+## Deployment
 
-## Live site
+Every push to `main` is built and published to GitHub Pages by `.github/workflows/deploy.yml`.
 
-Every push to `main` builds and publishes the app to GitHub Pages
-(`.github/workflows/deploy.yml`):
-
-**https://salmanstarneo.github.io/nte-team-builder/**
-
-One-time setup: in the repo, go to **Settings → Pages** and set **Source** to **GitHub Actions**.
-
-## How the project is organised
+## Project structure
 
 ```
 src/
-  data/
-    elements.js     six elements in Esper Cycle order, reactions, roles
-    characters.js   the roster: name, rank, element, role  <- update each patch
-    presets.js      community team archetypes
-  lib/
-    analyze.js      works out reactions and warnings for a team (pure functions)
-    teamsReducer.js every team change: add, rename, toggle member, delete...
-    share.js        team code encode/decode (nte1~Name~id.id.id.id)
-    storage.js      saves teams in the browser (localStorage)
-  components/       React UI pieces (roster, slots, Esper Cycle diagram...)
-  App.jsx           puts it all together
-  styles.css        all styling, with light and dark themes
+  data/          game data: elements, reactions, characters, presets
+  lib/           team analysis, state management, share codes, storage
+  components/    React UI components
+  App.jsx        application shell
+  styles.css     styles and theme tokens
+public/
+  characters/    optional character portraits (see the README in that folder)
 ```
 
-The rules of the game live in `data/` and `lib/`, separate from the UI. That's on purpose: you can change how the page looks without touching the logic, and test the logic without a browser.
+Game rules and data live in `src/data` and `src/lib`, independent of the UI.
 
-## How reactions are worked out
+### Updating the roster
 
-The six elements sit on a ring: Cosmos, Anima, Incantation, Chaos, Psyche, Lakshana. Each element reacts with the two next to it:
-
-| Pair | Reaction |
-| --- | --- |
-| Cosmos + Anima | Blossom |
-| Anima + Incantation | Hexed |
-| Incantation + Chaos | Scorch |
-| Chaos + Psyche | Nova |
-| Psyche + Lakshana | Stain |
-| Lakshana + Cosmos | Remora |
-
-Three neighbours in a row unlock a trio reaction: **Charge** (Lakshana, Cosmos, Anima) and **Discord** (Incantation, Chaos, Psyche).
-
-This mapping was checked against 11 community team guides; every one gives the reactions those guides list. The Stain pair (Psyche + Lakshana) is the least directly sourced, so double-check it in-game.
-
-## Updating for a new patch
-
-Add the character to `src/data/characters.js`:
+Add or edit entries in `src/data/characters.js`:
 
 ```js
-{ id: 'newname', name: 'New Name', rarity: 'S', element: 'cosmos', role: 'Damage' },
+{ id: 'example', name: 'Example', rarity: 'S', element: 'cosmos', role: 'Damage' },
 ```
 
-Remove `upcoming: true` from a character once they're released.
+Characters marked `upcoming: true` appear only when the "Show upcoming" filter is enabled.
 
-## Ideas for what to build next
+## Privacy
 
-Good ways to practise, roughly from easiest to hardest:
+The app has no backend, accounts, analytics or tracking. Teams are stored only in your browser's local storage and never leave your device unless you share a team code yourself. Fonts are served by Google Fonts.
 
-1. **"Characters I own" filter**: a checkbox per character, saved in `storage.js`.
-2. **Drag and drop**: drag roster cards into specific slots (try the HTML Drag and Drop API, then `@dnd-kit/core`).
-3. **Endgame pair check**: pick two teams and warn if they share a character (`usageInOtherTeams` in `analyze.js` is a start).
-4. **Stage weakness**: choose a stage's weak element and highlight teams that hit it.
-5. **Tests**: add Vitest and test `analyzeTeam` and `decodeTeam`.
-6. **Share links**: when hosted, a link ending in `#nte1~...` already loads that team. Add a "Copy link" button.
+## Legal
+
+**Unofficial fan project.** NTE Team Builder is a free, non-commercial fan project. It is not affiliated with, endorsed by, or sponsored by Hotta Studio, Perfect World Games or any of their affiliates.
+
+**Trademarks and game content.** *Neverness to Everness*, *NTE*, and all related names, characters, artwork and other game content are trademarks or copyrighted material of their respective owners. They are referenced here for identification and informational purposes only, and all rights remain with their owners.
+
+**Artwork.** Element symbols and placeholder portraits in this project are original. Any official artwork added to the project is used only where its publisher has made it available for free public or fan use, under that publisher's terms, and is not covered by this repository's license.
+
+**No monetisation.** The project carries no advertising, paid features or donations and will not be monetised.
+
+**Removal requests.** Rights holders who would like any content changed or removed can [open an issue](https://github.com/SalmanStarneo/nte-team-builder/issues). Requests will be handled promptly.
+
+See [NOTICE.md](NOTICE.md) for full attribution.
+
+## License
+
+The source code is released under the [MIT License](LICENSE). The license covers this project's original code only; it grants no rights to third-party game content, trademarks or artwork.
