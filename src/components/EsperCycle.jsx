@@ -7,6 +7,18 @@ const SIZE = 300;
 const C = SIZE / 2;
 const R = 96;
 
+// Extra room on each side so side labels never touch the drawing's edge.
+const PAD_X = 56;
+
+// Where an element's name sits: above/below the top and bottom stations,
+// and beside the side stations, anchored to the disc's outer edge.
+function labelPosition(i) {
+  const [x, y] = point(i);
+  const dx = x - C;
+  if (Math.abs(dx) < 1) return { x, y: y + (y < C ? -30 : 31), anchor: 'middle' };
+  return dx > 0 ? { x: x + 24, y, anchor: 'start' } : { x: x - 24, y, anchor: 'end' };
+}
+
 const point = (i, r = R) => {
   const a = (Math.PI * 2 * i) / ELEMENTS.length - Math.PI / 2;
   return [C + r * Math.cos(a), C + r * Math.sin(a)];
@@ -17,7 +29,7 @@ export default function EsperCycle({ elementCounts, reactions, trios }) {
 
   return (
     <figure className="cycle">
-      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label="Esper Cycle with this team's elements and reactions">
+      <svg viewBox={`${-PAD_X} 0 ${SIZE + PAD_X * 2} ${SIZE}`} role="img" aria-label="Esper Cycle with this team's elements and reactions">
         {/* Segments between neighbouring stations */}
         {ELEMENTS.map((el, i) => {
           const j = (i + 1) % ELEMENTS.length;
@@ -41,7 +53,7 @@ export default function EsperCycle({ elementCounts, reactions, trios }) {
         {/* Stations */}
         {ELEMENTS.map((el, i) => {
           const [x, y] = point(i);
-          const [nx, ny] = point(i, R + 34);
+          const label = labelPosition(i);
           const count = elementCounts[el.id] || 0;
           return (
             <g
@@ -65,7 +77,13 @@ export default function EsperCycle({ elementCounts, reactions, trios }) {
                   </text>
                 </g>
               )}
-              <text className="station__name" x={nx} y={ny} textAnchor="middle" dominantBaseline="middle">
+              <text
+                className="station__name"
+                x={label.x}
+                y={label.y}
+                textAnchor={label.anchor}
+                dominantBaseline="middle"
+              >
                 {el.name}
               </text>
             </g>

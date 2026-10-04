@@ -521,14 +521,14 @@ button {
 }
 @media (min-width: 620px) {
   .analysis__grid {
-    grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
     align-items: start;
   }
 }
 
 .cycle {
   margin: 0;
-  max-width: 300px;
+  max-width: 380px;
   justify-self: center;
   width: 100%;
 }
