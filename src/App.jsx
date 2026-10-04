@@ -56,6 +56,9 @@ export default function App() {
 
   return (
     <div className="app">
+      <div className="backdrop" aria-hidden="true">
+        <span /><span /><span /><span /><span />
+      </div>
       <header className="masthead">
         <div className="masthead__line" aria-hidden="true" />
         <div className="masthead__row">

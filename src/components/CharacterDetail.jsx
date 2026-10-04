@@ -6,6 +6,7 @@ import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import AscensionPlanner from './AscensionPlanner.jsx';
+import StatIcon from './StatIcon.jsx';
 
 const fmt = (n) => n.toLocaleString('en-US');
 
@@ -69,11 +70,21 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
           {c.stats ? (
             <table>
               <tbody>
-                <tr><th scope="row">HP</th><td>{fmt(c.stats.hp)}</td></tr>
-                <tr><th scope="row">ATK</th><td>{c.stats.atk}</td></tr>
-                <tr><th scope="row">DEF</th><td>{c.stats.def}</td></tr>
-                <tr><th scope="row">Crit Rate</th><td>{c.stats.critRate}%</td></tr>
-                <tr><th scope="row">Crit DMG</th><td>{c.stats.critDmg}%</td></tr>
+                {[
+                  ['hp', 'HP', fmt(c.stats.hp)],
+                  ['atk', 'ATK', c.stats.atk],
+                  ['def', 'DEF', c.stats.def],
+                  ['critRate', 'Crit Rate', `${c.stats.critRate.toFixed(2)}%`],
+                  ['critDmg', 'Crit DMG', `${c.stats.critDmg.toFixed(2)}%`],
+                  ['dmgBonus', 'Universal DMG Bonus', '0.00%'],
+                ].map(([key, label, value]) => (
+                  <tr key={key}>
+                    <th scope="row">
+                      <span className="stat-label"><StatIcon stat={key} />{label}</span>
+                    </th>
+                    <td>{value}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           ) : (

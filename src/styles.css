@@ -28,6 +28,8 @@
   --elb-psyche: #4fbcf3;
   --elb-lakshana: #f3d03e;
   --station-bg: #1a1e29;
+  --band-fill: rgba(214, 69, 127, 0.07);
+  --band-line: rgba(214, 69, 127, 0.12);
 
   --font-display: 'Big Shoulders Display', 'Arial Narrow', 'Roboto Condensed', sans-serif;
   --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -40,7 +42,9 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --bg: #0e1119;
-    --surface: #161a25;
+    --surface: rgba(22, 26, 37, 0.9);
+    --band-fill: rgba(194, 24, 91, 0.16);
+    --band-line: rgba(232, 72, 140, 0.22);
     --surface-2: #1f2432;
     --fg: #e7eaf2;
     --muted: #9aa3b7;
@@ -67,8 +71,10 @@
 }
 :root[data-theme='dark'] {
   --bg: #0e1119;
-  --surface: #161a25;
+  --surface: rgba(22, 26, 37, 0.9);
   --surface-2: #1f2432;
+  --band-fill: rgba(194, 24, 91, 0.16);
+  --band-line: rgba(232, 72, 140, 0.22);
   --fg: #e7eaf2;
   --muted: #9aa3b7;
   --line: #2b3242;
@@ -1853,4 +1859,46 @@ th[aria-sort='descending'] .th-btn {
 }
 .phase-table tr:not(.in-range) td {
   opacity: 0.45;
+}
+
+/* ---------- Backdrop: tilted pink bands, like the in-game menus ---------- */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.backdrop span {
+  position: absolute;
+  left: -20vw;
+  width: 140vw;
+  height: 150px;
+  border-radius: 999px;
+  background: var(--band-fill);
+  transform: rotate(-12deg);
+}
+/* Inner dashed track, echoing the stitched stripe on the in-game banner */
+.backdrop span::after {
+  content: '';
+  position: absolute;
+  inset: 22px 90px;
+  border-radius: 999px;
+  border: 2px dashed var(--band-line);
+}
+.backdrop span:nth-child(1) { top: -4%; left: -10vw; height: 170px; }
+.backdrop span:nth-child(2) { top: 22%; left: -35vw; height: 110px; opacity: 0.7; }
+.backdrop span:nth-child(3) { top: 46%; left: -5vw; height: 190px; }
+.backdrop span:nth-child(4) { top: 72%; left: -40vw; height: 120px; opacity: 0.6; }
+.backdrop span:nth-child(5) { top: 94%; left: -15vw; height: 160px; opacity: 0.8; }
+
+/* ---------- Stat icons ---------- */
+.stat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.stat-icon {
+  flex: none;
+  color: var(--muted);
 }
