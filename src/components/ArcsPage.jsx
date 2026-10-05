@@ -107,7 +107,7 @@ export default function ArcsPage({ arcType }) {
             const sig = a.signature && CHARACTER_BY_ID[a.signature];
             const recs = (RECOMMENDED_FOR[a.id] || []).filter((id) => id !== a.signature).map((id) => CHARACTER_BY_ID[id]);
             return (
-              <li key={a.id} className="arc-card">
+              <li key={a.id} className="arc-card" data-arc-type={a.type.toLowerCase()}>
                 <div className="arc-card__top">
                   <RankBadge rank={a.rarity} size={22} />
                   <h3 className="arc-card__name">{a.name}</h3>

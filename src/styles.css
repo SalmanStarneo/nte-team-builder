@@ -36,11 +36,18 @@
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
   --radius: 10px;
+  /* Arc type textures */
+  --arc-base: #ffffff;
+  --sheen: 0.7;
+  --grain: rgba(30, 40, 60, 0.05);
   --gap: 16px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
+    --arc-base: #161a25;
+    --sheen: 0.11;
+    --grain: rgba(255, 255, 255, 0.035);
     --bg: #0e1119;
     --surface: rgba(22, 26, 37, 0.9);
     --band-fill: rgba(194, 24, 91, 0.16);
@@ -70,6 +77,9 @@
   }
 }
 :root[data-theme='dark'] {
+  --arc-base: #161a25;
+  --sheen: 0.11;
+  --grain: rgba(255, 255, 255, 0.035);
   --bg: #0e1119;
   --surface: rgba(22, 26, 37, 0.9);
   --surface-2: #1f2432;
@@ -1663,6 +1673,75 @@ th[aria-sort='descending'] .th-btn {
   font-size: 1rem;
   font-weight: 700;
   min-width: 0;
+}
+
+/* Arc type textures behind the name band. Kept low-contrast and tinted
+   towards the card colour, with a soft halo on the text, so names stay crisp. */
+.arc-card[data-arc-type] .arc-card__top {
+  margin: -14px -14px 0;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line);
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+  background-color: var(--arc-base);
+}
+.arc-card[data-arc-type] .arc-card__name,
+.arc-card[data-arc-type] .arc-card__type {
+  text-shadow: 0 0 6px var(--arc-base), 0 0 2px var(--arc-base);
+}
+.arc-card[data-arc-type] .arc-card__type { color: var(--fg); opacity: 0.75; }
+
+/* Solid: brushed metal */
+.arc-card[data-arc-type='solid'] .arc-card__top {
+  background-image:
+    linear-gradient(100deg, transparent 18%, rgba(255, 255, 255, var(--sheen)) 36%, transparent 56%),
+    repeating-linear-gradient(0deg, var(--grain) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, transparent 0 7px, var(--grain) 7px 8px, transparent 8px 19px),
+    linear-gradient(180deg,
+      color-mix(in srgb, #b4bdcb 30%, var(--arc-base)),
+      color-mix(in srgb, #6c7788 34%, var(--arc-base)));
+}
+
+/* Liquid: semi-gloss, soft highlight across the top */
+.arc-card[data-arc-type='liquid'] .arc-card__top {
+  background-image:
+    radial-gradient(130% 80% at 50% -18%, rgba(255, 255, 255, var(--sheen)) 0 42%, transparent 64%),
+    radial-gradient(60% 120% at 88% 120%, color-mix(in srgb, #5fc2ff 26%, transparent), transparent 70%),
+    linear-gradient(180deg,
+      color-mix(in srgb, #4aa3e8 16%, var(--arc-base)),
+      color-mix(in srgb, #1f6fb8 30%, var(--arc-base)));
+}
+
+/* Gas: drifting haze */
+.arc-card[data-arc-type='gas'] .arc-card__top {
+  background-image:
+    radial-gradient(38% 90% at 12% 70%, color-mix(in srgb, #a8e3d4 40%, transparent), transparent 72%),
+    radial-gradient(34% 110% at 52% 10%, color-mix(in srgb, #c6ece2 34%, transparent), transparent 72%),
+    radial-gradient(42% 120% at 90% 85%, color-mix(in srgb, #9bd7c6 34%, transparent), transparent 72%),
+    linear-gradient(180deg,
+      color-mix(in srgb, #8fcabb 14%, var(--arc-base)),
+      color-mix(in srgb, #5fa894 22%, var(--arc-base)));
+}
+
+/* Plasma: charged filaments and glow */
+.arc-card[data-arc-type='plasma'] .arc-card__top {
+  background-image:
+    radial-gradient(55% 150% at 100% 50%, color-mix(in srgb, #ff5fd2 30%, transparent), transparent 70%),
+    repeating-linear-gradient(118deg, transparent 0 15px, color-mix(in srgb, #d07dff 22%, transparent) 15px 16px, transparent 16px 27px),
+    linear-gradient(180deg,
+      color-mix(in srgb, #b07aff 14%, var(--arc-base)),
+      color-mix(in srgb, #7a3fd0 26%, var(--arc-base)));
+}
+
+/* Condensate: frosted crystal facets */
+.arc-card[data-arc-type='condensate'] .arc-card__top {
+  background-image:
+    linear-gradient(135deg, rgba(255, 255, 255, var(--sheen)) 0 16%, transparent 16% 38%,
+      rgba(255, 255, 255, calc(var(--sheen) * 0.55)) 38% 50%, transparent 50%),
+    linear-gradient(48deg, transparent 0 58%, color-mix(in srgb, #9fe6f6 30%, transparent) 58% 70%, transparent 70%),
+    linear-gradient(160deg, transparent 0 74%, color-mix(in srgb, #ffffff 18%, transparent) 74% 82%, transparent 82%),
+    linear-gradient(180deg,
+      color-mix(in srgb, #9fe0f0 18%, var(--arc-base)),
+      color-mix(in srgb, #4fb3d0 26%, var(--arc-base)));
 }
 .arc-card__type {
   margin-left: auto;
