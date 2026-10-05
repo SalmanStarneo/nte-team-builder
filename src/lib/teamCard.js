@@ -3,7 +3,7 @@
 import { CHARACTER_BY_ID } from '../data/characters.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import { ARC_BY_ID, arcTag } from '../data/arcs.js';
-import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
+import { CARTRIDGE_BY_ID, MODULE_TYPES, cartridgesFor } from '../data/gear.js';
 import { loadoutOf } from './teamsReducer.js';
 import { analyzeTeam } from './analyze.js';
 import { activeResonance } from '../data/awakenings.js';
@@ -36,6 +36,21 @@ const EL = {
   chaos: '#ad93f7',
   psyche: '#4fbcf3',
   lakshana: '#f3d03e',
+};
+
+// Short module stat labels that fit a small tile.
+const STAT_SHORT = {
+  'ATK %': 'ATK%',
+  ATK: 'ATK',
+  'Crit Rate': 'CRIT R',
+  'Crit DMG': 'CRIT D',
+  'Elemental DMG': 'ELEM',
+  'Break Intensity': 'BREAK',
+  'HP %': 'HP%',
+  HP: 'HP',
+  'DEF %': 'DEF%',
+  DEF: 'DEF',
+  'Energy Regen': 'ENERGY',
 };
 
 function loadImage(src) {
@@ -418,6 +433,11 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     ctx.lineTo(gx + gw, gy - 12);
     ctx.stroke();
 
+    const modules = (gear.modules ?? []).slice(0, 4);
+    const hasModules = modules.some(Boolean);
+    // With modules shown, names stay on one line so the module row has room.
+    const maxLines = hasModules ? 1 : 2;
+
     const gearRow = (label, value, tag, extra) => {
       ctx.fillStyle = C.muted;
       ctx.font = `500 11px ${MONO}`;
@@ -439,12 +459,50 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
       }
       ctx.fillStyle = value ? C.fg : C.muted;
       ctx.font = `${value ? 600 : 400} 15px ${BODY}`;
-      const lines = wrap(ctx, value || '\u2014', gw, 2);
+      const lines = wrap(ctx, value || '\u2014', gw, maxLines);
       lines.forEach((ln, k) => ctx.fillText(ln, gx, gy + 24 + k * 19));
       gy += 30 + lines.length * 19;
     };
     gearRow('ARC', arc?.name, arc ? arcTag(arc, c) : null, arc && gear.arcDupes ? `+${gear.arcDupes}` : null);
     gearRow('CARTRIDGE', cart?.name, cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null);
+
+    // Console modules: four tiles along the bottom of the panel.
+    if (hasModules) {
+      const tileGap = 6;
+      const tileW = (gw - tileGap * 3) / 4;
+      const tileH = 38;
+      const ty = top + ch - 14 - tileH;
+      ctx.fillStyle = C.muted;
+      ctx.font = `500 11px ${MONO}`;
+      ctx.fillText('MODULES', gx, ty - 8);
+      modules.forEach((m, k) => {
+        const tx = gx + k * (tileW + tileGap);
+        roundRect(ctx, tx, ty, tileW, tileH, 6);
+        if (!m) {
+          ctx.strokeStyle = C.line;
+          ctx.setLineDash([3, 3]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          return;
+        }
+        ctx.fillStyle = C.panel2;
+        ctx.fill();
+        // Size: lit cells out of four, in the character's element colour.
+        const cells = MODULE_TYPES.find((t) => t.id === m.type)?.cells ?? 0;
+        const cellW = (tileW - 16 - 3 * 3) / 4;
+        for (let n = 0; n < 4; n += 1) {
+          ctx.fillStyle = n < cells ? el : C.line;
+          roundRect(ctx, tx + 8 + n * (cellW + 3), ty + 7, cellW, 5, 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = C.fg;
+        ctx.font = `700 11px ${MONO}`;
+        ctx.textAlign = 'center';
+        const label = STAT_SHORT[m.stat] ?? m.stat;
+        ctx.fillText(wrap(ctx, label, tileW - 6, 1)[0], tx + tileW / 2, ty + 29);
+        ctx.textAlign = 'left';
+      });
+    }
   });
 
   // Reactions
