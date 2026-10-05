@@ -5,6 +5,8 @@
 //
 // roles: the in-game role comes first; extra roles reflect what community
 // guides use the character for (e.g. Hotori is a Buffer who also burst-damages).
+// "unit" is a squad inside the faction (e.g. ETD-6 in the Bureau of Anomaly Control).
+// "formerFaction" is shown with a "Former" tag.
 // "upcoming: true" hides a character unless the "Show upcoming" filter is on.
 export const DATA_VERSION = '1.4';
 
@@ -16,7 +18,7 @@ export const CHARACTERS = [
   // S-rank
   {
     id: 'baicang', name: 'Baicang', rarity: 'S', element: 'incantation', roles: ['Damage'],
-    arcType: 'Condensate', faction: 'Bureau of Anomaly Control, ETD-4', ability: 'Verdict and Autumn',
+    arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'ETD-4', ability: 'Verdict and Autumn',
     tags: ['Main DPS', 'DoT'], stats: stats(1370, 81, 66),
   },
   {
@@ -26,7 +28,7 @@ export const CHARACTERS = [
   },
   {
     id: 'chaos', name: 'Chaos', rarity: 'S', element: 'lakshana', roles: ['Damage'],
-    arcType: 'Condensate', faction: 'ETD-6', ability: null,
+    arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: null,
     tags: ['Main DPS'], stats: null,
   },
   {
@@ -46,7 +48,7 @@ export const CHARACTERS = [
   },
   {
     id: 'fadia', name: 'Fadia', rarity: 'S', element: 'psyche', roles: ['Survival', 'Damage'],
-    arcType: 'Condensate', faction: 'Bureau of Anomaly Control, ETD-4', ability: 'Lilith',
+    arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'ETD-4', ability: 'Lilith',
     tags: ['Survival'], stats: stats(1410, 75, 75),
   },
   {
@@ -71,12 +73,12 @@ export const CHARACTERS = [
   },
   {
     id: 'lacrimosa', name: 'Lacrimosa', rarity: 'S', element: 'chaos', roles: ['Damage'],
-    arcType: 'Liquid', faction: 'Bureau of Anomaly Control, ETD-4', ability: 'Requiem',
+    arcType: 'Liquid', faction: 'Bureau of Anomaly Control', unit: 'ETD-4', ability: 'Requiem',
     tags: ['Main DPS', 'DoT'], stats: stats(1320, 80, 75),
   },
   {
     id: 'linko', name: 'Linko', rarity: 'S', element: 'anima', roles: ['Damage', 'Buff'],
-    arcType: 'Plasma', faction: null, ability: null,
+    arcType: 'Plasma', faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: null,
     tags: ['Sub-DPS', 'RES Shred'], stats: null,
   },
   {
@@ -96,7 +98,7 @@ export const CHARACTERS = [
   },
   {
     id: 'zankou', name: 'Zankou', rarity: 'S', element: 'incantation', roles: ['Damage'],
-    arcType: 'Gas', faction: null, ability: null,
+    arcType: 'Gas', faction: null, formerFaction: 'The Scarlet Letter', ability: null,
     tags: ['Main DPS', 'DoT'], stats: null,
   },
   {
@@ -107,12 +109,12 @@ export const CHARACTERS = [
   // Version 1.5 drip-marketing reveals. Arc type and kit not published yet.
   {
     id: 'elyms', name: 'Elyms', rarity: 'S', element: 'cosmos', roles: ['Damage'],
-    arcType: null, faction: 'E.T.D. 6', ability: null,
+    arcType: null, faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: null,
     tags: ['Melee'], stats: null, upcoming: true,
   },
   {
     id: 'exe', name: 'Exe', rarity: 'S', element: 'chaos', roles: ['Damage'],
-    arcType: null, faction: 'E.T.D. 6', ability: null,
+    arcType: null, faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: null,
     tags: [], stats: null, upcoming: true,
   },
   // A-rank
@@ -143,7 +145,7 @@ export const CHARACTERS = [
   },
   {
     id: 'skia', name: 'Skia', rarity: 'A', element: 'lakshana', roles: ['Damage'],
-    arcType: 'Gas', faction: 'Bureau of Anomaly Control, ETD-4', ability: 'Faust',
+    arcType: 'Gas', faction: 'Bureau of Anomaly Control', unit: 'ETD-4', ability: 'Faust',
     tags: ['Main DPS'], stats: stats(1100, 70, 55),
   },
 ];

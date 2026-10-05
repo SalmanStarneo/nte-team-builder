@@ -65,7 +65,16 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
               </dd>
             </div>
           )}
-          <div><dt>Faction</dt><dd>{c.faction ?? '—'}</dd></div>
+          <div><dt>Faction</dt><dd>
+            {c.faction ?? (c.formerFaction ? '' : '—')}
+            {c.unit && <span className="muted"> · {c.unit}</span>}
+            {c.formerFaction && (
+              <span className="former">
+                {c.faction && ' '}
+                <span className="former__tag">Former</span> {c.formerFaction}
+              </span>
+            )}
+          </dd></div>
           <div><dt>Esper ability</dt><dd>{c.ability ?? '—'}</dd></div>
           <div>
             <dt>Recommended Cartridges</dt>
