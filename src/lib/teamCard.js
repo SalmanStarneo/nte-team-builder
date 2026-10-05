@@ -219,8 +219,8 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
 
   drawBands(ctx);
 
-  // Element stripe
-  const order = ['cosmos', 'anima', 'incantation', 'chaos', 'psyche', 'lakshana'];
+  // Element stripe: Charge trio on the left, Discord trio on the right
+  const order = ['lakshana', 'cosmos', 'anima', 'incantation', 'chaos', 'psyche'];
   order.forEach((el, i) => {
     ctx.fillStyle = EL[el];
     ctx.fillRect((CARD_W / 6) * i, 0, CARD_W / 6 + 1, 8);

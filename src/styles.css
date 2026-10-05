@@ -144,12 +144,13 @@ button {
   border-radius: 3px;
   background: linear-gradient(
     90deg,
-    var(--el-cosmos) 0 16.66%,
-    var(--el-anima) 16.66% 33.33%,
-    var(--el-incantation) 33.33% 50%,
-    var(--el-chaos) 50% 66.66%,
-    var(--el-psyche) 66.66% 83.33%,
-    var(--el-lakshana) 83.33% 100%
+    /* Charge trio on the left, Discord trio on the right */
+    var(--el-lakshana) 0 16.66%,
+    var(--el-cosmos) 16.66% 33.33%,
+    var(--el-anima) 33.33% 50%,
+    var(--el-incantation) 50% 66.66%,
+    var(--el-chaos) 66.66% 83.33%,
+    var(--el-psyche) 83.33% 100%
   );
 }
 
