@@ -188,6 +188,17 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     members.map((c) => (c ? loadImage(`${base}characters/${c.id}.webp`) : null)),
   );
   const analysis = analyzeTeam(team.members);
+  // Official element and role icons.
+  const elementIds = [...new Set(members.filter(Boolean).map((c) => c.element))];
+  const roleIds = [...new Set(members.filter(Boolean).flatMap((c) => c.roles))];
+  const [elIcons, roleIcons] = await Promise.all([
+    Promise.all(elementIds.map((id) => loadImage(`${base}icons/elements/${id}.webp`))).then((l) =>
+      Object.fromEntries(elementIds.map((id, i) => [id, l[i]])),
+    ),
+    Promise.all(roleIds.map((r) => loadImage(`${base}icons/roles/${r.toLowerCase()}.webp`))).then((l) =>
+      Object.fromEntries(roleIds.map((r, i) => [r, l[i]])),
+    ),
+  ]);
 
   const canvas = document.createElement('canvas');
   const scale = 2; // sharp on high-density screens
@@ -363,13 +374,32 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     const elName = ELEMENT_BY_ID[c.element].name.toUpperCase();
     const elW = ctx.measureText(elName).width;
     ctx.textAlign = 'left';
-    const startX = cx - (elW + 32) / 2;
-    ctx.fillText(elName, startX, top + 199);
-    drawRank(ctx, c.rarity, startX + elW + 8, top + 194, 24);
-    ctx.textAlign = 'center';
-    ctx.fillStyle = C.muted;
+    const elIcon = elIcons[c.element];
+    const iconW = elIcon ? 24 : 0;
+    const startX = cx - (iconW + elW + 32) / 2;
+    if (elIcon) ctx.drawImage(elIcon, startX, top + 182, 20, 20);
+    ctx.fillText(elName, startX + iconW, top + 199);
+    drawRank(ctx, c.rarity, startX + iconW + elW + 8, top + 194, 24);
+
+    // Roles, each with its icon, centred as one line
     ctx.font = `500 14px ${BODY}`;
-    ctx.fillText(c.roles.join(' \u00b7 '), cx, top + 220);
+    const ROLE_ICON = 16;
+    const parts = c.roles.map((role) => ({ role, w: ROLE_ICON + 4 + ctx.measureText(role).width }));
+    const sepW = ctx.measureText('  \u00b7  ').width;
+    const total = parts.reduce((sum, p) => sum + p.w, 0) + sepW * (parts.length - 1);
+    // Stay clear of the awakening column on the left edge.
+    let rx2 = Math.max(cx - total / 2, x + 56);
+    ctx.fillStyle = C.muted;
+    parts.forEach((p, k) => {
+      if (k > 0) {
+        ctx.fillText('  \u00b7  ', rx2, top + 222);
+        rx2 += sepW;
+      }
+      const icon = roleIcons[p.role];
+      if (icon) ctx.drawImage(icon, rx2, top + 209, ROLE_ICON, ROLE_ICON);
+      ctx.fillText(p.role, rx2 + ROLE_ICON + 4, top + 222);
+      rx2 += p.w;
+    });
     ctx.textAlign = 'left';
 
     // Gear

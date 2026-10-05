@@ -6,6 +6,7 @@ import CharacterDetail from './CharacterDetail.jsx';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
+import RoleList from './RoleList.jsx';
 
 const COLUMNS = [
   { id: 'name', label: 'Character', get: (c) => c.name },
@@ -163,7 +164,7 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                   </span>
                 </td>
                 <td><RankBadge rank={c.rarity} size={22} /></td>
-                <td>{c.roles.join(', ')}</td>
+                <td><RoleList roles={c.roles} size={14} /></td>
                 <td>{c.arcType}</td>
                 <td className="num">{c.stats ? c.stats.hp.toLocaleString('en-US') : '—'}</td>
                 <td className="num">{c.stats?.atk ?? '—'}</td>

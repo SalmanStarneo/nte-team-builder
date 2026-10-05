@@ -62,13 +62,7 @@ export default function EsperCycle({ elementCounts, reactions, trios }) {
               style={{ '--glow': `var(--elb-${el.id})` }}
             >
               <circle cx={x} cy={y} r="17" style={count ? { stroke: `var(--elb-${el.id})` } : undefined} />
-              <ElementGlyph
-                element={el.id}
-                size={18}
-                x={x - 9}
-                y={y - 9}
-                color={count ? `var(--elb-${el.id})` : el.color}
-              />
+              <ElementGlyph element={el.id} size={34} x={x - 17} y={y - 17} />
               {count > 1 && (
                 <g className="station__count">
                   <circle cx={x + 14} cy={y - 14} r="8" />

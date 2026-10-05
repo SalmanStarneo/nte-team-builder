@@ -4,6 +4,7 @@ import { ELEMENTS, PAIR_REACTIONS, ROLES } from '../data/elements.js';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
+import RoleList from './RoleList.jsx';
 
 // Which new reactions a character would unlock if added to this team.
 function unlocks(character, presentElements, activeReactionIds) {
@@ -119,7 +120,7 @@ export default function Roster({ members, analysis, usage, dispatch }) {
                       {c.name}
                       <RankBadge rank={c.rarity} size={18} />
                     </span>
-                    <span className="card__role">{c.roles.join(' · ')}</span>
+                    <span className="card__role"><RoleList roles={c.roles} size={13} separator={false} /></span>
                     {gains.length > 0 && (
                       <span className="card__gain">+ {gains.map((g) => g.name).join(', ')}</span>
                     )}

@@ -8,6 +8,7 @@ import Portrait from './Portrait.jsx';
 import AscensionPlanner from './AscensionPlanner.jsx';
 import StatIcon from './StatIcon.jsx';
 import { AWAKENINGS, RESONANCES } from '../data/awakenings.js';
+import RoleList from './RoleList.jsx';
 
 const fmt = (n) => n.toLocaleString('en-US');
 
@@ -27,7 +28,8 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
         <Portrait character={c} size="xl" />
         <div className="detail__title">
           <p className="eyebrow">
-            <ElementGlyph element={c.element} size={14} /> {element.name} · {c.rarity}-rank · {c.roles.join(' · ')}
+            <ElementGlyph element={c.element} size={16} /> {element.name} · {c.rarity}-rank ·{' '}
+            <RoleList roles={c.roles} size={14} />
           </p>
           <h2 id="detail-name" className="detail__name">{c.name}</h2>
           {c.tags?.length > 0 && (

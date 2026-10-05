@@ -4,6 +4,7 @@ import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import { loadoutOf } from '../lib/teamsReducer.js';
 import Portrait from './Portrait.jsx';
+import RoleList from './RoleList.jsx';
 
 // Four team slots. Selecting a filled slot opens its loadout below.
 export default function TeamSlots({ team, selected, onSelect, dispatch }) {
@@ -37,7 +38,7 @@ export default function TeamSlots({ team, selected, onSelect, dispatch }) {
             >
               <Portrait character={c} size="lg" />
               <span className="slot__name">{c.name}</span>
-              <span className="slot__meta">{c.roles.join(' · ')}</span>
+              <span className="slot__meta"><RoleList roles={c.roles} size={13} separator={false} /></span>
               <span className="slot__gear">
                 <span className={arc ? 'gear-chip gear-chip--on' : 'gear-chip'} title={arc?.name ?? 'No Arc'}>
                   <span className="gear-chip__name">{arc ? arc.name : 'No Arc'}</span>

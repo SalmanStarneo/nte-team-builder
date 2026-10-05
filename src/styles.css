@@ -2237,3 +2237,58 @@ th[aria-sort='descending'] .th-btn {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+/* ---------- Official element and role icons ---------- */
+.glyph image {
+  image-rendering: auto;
+}
+/* Esper Cycle: inactive stations are dimmed and desaturated */
+.station:not(.station--on) .glyph {
+  opacity: 0.45;
+  filter: grayscale(0.7);
+}
+.station > circle {
+  r: 18px;
+}
+.role-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  justify-content: inherit;
+}
+.role-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.role-sep {
+  margin-right: 2px;
+  opacity: 0.6;
+}
+.role-icon {
+  flex: none;
+  display: inline-block;
+  object-fit: contain;
+}
+.slot__meta .role-list {
+  justify-content: center;
+}
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.eyebrow .role-list {
+  text-transform: none;
+  letter-spacing: 0;
+}
+.detail > *,
+.detail__head > * {
+  min-width: 0;
+}
+.eyebrow {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}

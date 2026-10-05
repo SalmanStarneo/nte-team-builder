@@ -1,6 +1,7 @@
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import EsperCycle from './EsperCycle.jsx';
 import ElementGlyph from './ElementGlyph.jsx';
+import { roleIconUrl } from '../lib/icons.js';
 
 export default function Analysis({ analysis }) {
   const { elementCounts, reactions, trios, roleCounts, notes } = analysis;
@@ -15,6 +16,7 @@ export default function Analysis({ analysis }) {
           <div className="roles">
             {Object.entries(roleCounts).map(([role, n]) => (
               <span key={role} className={n ? 'role-chip role-chip--on' : 'role-chip'}>
+                <img className="role-icon" src={roleIconUrl(role)} width={14} height={14} alt="" />
                 <b>{n}</b> {role}
               </span>
             ))}
