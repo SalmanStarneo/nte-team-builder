@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ARC_TYPES, CHARACTERS, CHARACTER_BY_ID } from '../data/characters.js';
 import { ELEMENTS, ELEMENT_BY_ID, ROLES } from '../data/elements.js';
 import { navigate } from '../lib/route.js';
@@ -7,6 +7,17 @@ import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
 import RoleList from './RoleList.jsx';
+
+const BASE = import.meta.env.BASE_URL;
+const VIEW_KEY = 'nte-team-builder:charView';
+
+function loadView() {
+  try {
+    return localStorage.getItem(VIEW_KEY) === 'grid' ? 'grid' : 'list';
+  } catch {
+    return 'list';
+  }
+}
 
 const COLUMNS = [
   { id: 'name', label: 'Character', get: (c) => c.name },
@@ -27,7 +38,7 @@ function compare(a, b, col, dir) {
   if (va == null) return 1;
   if (vb == null) return -1;
   const result = typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb));
-  return (result || a.name.localeCompare(b.name)) * dir;
+  return result ? result * dir : a.name.localeCompare(b.name);
 }
 
 export default function CharactersPage({ characterId, activeTeam, onAdd }) {
@@ -37,6 +48,15 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
   const [rarity, setRarity] = useState('all');
   const [arcType, setArcType] = useState('all');
   const [sort, setSort] = useState({ id: 'name', dir: 1 });
+  const [view, setView] = useState(loadView);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(VIEW_KEY, view);
+    } catch {
+      /* storage unavailable: the choice just won't be remembered */
+    }
+  }, [view]);
 
   const selected = characterId ? CHARACTER_BY_ID[characterId] : null;
 
@@ -123,9 +143,75 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
               {ARC_TYPES.map((a) => <option key={a} value={a}>{a}</option>)}
             </select>
           </label>
+          {view === 'grid' && (
+            <label className="select">
+              <span>Sort</span>
+              <select
+                id="index-sort"
+                value={`${sort.id}:${sort.dir}`}
+                onChange={(e) => {
+                  const [id, dir] = e.target.value.split(':');
+                  setSort({ id, dir: Number(dir) });
+                }}
+              >
+                <option value="name:1">Name A–Z</option>
+                <option value="name:-1">Name Z–A</option>
+                <option value="element:1">Element</option>
+                <option value="rarity:-1">Rank</option>
+                <option value="hp:-1">HP</option>
+                <option value="atk:-1">ATK</option>
+                <option value="def:-1">DEF</option>
+              </select>
+            </label>
+          )}
+          <div className="view-toggle" role="group" aria-label="Layout">
+            <button className="view-toggle__btn" aria-pressed={view === 'list'} onClick={() => setView('list')} title="List view">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M2 3.5h12M2 8h12M2 12.5h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+              List
+            </button>
+            <button className="view-toggle__btn" aria-pressed={view === 'grid'} onClick={() => setView('grid')} title="Grid view">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <rect x="2" y="2" width="5" height="5" rx="1.2" fill="currentColor" />
+                <rect x="9" y="2" width="5" height="5" rx="1.2" fill="currentColor" />
+                <rect x="2" y="9" width="5" height="5" rx="1.2" fill="currentColor" />
+                <rect x="9" y="9" width="5" height="5" rx="1.2" fill="currentColor" />
+              </svg>
+              Grid
+            </button>
+          </div>
         </div>
       </div>
 
+      {view === 'grid' && (
+        <>
+          <ul className="char-grid">
+            {rows.map((c) => (
+              <li key={c.id}>
+                <a
+                  className={c.id === characterId ? 'char-tile is-selected' : 'char-tile'}
+                  href={`#character-${c.id}`}
+                  style={{ '--el': ELEMENT_BY_ID[c.element].color }}
+                  aria-current={c.id === characterId ? 'true' : undefined}
+                >
+                  <span className="char-tile__art">
+                    <img src={`${BASE}characters/${c.id}.webp`} alt="" loading="lazy" />
+                    <span className="char-tile__rank"><RankBadge rank={c.rarity} size={24} /></span>
+                    <span className="char-tile__el"><ElementGlyph element={c.element} size={20} title={ELEMENT_BY_ID[c.element].name} /></span>
+                    {c.upcoming && <span className="char-tile__tag">Upcoming</span>}
+                  </span>
+                  <span className="char-tile__name">{c.name}</span>
+                  <span className="char-tile__roles"><RoleList roles={c.roles} size={13} separator={false} /></span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          {rows.length === 0 && <p className="empty">No characters match these filters.</p>}
+        </>
+      )}
+
+      {view === 'list' && (
       <div className="table-wrap">
         <table className="index-table">
           <thead>
@@ -175,6 +261,7 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
         </table>
         {rows.length === 0 && <p className="empty">No characters match these filters.</p>}
       </div>
+      )}
       <p className="muted small">Base stats at Level 1. “—” means the value hasn’t been published yet.</p>
     </div>
   );
