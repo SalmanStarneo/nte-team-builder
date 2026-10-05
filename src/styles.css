@@ -739,6 +739,11 @@ button {
   color: var(--fg);
   font: 0.8rem var(--font-mono);
 }
+.code--card {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
 .field__error {
   margin: 0;
   color: var(--danger);

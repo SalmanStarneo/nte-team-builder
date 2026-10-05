@@ -7,6 +7,7 @@ import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import { loadoutOf } from './teamsReducer.js';
 import { analyzeTeam } from './analyze.js';
 import { activeResonance } from '../data/awakenings.js';
+import { encodeCardCode } from './cardCode.js';
 
 export const CARD_W = 1200;
 export const CARD_H = 675;
@@ -484,13 +485,21 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   ctx.fillStyle = C.muted;
   ctx.font = `400 12px ${BODY}`;
   ctx.fillText('Unofficial fan project. Neverness to Everness \u00a9 Hotta Studio / Perfect World Games.', PAD, CARD_H - 24);
+  // Card code (bottom right): type it into the builder to rebuild this team.
+  ctx.textAlign = 'right';
+  const code = encodeCardCode(team, loadoutOf);
+  ctx.font = `600 20px ${MONO}`;
+  ctx.fillStyle = C.fg;
+  ctx.fillText(code, CARD_W - PAD, CARD_H - 22);
+  const codeW = ctx.measureText(code).width;
+  ctx.font = `500 11px ${MONO}`;
+  ctx.fillStyle = C.muted;
+  ctx.fillText('CODE', CARD_W - PAD - codeW - 12, CARD_H - 24);
   if (site) {
-    ctx.font = `500 13px ${MONO}`;
-    ctx.textAlign = 'right';
-    ctx.fillStyle = C.fg;
-    ctx.fillText(site, CARD_W - PAD, CARD_H - 24);
-    ctx.textAlign = 'left';
+    ctx.font = `500 12px ${MONO}`;
+    ctx.fillText(site, CARD_W - PAD, CARD_H - 50);
   }
+  ctx.textAlign = 'left';
 
   return canvas;
 }

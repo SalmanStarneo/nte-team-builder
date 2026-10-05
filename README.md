@@ -19,7 +19,7 @@ Plan squads, browse every character, see which elemental reactions they trigger 
 - **Roster with smart hints.** Filter by element, role and rank. Each character card shows which new reactions it would add to the current team.
 - **Community presets.** Load well-known team archetypes as a starting point.
 - **Team images.** Export any team as a 1200×675 card with portraits, gear and reactions, then save it, copy it to the clipboard, or share it from a phone.
-- **Team codes.** Copy a compact code to share a team; paste a code to import one. Links ending in `#nte1~…` import the team automatically.
+- **Team codes.** Every exported card carries a 12-character card code (for example `700B-00C0-140B`) that rebuilds the team, duplicate counts and Arcs when typed into the builder. Link codes (`#nte1~…`) carry the team and its name and import automatically when opened.
 - **Character index.** A sortable, filterable table of every Esper with rank, element, role, Arc type and base stats. Each character has a detail view with faction, Esper ability, reactions and featured teams.
 - **Arcs.** All Arcs with tabs for each Arc type (Solid, Liquid, Gas, Plasma, Condensate), rank filter, search, and the characters each Arc is the signature of or recommended for.
 - **Ascension planner.** Each character page lists the materials to raise their level cap, with a from/to range and a per-ascension breakdown.

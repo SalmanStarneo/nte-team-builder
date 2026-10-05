@@ -1,29 +1,33 @@
 import { useState } from 'react';
 import { PRESETS } from '../data/presets.js';
 import { encodeTeam, decodeTeam } from '../lib/share.js';
+import { decodeCardCode, encodeCardCode } from '../lib/cardCode.js';
+import { loadoutOf } from '../lib/teamsReducer.js';
 
 export default function SharePanel({ team, dispatch }) {
   const code = encodeTeam(team);
-  const [copied, setCopied] = useState(false);
+  const cardCode = encodeCardCode(team, loadoutOf);
+  const [copied, setCopied] = useState(null);
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
 
-  async function copy() {
+  async function copy(text, fieldId) {
     try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
+      await navigator.clipboard.writeText(text);
+      setCopied(fieldId);
+      setTimeout(() => setCopied(null), 1600);
     } catch {
       // Clipboard blocked: select the text so it can be copied by hand.
-      document.getElementById('team-code')?.select();
+      document.getElementById(fieldId)?.select();
     }
   }
 
   function importCode(e) {
     e.preventDefault();
-    const team = decodeTeam(input);
+    const card = decodeCardCode(input);
+    const team = card ? { name: 'Imported team', ...card } : decodeTeam(input);
     if (!team) {
-      setError('That code isn’t valid. Codes start with nte1~');
+      setError('That code isn’t valid. Use a card code like 1JHK-JJBN-2345, or a link code starting with nte1~');
       return;
     }
     setError('');
@@ -53,10 +57,18 @@ export default function SharePanel({ team, dispatch }) {
       </label>
 
       <div className="field">
-        <label htmlFor="team-code">Team code</label>
+        <label htmlFor="card-code">Card code <span className="muted">· team, duplicates and Arcs</span></label>
+        <div className="code-row">
+          <input id="card-code" className="code code--card" readOnly value={cardCode} onFocus={(e) => e.target.select()} />
+          <button className="btn" onClick={() => copy(cardCode, 'card-code')}>{copied === 'card-code' ? 'Copied' : 'Copy'}</button>
+        </div>
+      </div>
+
+      <div className="field">
+        <label htmlFor="team-code">Link code <span className="muted">· team and name</span></label>
         <div className="code-row">
           <input id="team-code" className="code" readOnly value={code} onFocus={(e) => e.target.select()} />
-          <button className="btn" onClick={copy}>{copied ? 'Copied' : 'Copy'}</button>
+          <button className="btn" onClick={() => copy(code, 'team-code')}>{copied === 'team-code' ? 'Copied' : 'Copy'}</button>
         </div>
       </div>
 
@@ -66,7 +78,7 @@ export default function SharePanel({ team, dispatch }) {
           <input
             id="import-code"
             className="code"
-            placeholder="nte1~Team~…"
+            placeholder="1JHK-JJBN-2345 or nte1~…"
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />

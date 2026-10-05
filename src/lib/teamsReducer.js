@@ -66,7 +66,10 @@ export function teamsReducer(state, action) {
     }
 
     case 'import': {
-      const team = makeTeam(action.name, action.members);
+      const loadouts = Object.fromEntries(
+        Object.entries(action.loadouts ?? {}).map(([id, lo]) => [id, { ...emptyLoadout(), ...lo }]),
+      );
+      const team = makeTeam(action.name, action.members, loadouts);
       return {
         ...state,
         isExample: false,
