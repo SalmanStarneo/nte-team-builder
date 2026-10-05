@@ -7,7 +7,7 @@ import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import AscensionPlanner from './AscensionPlanner.jsx';
 import StatIcon from './StatIcon.jsx';
-import { AWAKENINGS } from '../data/awakenings.js';
+import { AWAKENINGS, RESONANCES } from '../data/awakenings.js';
 
 const fmt = (n) => n.toLocaleString('en-US');
 
@@ -140,6 +140,23 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
             <p className="muted small">
               Each duplicate unlocks one awakening of your choice, in any order.
             </p>
+            {RESONANCES[c.id] && (
+              <>
+                <h3 className="mini-title reso-title">Resonance</h3>
+                <ol className="awaken-list reso-list">
+                  {RESONANCES[c.id].map((r) => (
+                    <li key={r.id}>
+                      <span className="reso__dot is-on is-static">{r.id}</span>
+                      <span className="awaken-body">
+                        <b>{r.name}</b>
+                        <span>{r.effect}</span>
+                        <span className="reso-when">Active with {r.at} awakenings on</span>
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </>
+            )}
           </>
         ) : (
           <p className="muted small">Awakenings will be added once they’re published.</p>

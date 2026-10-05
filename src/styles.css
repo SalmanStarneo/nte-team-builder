@@ -2153,3 +2153,87 @@ th[aria-sort='descending'] .th-btn {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ---------- Resonance ---------- */
+.reso {
+  display: grid;
+  gap: 8px;
+}
+.reso__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reso__label {
+  font: 600 0.72rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-right: 2px;
+}
+.reso__dot {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font: 700 0.78rem var(--font-mono);
+}
+.reso__dot:hover {
+  border-color: var(--fg);
+}
+.reso__dot.is-on {
+  border-color: var(--el);
+  background: var(--el);
+  color: var(--bg);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--el) 55%, transparent);
+}
+.reso__dot.is-open {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+.reso__dot.is-static {
+  width: 30px;
+  height: 30px;
+  font-size: 0.7rem;
+  box-shadow: none;
+}
+.reso__desc {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--el);
+  font-size: 0.85rem;
+}
+.reso__desc p {
+  margin: 0;
+  color: var(--muted);
+}
+.reso__state {
+  justify-self: start;
+  font: 600 0.68rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.reso__state.is-on {
+  color: var(--good);
+}
+.reso-title {
+  margin-top: 14px;
+}
+.reso-list li {
+  align-items: center;
+}
+.reso-when {
+  font: 500 0.7rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

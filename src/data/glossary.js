@@ -74,8 +74,9 @@ export const GLOSSARY = [
   },
   {
     term: 'Resonance',
+    also: 'R3 and R6',
     category: 'Characters',
-    text: 'Bonus effects unlocked alongside Awakenings, such as higher skill levels or a team-wide stat bonus.',
+    text: 'Two bonuses per character that switch on automatically: R3 with 3 awakenings active and R6 with all 6. R3 usually raises skill levels; R6 is a bigger personal or team bonus.',
   },
   {
     term: 'Ascension',

@@ -6,6 +6,7 @@ import { ARC_BY_ID, arcTag } from '../data/arcs.js';
 import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import { loadoutOf } from './teamsReducer.js';
 import { analyzeTeam } from './analyze.js';
+import { activeResonance } from '../data/awakenings.js';
 
 export const CARD_W = 1200;
 export const CARD_H = 675;
@@ -301,21 +302,56 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     ctx.lineWidth = 4;
     ctx.stroke();
 
-    // Awakenings badge, top-right corner
+    // Awakenings A1-A6 down the left edge, then R3 / R6 Resonance circles.
     const gearAw = loadoutOf(team, c.id);
-    const awText = gearAw.awakenings.length
-      ? [...gearAw.awakenings].sort().join(' ')
-      : gearAw.dupes
-        ? `+${gearAw.dupes}`
-        : 'A0';
-    ctx.font = `700 12px ${MONO}`;
-    const awW = ctx.measureText(awText).width + 16;
-    pill(ctx, x + cw - 12 - awW, top + 16, awText, {
-      bg: gearAw.awakenings.length ? el : C.panel2,
-      fg: gearAw.awakenings.length ? C.bg : C.muted,
-      font: `700 12px ${MONO}`,
-      h: 22,
+    const onSet = new Set(gearAw.awakenings);
+    const colX = x + 14;
+    const pillW = 34;
+    const pillH = 20;
+    for (let k = 0; k < 6; k++) {
+      const id = `A${k + 1}`;
+      const on = onSet.has(id);
+      const py = top + 18 + k * 24;
+      ctx.fillStyle = on ? el : 'rgba(255, 255, 255, 0.06)';
+      roundRect(ctx, colX, py, pillW, pillH, 6);
+      ctx.fill();
+      if (!on) {
+        ctx.strokeStyle = C.line;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+      ctx.fillStyle = on ? C.bg : C.muted;
+      ctx.font = `700 11px ${MONO}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(id, colX + pillW / 2, py + pillH / 2 + 1);
+    }
+    const reso = activeResonance(onSet.size);
+    ['R3', 'R6'].forEach((id, k) => {
+      const on = reso[id];
+      const rcx = colX + pillW / 2;
+      const rcy = top + 18 + 6 * 24 + 18 + k * 34;
+      ctx.beginPath();
+      ctx.arc(rcx, rcy, 14, 0, Math.PI * 2);
+      ctx.fillStyle = on ? el : 'rgba(255, 255, 255, 0.04)';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = on ? el : C.line;
+      ctx.stroke();
+      ctx.fillStyle = on ? C.bg : C.muted;
+      ctx.font = `700 11px ${MONO}`;
+      ctx.fillText(id, rcx, rcy + 1);
     });
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+
+    // Duplicate count, top-right corner
+    if (gearAw.dupes) {
+      const dText = `+${gearAw.dupes}`;
+      ctx.font = `700 12px ${MONO}`;
+      const dW = ctx.measureText(dText).width + 16;
+      pill(ctx, x + cw - 12 - dW, top + 16, dText, { bg: C.panel2, fg: C.muted, font: `700 12px ${MONO}`, h: 22 });
+    }
 
     // Name and element
     ctx.textAlign = 'center';

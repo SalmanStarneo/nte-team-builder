@@ -4,6 +4,7 @@ import { ELEMENT_BY_ID } from '../data/elements.js';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
 import { AWAKENINGS, MAX_ARC_DUPES, MAX_DUPES } from '../data/awakenings.js';
+import ResonanceBadges from './ResonanceBadges.jsx';
 
 // Gear editor for one team member: Arc, Cartridge set and Console modules.
 export default function LoadoutPanel({ character: c, loadout, onChange, onClose, dispatch }) {
@@ -103,6 +104,7 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
           ) : (
             <p className="muted small">Awakenings will be added once they’re published.</p>
           )}
+          <ResonanceBadges characterId={c.id} awakeningCount={loadout.awakenings.length} />
           <p className="muted small">
             {loadout.dupes === 0
               ? 'Add duplicates to unlock awakenings. Each one lets you turn on any awakening, in any order.'

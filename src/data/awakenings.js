@@ -196,3 +196,45 @@ export const AWAKENINGS = {
     ['Deceptive Liberation', 'Appraise and Engrave extra DMG becomes 300% ATK.'],
   ),
 };
+
+// Resonance: two bonuses that switch on automatically when a character has
+// 3 (R3) and 6 (R6) awakenings active. Sources: neverness.gg build guides,
+// Icy Veins (Zankou). Summaries; check in-game text for exact values.
+export const RESONANCE_AT = { R3: 3, R6: 6 };
+
+const r = (r3, r6) => [
+  { id: 'R3', at: 3, name: r3[0], effect: r3[1] },
+  { id: 'R6', at: 6, name: r6[0], effect: r6[1] },
+];
+
+export const RESONANCES = {
+  adler: r(['Cleanse', 'Deliverance, Evil’s Bane and Tranquility +1 skill level.'], ['Enlightened Guardian', 'Team Incantation DMG +10% while protected by Blessing.']),
+  aurelia: r(['Universal Harmony', 'Cappella, Cadenza Aria and Canon Chorus +1 skill level.'], ['Shared Melody', 'All allies’ Psyche DMG +8% for 15s when Cadenza starts or is extended.']),
+  baicang: r(['Earth Sequence', 'Walk the Talk, Generous Guidance and Judgment of Autumn +1 skill level.'], ['Remained', 'Allies in the domain gain 20% ATK and Execution during Judgment of Autumn.']),
+  blackbird: r(['Atonement Unveiled', 'Six skills +1 level; Ultimate DMG +100% and +50%; Ultimate grants 20 Malice.'], ['When the Stars Mourn', 'Team Crit DMG +30% while Blackbird is on the team.']),
+  chaos: r(['Justice / Truth', 'Pursuit, Doubtmark and Retribution +1 skill level.'], ['Light / Daybreak', 'Enemies with Warrant have 10% less Lakshana RES.']),
+  chiz: r(['Friends and Family', 'Grain gain +50% more while in Debt.'], ['Homecoming', 'Her hits lower the target’s Cosmos RES by 10%.']),
+  daffodill: r(['Covert Operation', 'Still Waters, Resonance and Witness This Finale +1 skill level.'], ['Sunlight and Sanctuary', 'Targets entering Break lose 20% Chaos RES.']),
+  edgar: r(['Pursuit of Knowledge', 'Wild Current, Finnegan’s Wake and Weight of Knowledge +1 skill level.'], ['Keen Insight', 'Each 3% Max HP a teammate loses grants a Finnegan’s Vigil Charge (up to 20).']),
+  fadia: r(['The Disrespecting Saint', 'Wordless Rejection, Existence and Agony to Euphoria +1 skill level.'], ['The Unified Saint', 'Team ATK +10% while Fadia is on the team.']),
+  haniel: r(['Prequel', 'Genesse Technique, Silent Moonlit Forest Guardian and A Melody Named Haniel +1 skill level.'], ['Sequel', 'Team Crit DMG +12% while she is Paranormal Ace.']),
+  hathor: r(['Doubled Capacity', 'Rapid Delivery, Aerial Command and Rider Express +1 skill level.'], ['Unhindered Passage', 'Ignores 10% DEF in Emergency Delivery.']),
+  hotori: r(['Eternity Shattered', 'Misty Moon Style, Present Replay and World’s Tide +1 skill level.'], ['The Ultimate Treasure of Clear Understanding', 'Team ATK +10% while Hotori is on the team and alive.']),
+  iroi: r(['Primate Among All Things', 'Three skills +1 level; all team members’ DEF +30%.'], ['Self-Proclaimed Crown of Creation', 'Team Crit DMG +25% while Iroi is on the team; her DMG +15% and Crit Rate +5%.']),
+  jiuyuan: r(['Doubled Capacity', 'When Secrets Take Shape, Intel Hunter and Final Reckoning +1 skill level.'], ['Unhindered Passage', 'Lethal Rose Pact targets lose 10% Anima RES.']),
+  lacrimosa: r(['The Heart’s Drowsy Flames', 'Sweet and Sour, Morning Tomato, Devilish Gift and Working Day Judgement +1 skill level.'], ['Lullaby', 'Effect not published yet.']),
+  linko: r(['Shared Pulse', 'Spectral Cross, Full-Frequency Pulse and Oversync +1 skill level; Linko ATK +20%.'], ['Perfect Reception', 'Resonance Field lasts 5s longer; allies’ Anima and Incantation DMG +30% inside it.']),
+  mint: r(['Minty Bubble Tea', 'Perfect Containment, Super Claws and Thunderous Whirlwind Slash +1 skill level.'], ['Fluffy Mousse', 'Super Claws grants 5 extra Cycle Rate.']),
+  nanally: r(['Colucci Secrets: Part 1', 'Colucci Secret Skill, Howling Technique and Ultimate Technique +1 skill level.'], ['Colucci Secrets: Part 2', 'Nanally’s DMG +10%.']),
+  sakiri: r(['Insatiable Appetite', 'Kiroumaru Headbutt, Devour Whole and Feast of Gluttony +1 skill level.'], ['Fog Penetration', 'DMG +3% per negative effect on the target, up to 12%.']),
+  shinku: r(['Awakened Resolve', 'Basic Attack, Redirect Skill and Ultimate +1 level; DMG +30% in Surging Crimson.'], ['Crimson Hero', 'Crit Rate +10% and ignores 15% DEF.']),
+  skia: r(['Cubical Survival Manual', 'Arresting Art, Shadow Hound Chase and The Pack +1 skill level.'], ['Employee of the Month', 'Each Fang Thrust lock lowers the target’s Lakshana RES.']),
+  zankou: r(['Scarlet Feast', 'Six skills +1 level; Bloodfeast Reverie and Inferno Flamenco DMG +20%.'], ['Venom Flame', 'ATK +40% for 20s after dealing DMG; enhanced for 60s after defeating a Scorched target.']),
+  zero: r(['Discern', 'Appraisal, Appraise and Engrave and Divide by Zero +1 skill level.'], ['Zero Display', 'Team ATK +10% for 20s when Zero triggers a Cosmos Esper Cycle.']),
+};
+
+/** Which Resonances are active for a number of active awakenings. */
+export const activeResonance = (awakeningCount) => ({
+  R3: awakeningCount >= RESONANCE_AT.R3,
+  R6: awakeningCount >= RESONANCE_AT.R6,
+});
