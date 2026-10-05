@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { canvasToBlob, renderTeamCard } from '../lib/teamCard.js';
 
 const BASE = import.meta.env.BASE_URL;
-const SITE = 'salmanstarneo.github.io/nte-team-builder';
+// The site address is left off the card while the app is in testing.
 
 const fileName = (name) =>
   `${(name || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'team'}-nte-team.png`;
@@ -17,7 +17,7 @@ export default function ExportDialog({ team, onClose }) {
   useEffect(() => {
     let cancelled = false;
     let objectUrl;
-    renderTeamCard(team, { base: BASE, site: SITE })
+    renderTeamCard(team, { base: BASE })
       .then(canvasToBlob)
       .then((b) => {
         if (cancelled || !b) return;
