@@ -6,6 +6,7 @@ import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import AscensionPlanner from './AscensionPlanner.jsx';
+import SkillsSection from './SkillsSection.jsx';
 import StatIcon from './StatIcon.jsx';
 import { AWAKENINGS, RESONANCES } from '../data/awakenings.js';
 import RoleList from './RoleList.jsx';
@@ -179,6 +180,8 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
           <p className="muted small">Awakenings will be added once they’re published.</p>
         )}
       </section>
+
+      <SkillsSection key={`skills-${c.id}`} character={c} />
 
       <AscensionPlanner key={c.id} character={c} />
 

@@ -2400,3 +2400,53 @@ th[aria-sort='descending'] .th-btn {
   flex-wrap: wrap;
   row-gap: 2px;
 }
+
+/* Skills on the character page */
+.skill-list {
+  list-style: none;
+  margin: 8px 0 6px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+@media (min-width: 760px) {
+  .skill-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.skill-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  min-width: 0;
+}
+.skill-type {
+  flex: none;
+  min-width: 7.2em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--el) 22%, var(--surface));
+  font: 600 0.66rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+  line-height: 1.5;
+}
+.skill-type--life {
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+}
+.skill-life-title {
+  margin-top: 12px;
+}
+.skill-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 0.84rem;
+}
+.mat--life {
+  border-left-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}
