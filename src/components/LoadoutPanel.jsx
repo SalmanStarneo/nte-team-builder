@@ -115,7 +115,7 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
         {/* Arc */}
         <div className="gear-block">
           <label className="mini-title" htmlFor="gear-arc">
-            Arc <span>{c.arcType} only</span>
+            Arc <span>{c.arcType ? `${c.arcType} only` : 'Arc type not announced'}</span>
           </label>
           <select
             id="gear-arc"

@@ -104,6 +104,17 @@ export const CHARACTERS = [
     arcType: 'Liquid', faction: 'Tamamochi Street Resident Association', ability: null,
     tags: ['Main DPS'], stats: null, upcoming: true,
   },
+  // Version 1.5 drip-marketing reveals. Arc type and kit not published yet.
+  {
+    id: 'elyms', name: 'Elyms', rarity: 'S', element: 'cosmos', roles: ['Damage'],
+    arcType: null, faction: 'E.T.D. 6', ability: null,
+    tags: ['Melee'], stats: null, upcoming: true,
+  },
+  {
+    id: 'exe', name: 'Exe', rarity: 'S', element: 'chaos', roles: ['Damage'],
+    arcType: null, faction: 'E.T.D. 6', ability: null,
+    tags: [], stats: null, upcoming: true,
+  },
   // A-rank
   {
     id: 'adler', name: 'Adler', rarity: 'A', element: 'incantation', roles: ['Survival'],

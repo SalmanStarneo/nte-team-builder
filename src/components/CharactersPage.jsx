@@ -165,7 +165,7 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                 </td>
                 <td><RankBadge rank={c.rarity} size={22} /></td>
                 <td><RoleList roles={c.roles} size={14} /></td>
-                <td>{c.arcType}</td>
+                <td>{c.arcType ?? '—'}</td>
                 <td className="num">{c.stats ? c.stats.hp.toLocaleString('en-US') : '—'}</td>
                 <td className="num">{c.stats?.atk ?? '—'}</td>
                 <td className="num">{c.stats?.def ?? '—'}</td>

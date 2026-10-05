@@ -44,8 +44,14 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
       <div className="detail__grid">
         <dl className="facts">
           <div><dt>Arc type</dt><dd>
-            {c.arcType}{' '}
-            <a className="muted" href={`#arcs-${c.arcType.toLowerCase()}`}>· {arcCount} Arcs</a>
+            {c.arcType ? (
+              <>
+                {c.arcType}{' '}
+                <a className="muted" href={`#arcs-${c.arcType.toLowerCase()}`}>· {arcCount} Arcs</a>
+              </>
+            ) : (
+              <span className="muted">Not announced yet</span>
+            )}
           </dd></div>
           {signature && <div><dt>Signature Arc</dt><dd>{signature.name}</dd></div>}
           {RECOMMENDED[c.id]?.length > 0 && (
