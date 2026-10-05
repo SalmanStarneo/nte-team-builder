@@ -63,7 +63,7 @@ export const CHARACTERS = [
   },
   {
     id: 'iroi', name: 'Iroi', rarity: 'S', element: 'anima', roles: ['Survival', 'Buff'],
-    arcType: 'Liquid', faction: null, ability: null,
+    arcType: 'Liquid', faction: 'Bureau of Anomaly Control', unit: 'CSU-2', ability: null,
     tags: ['Survival', 'Team ATK Buff'], stats: null,
   },
   {
@@ -93,7 +93,7 @@ export const CHARACTERS = [
   },
   {
     id: 'shinku', name: 'Shinku', rarity: 'S', element: 'cosmos', roles: ['Damage'],
-    arcType: 'Condensate', faction: null, ability: null,
+    arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'CSU-2', ability: null,
     tags: ['Main DPS'], stats: null,
   },
   {
@@ -140,7 +140,7 @@ export const CHARACTERS = [
   },
   {
     id: 'mint', name: 'Mint', rarity: 'A', element: 'anima', roles: ['Damage'],
-    arcType: 'Liquid', faction: 'Bureau of Anomaly Control, CSU-2', ability: 'Nya-choo!',
+    arcType: 'Liquid', faction: 'Bureau of Anomaly Control', unit: 'CSU-2', ability: 'Nya-choo!',
     tags: ['Main DPS'], stats: stats(1000, 75, 60),
   },
   {
