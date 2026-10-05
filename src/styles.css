@@ -1702,19 +1702,19 @@ th[aria-sort='descending'] .th-btn {
 .arc-card[data-arc-type] .arc-card__type { color: var(--fg); opacity: 0.75; }
 
 /* Colours follow the in-game Arc effects:
-   Solid red-magenta rings, Liquid cyan water, Gas white wind,
-   Plasma electric blue, Condensate icy crystal. */
+   Solid icy crystal, Liquid cyan water, Gas white wind,
+   Plasma electric blue, Condensate red-magenta rings. */
 
-/* Solid: brushed metal, anodised red */
+/* Solid: icy crystal facets with a lilac tint */
 .arc-card[data-arc-type='solid'] .arc-card__top {
   background-image:
-    linear-gradient(100deg, transparent 18%, rgba(255, 255, 255, var(--sheen)) 36%, transparent 56%),
-    repeating-linear-gradient(0deg, var(--grain) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(90deg, transparent 0 7px, var(--grain) 7px 8px, transparent 8px 19px),
-    radial-gradient(70% 160% at 100% 50%, color-mix(in srgb, #ff4f9a 24%, transparent), transparent 70%),
+    linear-gradient(135deg, rgba(255, 255, 255, var(--sheen)) 0 16%, transparent 16% 38%,
+      rgba(255, 255, 255, calc(var(--sheen) * 0.55)) 38% 50%, transparent 50%),
+    linear-gradient(48deg, transparent 0 58%, color-mix(in srgb, #c9b8ff 30%, transparent) 58% 70%, transparent 70%),
+    linear-gradient(160deg, transparent 0 74%, color-mix(in srgb, #ffffff 18%, transparent) 74% 82%, transparent 82%),
     linear-gradient(180deg,
-      color-mix(in srgb, #ff6b7d 20%, var(--arc-base)),
-      color-mix(in srgb, #d8203f 32%, var(--arc-base)));
+      color-mix(in srgb, #c4d6ff 22%, var(--arc-base)),
+      color-mix(in srgb, #7f9df2 30%, var(--arc-base)));
 }
 
 /* Liquid: semi-gloss cyan water */
@@ -1748,17 +1748,18 @@ th[aria-sort='descending'] .th-btn {
       color-mix(in srgb, #1f3fd6 32%, var(--arc-base)));
 }
 
-/* Condensate: icy crystal facets with a lilac tint */
+/* Condensate: glowing red-magenta rings */
 .arc-card[data-arc-type='condensate'] .arc-card__top {
   background-image:
-    linear-gradient(135deg, rgba(255, 255, 255, var(--sheen)) 0 16%, transparent 16% 38%,
-      rgba(255, 255, 255, calc(var(--sheen) * 0.55)) 38% 50%, transparent 50%),
-    linear-gradient(48deg, transparent 0 58%, color-mix(in srgb, #c9b8ff 30%, transparent) 58% 70%, transparent 70%),
-    linear-gradient(160deg, transparent 0 74%, color-mix(in srgb, #ffffff 18%, transparent) 74% 82%, transparent 82%),
+    radial-gradient(130% 80% at 50% -18%, rgba(255, 255, 255, calc(var(--sheen) * 0.7)) 0 40%, transparent 62%),
+    repeating-radial-gradient(circle at 92% 50%, transparent 0 9px,
+      color-mix(in srgb, #ff4f9a 26%, transparent) 9px 11px, transparent 11px 17px),
+    radial-gradient(60% 160% at 92% 50%, color-mix(in srgb, #ff3b5c 30%, transparent), transparent 70%),
     linear-gradient(180deg,
-      color-mix(in srgb, #c4d6ff 22%, var(--arc-base)),
-      color-mix(in srgb, #7f9df2 30%, var(--arc-base)));
+      color-mix(in srgb, #ff6b7d 18%, var(--arc-base)),
+      color-mix(in srgb, #d8203f 30%, var(--arc-base)));
 }
+
 
 .arc-card__type {
   margin-left: auto;
