@@ -57,9 +57,16 @@ export default function SharePanel({ team, dispatch }) {
       </label>
 
       <div className="field">
-        <label htmlFor="card-code">Card code <span className="muted">· team, duplicates and Arcs</span></label>
+        <label htmlFor="card-code">Card code <span className="muted">· team, duplicates, Arcs, Cartridges and modules</span></label>
         <div className="code-row">
-          <input id="card-code" className="code code--card" readOnly value={cardCode} onFocus={(e) => e.target.select()} />
+          <textarea
+            id="card-code"
+            className="code code--card"
+            readOnly
+            rows={cardCode.length > 14 ? 2 : 1}
+            value={cardCode}
+            onFocus={(e) => e.target.select()}
+          />
           <button className="btn" onClick={() => copy(cardCode, 'card-code')}>{copied === 'card-code' ? 'Copied' : 'Copy'}</button>
         </div>
       </div>

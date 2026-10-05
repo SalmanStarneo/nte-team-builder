@@ -2,8 +2,6 @@
 
 An unofficial, fan-made team planner for **Neverness to Everness (NTE)**.
 
-**Live app: https://salmanstarneo.github.io/nte-team-builder/**
-
 Plan squads, browse every character, see which elemental reactions they trigger on the Esper Cycle, and share teams with a short code. Works in any modern browser on desktop and mobile, with no account or installation.
 
 > NTE Team Builder is not affiliated with, endorsed by, or sponsored by Hotta Studio or Perfect World Games. See [Legal](#legal).
@@ -19,7 +17,7 @@ Plan squads, browse every character, see which elemental reactions they trigger 
 - **Roster with smart hints.** Filter by element, role and rank. Each character card shows which new reactions it would add to the current team.
 - **Community presets.** Load well-known team archetypes as a starting point.
 - **Team images.** Export any team as a 1200×675 card with portraits, gear and reactions, then save it, copy it to the clipboard, or share it from a phone.
-- **Team codes.** Every exported card carries a 12-character card code (for example `700B-00C0-140B`) that rebuilds the team, duplicate counts and Arcs when typed into the builder. Link codes (`#nte1~…`) carry the team and its name and import automatically when opened.
+- **Team codes.** Every exported card carries a card code (for example `700B-00C0-140B`) that rebuilds the team, duplicate counts and Arcs when typed into the builder. When Cartridges or Console modules are set, the code grows by a few groups to carry them too. Link codes (`#nte1~…`) carry the team and its name and import automatically when opened.
 - **Character index.** A sortable, filterable table of every Esper with rank, element, role, Arc type and base stats. Each character has a detail view with faction, Esper ability, reactions and featured teams.
 - **Arcs.** All Arcs with tabs for each Arc type (Solid, Liquid, Gas, Plasma, Condensate), rank filter, search, and the characters each Arc is the signature of or recommended for.
 - **Ascension planner.** Each character page lists the materials to raise their level cap, with a from/to range and a per-ascension breakdown.

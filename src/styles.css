@@ -728,6 +728,7 @@ button {
 .code-row {
   display: flex;
   gap: 6px;
+  align-items: flex-start;
 }
 .code {
   flex: 1;
@@ -740,6 +741,10 @@ button {
   font: 0.8rem var(--font-mono);
 }
 .code--card {
+  resize: none;
+  field-sizing: content;
+  word-break: break-all;
+  line-height: 1.4;
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.06em;

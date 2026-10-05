@@ -481,23 +481,35 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     px += w + 8;
   }
 
-  // Footer
+  // Footer: legal line on the left, card code on the right.
+  // A long code (full gear) pushes the legal line up so both stay readable.
+  const LEGAL = 'Unofficial fan project. Neverness to Everness \u00a9 Hotta Studio / Perfect World Games.';
+  const code = encodeCardCode(team, loadoutOf);
+  ctx.font = `400 12px ${BODY}`;
+  const legalW = ctx.measureText(LEGAL).width;
+  ctx.font = `600 20px ${MONO}`;
+  let codeW = ctx.measureText(code).width;
+  const labelW = 46;
+  const sideBySide = PAD + legalW + 32 + labelW + codeW <= CARD_W - PAD;
+  let codeSize = 20;
+  if (!sideBySide) {
+    codeSize = Math.max(14, Math.min(20, Math.floor((20 * (CARD_W - PAD * 2 - labelW)) / codeW)));
+  }
   ctx.fillStyle = C.muted;
   ctx.font = `400 12px ${BODY}`;
-  ctx.fillText('Unofficial fan project. Neverness to Everness \u00a9 Hotta Studio / Perfect World Games.', PAD, CARD_H - 24);
-  // Card code (bottom right): type it into the builder to rebuild this team.
+  ctx.fillText(LEGAL, PAD, sideBySide ? CARD_H - 24 : CARD_H - 52);
+  // Card code: type it into the builder to rebuild this team and its gear.
   ctx.textAlign = 'right';
-  const code = encodeCardCode(team, loadoutOf);
-  ctx.font = `600 20px ${MONO}`;
+  ctx.font = `600 ${codeSize}px ${MONO}`;
   ctx.fillStyle = C.fg;
   ctx.fillText(code, CARD_W - PAD, CARD_H - 22);
-  const codeW = ctx.measureText(code).width;
+  codeW = ctx.measureText(code).width;
   ctx.font = `500 11px ${MONO}`;
   ctx.fillStyle = C.muted;
   ctx.fillText('CODE', CARD_W - PAD - codeW - 12, CARD_H - 24);
   if (site) {
     ctx.font = `500 12px ${MONO}`;
-    ctx.fillText(site, CARD_W - PAD, CARD_H - 50);
+    ctx.fillText(site, CARD_W - PAD, CARD_H - 52);
   }
   ctx.textAlign = 'left';
 
