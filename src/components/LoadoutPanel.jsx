@@ -1,4 +1,5 @@
 import { ARC_BY_ID, arcTag, arcsFor } from '../data/arcs.js';
+import CartridgeIcon from './CartridgeIcon.jsx';
 import { CARTRIDGES, CARTRIDGE_BY_ID, MODULE_STATS, MODULE_TYPES, cartridgesFor } from '../data/gear.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import Portrait from './Portrait.jsx';
@@ -33,7 +34,7 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
   function setModule(i, patch) {
     const modules = loadout.modules.map((m, j) => {
       if (j !== i) return m;
-      const next = { type: 'II', stat: MODULE_STATS[0], ...m, ...patch };
+      const next = { type: 'II', stat: 'ATK%', ...m, ...patch };
       return next.type ? next : null;
     });
     onChange({ modules });
@@ -206,6 +207,7 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
           {cart ? (
             <div className="gear-card">
               <div className="gear-card__top">
+                <CartridgeIcon id={cart.id} size={30} />
                 <b>{cart.name}</b>
                 {cartIsRec && <span className="arc-tag arc-tag--rec">Recommended</span>}
               </div>
@@ -219,6 +221,7 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
               <div className="arc-picks">
                 {recSets.map((id) => (
                   <button key={id} type="button" className="arc-pick" onClick={() => onChange({ cartridge: id })}>
+                    <CartridgeIcon id={id} size={18} />
                     <span className="arc-tag arc-tag--rec">Rec</span>
                     {CARTRIDGE_BY_ID[id].name}
                   </button>

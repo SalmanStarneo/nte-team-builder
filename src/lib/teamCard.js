@@ -40,18 +40,22 @@ const EL = {
 
 // Short module stat labels that fit a small tile.
 const STAT_SHORT = {
-  'ATK %': 'ATK%',
-  ATK: 'ATK',
-  'Crit Rate': 'CRIT R',
-  'Crit DMG': 'CRIT D',
-  'Elemental DMG': 'ELEM',
+  'HP%': 'HP%',
+  'ATK%': 'ATK%',
+  'DEF%': 'DEF%',
+  'CRIT Rate': 'CRIT R',
+  'CRIT DMG': 'CRIT D',
+  'Cycle Intensity': 'CYCLE',
   'Break Intensity': 'BREAK',
-  'HP %': 'HP%',
-  HP: 'HP',
-  'DEF %': 'DEF%',
-  DEF: 'DEF',
-  'Energy Regen': 'ENERGY',
-};
+  'Healing%': 'HEAL%',
+  'Cosmos DMG%': 'COSMOS',
+  'Anima DMG%': 'ANIMA',
+  'Incantation DMG%': 'INCANT',
+  'Chaos DMG%': 'CHAOS',
+  'Psyche DMG%': 'PSYCHE',
+  'Lakshana DMG%': 'LAKSH',
+  'Mental DMG%': 'MENTAL',
+}
 
 function loadImage(src) {
   return new Promise((resolve) => {
@@ -207,6 +211,10 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   // Official element and role icons.
   const elementIds = [...new Set(members.filter(Boolean).map((c) => c.element))];
   const roleIds = [...new Set(members.filter(Boolean).flatMap((c) => c.roles))];
+  const cartIds = [...new Set(members.filter(Boolean).map((c) => loadoutOf(team, c.id).cartridge).filter(Boolean))];
+  const cartIcons = Object.fromEntries(
+    await Promise.all(cartIds.map(async (id) => [id, await loadImage(`${base}icons/cartridges/${id}.webp`)])),
+  );
   const [elIcons, roleIcons] = await Promise.all([
     Promise.all(elementIds.map((id) => loadImage(`${base}icons/elements/${id}.webp`))).then((l) =>
       Object.fromEntries(elementIds.map((id, i) => [id, l[i]])),
@@ -438,7 +446,7 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     // With modules shown, names stay on one line so the module row has room.
     const maxLines = hasModules ? 1 : 2;
 
-    const gearRow = (label, value, tag, extra) => {
+    const gearRow = (label, value, tag, extra, icon) => {
       ctx.fillStyle = C.muted;
       ctx.font = `500 11px ${MONO}`;
       ctx.fillText(label, gx, gy + 4);
@@ -459,12 +467,21 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
       }
       ctx.fillStyle = value ? C.fg : C.muted;
       ctx.font = `${value ? 600 : 400} 15px ${BODY}`;
-      const lines = wrap(ctx, value || '\u2014', gw, maxLines);
-      lines.forEach((ln, k) => ctx.fillText(ln, gx, gy + 24 + k * 19));
+      const ICON = 20;
+      const tx = icon ? gx + ICON + 6 : gx;
+      if (icon) {
+        ctx.save();
+        roundRect(ctx, gx, gy + 10, ICON, ICON, 5);
+        ctx.clip();
+        ctx.drawImage(icon, gx, gy + 10, ICON, ICON);
+        ctx.restore();
+      }
+      const lines = wrap(ctx, value || '\u2014', gw - (tx - gx), maxLines);
+      lines.forEach((ln, k) => ctx.fillText(ln, tx, gy + 24 + k * 19));
       gy += 30 + lines.length * 19;
     };
     gearRow('ARC', arc?.name, arc ? arcTag(arc, c) : null, arc && gear.arcDupes ? `+${gear.arcDupes}` : null);
-    gearRow('CARTRIDGE', cart?.name, cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null);
+    gearRow('CARTRIDGE', cart?.name, cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null, null, cart && cartIcons[cart.id]);
 
     // Console modules: four tiles along the bottom of the panel.
     if (hasModules) {

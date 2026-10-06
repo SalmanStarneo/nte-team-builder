@@ -53,14 +53,15 @@ const CART_ORDER = [
 const MODULE_TYPE_ORDER = ['II', 'III', 'IV'];
 
 const MODULE_STAT_ORDER = [
-  'ATK %', 'ATK', 'Crit Rate', 'Crit DMG', 'Elemental DMG', 'Break Intensity',
-  'HP %', 'HP', 'DEF %', 'DEF', 'Energy Regen',
-];
+  'HP%', 'ATK%', 'DEF%', 'CRIT Rate', 'CRIT DMG', 'Cycle Intensity', 'Break Intensity',
+  'Healing%', 'Cosmos DMG%', 'Anima DMG%', 'Incantation DMG%', 'Chaos DMG%', 'Psyche DMG%',
+  'Lakshana DMG%', 'Mental DMG%',
+]
 
 // Crockford base 32: no I, L, O or U, so codes are easy to read and type.
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 const HEAD_SALT = 0x9; // change if a layout ever changes, so old and new codes can't be confused
-const TAIL_SALT = 0x15;
+const TAIL_SALT = 0x0b; // v2: module stats follow the in-game attribute list
 const HEAD_CHARS = 12;
 const GROUP = 4;
 

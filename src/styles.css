@@ -2578,3 +2578,27 @@ th[aria-sort='descending'] .th-btn {
     max-width: none;
   }
 }
+
+/* Cartridge set icons */
+.cart-icon {
+  flex: none;
+  border-radius: 24%;
+  vertical-align: middle;
+}
+.gear-chip .cart-icon {
+  margin-right: 4px;
+  vertical-align: -3px;
+}
+.arc-pick .cart-icon {
+  margin-right: 2px;
+}
+.cart-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+.cart-list__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

@@ -1,5 +1,7 @@
 import { TEAM_SIZE } from './analyze.js';
-import { MODULE_SLOTS } from '../data/gear.js';
+import { CHARACTER_BY_ID } from '../data/characters.js';
+import { ELEMENT_BY_ID } from '../data/elements.js';
+import { LEGACY_MODULE_STATS, MODULE_SLOTS, MODULE_STATS } from '../data/gear.js';
 import { MAX_ARC_DUPES, MAX_DUPES } from '../data/awakenings.js';
 
 // All team changes go through this reducer, so the rules live in one place.
@@ -26,9 +28,23 @@ export const emptyLoadout = () => ({
   awakenings: [],
 });
 
+// Modules saved with an older stat name are renamed ("Elemental DMG" becomes the
+// character's own element); anything else unknown falls back to ATK%, so the
+// module and its size are kept.
+const fixModule = (m, charId) => {
+  if (!m) return null;
+  let stat = LEGACY_MODULE_STATS[m.stat] ?? m.stat;
+  if (stat === 'Elemental DMG') {
+    const el = ELEMENT_BY_ID[CHARACTER_BY_ID[charId]?.element];
+    stat = el ? `${el.name} DMG%` : 'ATK%';
+  }
+  return { ...m, stat: MODULE_STATS.includes(stat) ? stat : 'ATK%' };
+};
+
 export function loadoutOf(team, charId) {
   // Merge with defaults so loadouts saved before new fields existed still work.
-  return { ...emptyLoadout(), ...(team.loadouts?.[charId] ?? {}) };
+  const lo = { ...emptyLoadout(), ...(team.loadouts?.[charId] ?? {}) };
+  return { ...lo, modules: (lo.modules ?? []).map((m) => fixModule(m, charId)) };
 }
 
 export function initialState(saved) {

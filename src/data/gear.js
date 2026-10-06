@@ -61,18 +61,38 @@ export const MODULE_TYPES = [
   { id: 'IV', label: 'Type IV', cells: 4 },
 ];
 
+// Main attributes a module can roll (in-game "Possible Attributes" table).
 export const MODULE_STATS = [
-  'ATK %',
-  'ATK',
-  'Crit Rate',
-  'Crit DMG',
-  'Elemental DMG',
+  'HP%',
+  'ATK%',
+  'DEF%',
+  'CRIT Rate',
+  'CRIT DMG',
+  'Cycle Intensity',
   'Break Intensity',
-  'HP %',
-  'HP',
-  'DEF %',
-  'DEF',
-  'Energy Regen',
+  'Healing%',
+  'Cosmos DMG%',
+  'Anima DMG%',
+  'Incantation DMG%',
+  'Chaos DMG%',
+  'Psyche DMG%',
+  'Lakshana DMG%',
+  'Mental DMG%',
 ];
+
+// Sub attributes (shown for reference; not tracked per module yet).
+export const MODULE_SUB_STATS = [
+  'HP', 'HP%', 'ATK', 'ATK%', 'DEF', 'DEF%',
+  'Break Intensity', 'Cycle Intensity', 'DMG%', 'CRIT Rate', 'CRIT DMG',
+];
+
+// Older saved teams used these names; map them to the current list.
+export const LEGACY_MODULE_STATS = {
+  'ATK %': 'ATK%',
+  'HP %': 'HP%',
+  'DEF %': 'DEF%',
+  'Crit Rate': 'CRIT Rate',
+  'Crit DMG': 'CRIT DMG',
+};
 
 export const MODULE_SLOTS = 4;

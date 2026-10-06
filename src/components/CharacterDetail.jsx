@@ -3,6 +3,7 @@ import { PRESETS } from '../data/presets.js';
 import { CHARACTER_BY_ID } from '../data/characters.js';
 import { ARCS, ARC_BY_ID, RECOMMENDED } from '../data/arcs.js';
 import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
+import CartridgeIcon from './CartridgeIcon.jsx';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import AscensionPlanner from './AscensionPlanner.jsx';
@@ -79,7 +80,14 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
           <div><dt>Esper ability</dt><dd>{c.ability ?? '—'}</dd></div>
           <div>
             <dt>Recommended Cartridges</dt>
-            <dd>{cartridgesFor(c).map((id) => CARTRIDGE_BY_ID[id].name).join(', ')}</dd>
+            <dd className="cart-list">
+              {cartridgesFor(c).map((id) => (
+                <span key={id} className="cart-list__item">
+                  <CartridgeIcon id={id} size={22} />
+                  {CARTRIDGE_BY_ID[id].name}
+                </span>
+              ))}
+            </dd>
           </div>
           {c.upcoming && <div><dt>Status</dt><dd>Upcoming</dd></div>}
         </dl>
