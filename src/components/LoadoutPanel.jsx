@@ -1,13 +1,15 @@
 import { ARC_BY_ID, arcTag, arcsFor } from '../data/arcs.js';
 import CartridgeIcon from './CartridgeIcon.jsx';
-import { CARTRIDGES, CARTRIDGE_BY_ID, MODULE_STATS, MODULE_TYPES, cartridgesFor } from '../data/gear.js';
+import {
+  CARTRIDGES, CARTRIDGE_BY_ID, CARTRIDGE_MAIN_STATS, CARTRIDGE_SUB_SLOTS, MODULE_SUB_STATS, cartridgesFor, isPercentStat,
+} from '../data/gear.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
 import { AWAKENINGS, MAX_ARC_DUPES, MAX_DUPES } from '../data/awakenings.js';
 import ResonanceBadges from './ResonanceBadges.jsx';
 
-// Gear editor for one team member: Arc, Cartridge set and Console modules.
+// Gear editor for one team member: Arc, Cartridge set and Cartridge stats.
 export default function LoadoutPanel({ character: c, loadout, onChange, onClose, dispatch }) {
   const awakenings = AWAKENINGS[c.id];
   const arcs = arcsFor(c);
@@ -31,13 +33,9 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
   const otherSets = CARTRIDGES.filter((s) => !recSets.includes(s.id));
   const cartIsRec = cart && recSets.includes(cart.id);
 
-  function setModule(i, patch) {
-    const modules = loadout.modules.map((m, j) => {
-      if (j !== i) return m;
-      const next = { type: 'II', stat: 'ATK%', ...m, ...patch };
-      return next.type ? next : null;
-    });
-    onChange({ modules });
+  const stats = loadout.cartStats;
+  function setCartStats(next) {
+    onChange({ cartStats: next });
   }
 
   return (
@@ -234,53 +232,70 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
           )}
         </div>
 
-        {/* Modules */}
+        {/* Cartridge attributes */}
         <div className="gear-block gear-block--wide">
-          <p className="mini-title">Console modules</p>
-          <ol className="modules">
-            {loadout.modules.map((m, i) => (
-              <li key={i} className={m ? 'module module--on' : 'module'}>
-                <span className="module__cells" aria-hidden="true">
-                  {Array.from({ length: 4 }, (_, k) => (
-                    <span
-                      key={k}
-                      className={
-                        m && k < MODULE_TYPES.find((t) => t.id === m.type).cells ? 'cell cell--on' : 'cell'
-                      }
-                    />
-                  ))}
-                </span>
-                <label className="sr-only" htmlFor={`mod-type-${i}`}>Module {i + 1} size</label>
-                <select
-                  id={`mod-type-${i}`}
-                  value={m?.type ?? ''}
-                  onChange={(e) => setModule(i, { type: e.target.value || null })}
-                >
-                  <option value="">Empty</option>
-                  {MODULE_TYPES.map((t) => (
-                    <option key={t.id} value={t.id}>{t.label} ({t.cells} cells)</option>
-                  ))}
-                </select>
-                <label className="sr-only" htmlFor={`mod-stat-${i}`}>Module {i + 1} main stat</label>
-                <select
-                  id={`mod-stat-${i}`}
-                  value={m?.stat ?? ''}
-                  disabled={!m}
-                  onChange={(e) => setModule(i, { stat: e.target.value })}
-                >
-                  {!m && <option value="">Main stat</option>}
-                  {MODULE_STATS.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </li>
+          <p className="mini-title">Cartridge stats <span>1 main · {CARTRIDGE_SUB_SLOTS} sub</span></p>
+          <div className="cstats">
+            <StatRow
+              id="cs-main"
+              label="Main"
+              options={CARTRIDGE_MAIN_STATS}
+              value={stats.main}
+              onChange={(v) => setCartStats({ ...stats, main: v })}
+            />
+            {stats.subs.map((sub, i) => (
+              <StatRow
+                key={i}
+                id={`cs-sub-${i}`}
+                label={`Sub ${i + 1}`}
+                options={MODULE_SUB_STATS}
+                value={sub}
+                onChange={(v) => setCartStats({ ...stats, subs: stats.subs.map((x, j) => (j === i ? v : x)) })}
+              />
             ))}
-          </ol>
+          </div>
           <p className="muted small">
-            Records each module’s size and main stat. Interactive Console grid placement is coming next.
+            Enter the values shown on your Cartridge. They’re added to the Arc’s stats under Bonus stats on
+            the team image. Console modules get their own tab once the grid layouts are confirmed.
           </p>
         </div>
       </div>
     </section>
+  );
+}
+
+// One attribute: stat picker + value. Empty stat clears the row.
+function StatRow({ id, label, options, value, onChange }) {
+  const pct = value && isPercentStat(value.stat);
+  return (
+    <div className={value ? 'cstat cstat--on' : 'cstat'}>
+      <label className="cstat__label" htmlFor={id}>{label}</label>
+      <select
+        id={id}
+        value={value?.stat ?? ''}
+        onChange={(e) => onChange(e.target.value ? { stat: e.target.value, value: value?.value ?? 0 } : null)}
+      >
+        <option value="">—</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+      <span className="cstat__value">
+        <label className="sr-only" htmlFor={`${id}-v`}>{label} value</label>
+        <input
+          id={`${id}-v`}
+          type="number"
+          inputMode="decimal"
+          min="0"
+          step={pct ? '0.01' : '1'}
+          disabled={!value}
+          value={value ? value.value : ''}
+          placeholder="0"
+          onChange={(e) => {
+            const n = Math.max(0, Math.min(10000, Number(e.target.value) || 0));
+            onChange({ ...value, value: Math.round(n * 100) / 100 });
+          }}
+        />
+        <span className="cstat__unit" aria-hidden="true">{pct ? '%' : ''}</span>
+      </span>
+    </div>
   );
 }

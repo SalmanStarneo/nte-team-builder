@@ -80,7 +80,11 @@ export const MODULE_STATS = [
   'Mental DMG%',
 ];
 
-// Sub attributes (shown for reference; not tracked per module yet).
+// A Cartridge has 1 main attribute (from MODULE_STATS) and 4 sub attributes.
+export const CARTRIDGE_MAIN_STATS = MODULE_STATS;
+export const CARTRIDGE_SUB_SLOTS = 4;
+
+// Sub attributes for Cartridges (and later, Console modules).
 export const MODULE_SUB_STATS = [
   'HP', 'HP%', 'ATK', 'ATK%', 'DEF', 'DEF%',
   'Break Intensity', 'Cycle Intensity', 'DMG%', 'CRIT Rate', 'CRIT DMG',
@@ -96,3 +100,44 @@ export const LEGACY_MODULE_STATS = {
 };
 
 export const MODULE_SLOTS = 4;
+
+// Stats shown as percentages (everything else is a flat number).
+export const isPercentStat = (stat) => /%$/.test(stat) || stat.startsWith('CRIT');
+
+export const formatStat = (stat, value) => {
+  const n = Number(value);
+  const text = Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/0$/, '');
+  return `${stat.replace(/%$/, '')} +${text}${isPercentStat(stat) ? '%' : ''}`;
+};
+
+// Arc secondary stats are written like "Crit Rate 24%"; turn them into the
+// same names the Cartridge lists use, so bonus stats can be added together.
+const ARC_SUB_NAMES = {
+  'ATK %': 'ATK%', 'HP %': 'HP%', 'DEF %': 'DEF%',
+  'Crit Rate %': 'CRIT Rate', 'Crit DMG %': 'CRIT DMG',
+};
+export function parseArcSub(text) {
+  const m = /^(.*?)\s+([\d.]+)(%?)$/.exec(text ?? '');
+  if (!m) return null;
+  const key = `${m[1]}${m[3] ? ' %' : ''}`;
+  return { stat: ARC_SUB_NAMES[key] ?? (m[3] ? `${m[1]}%` : m[1]), value: Number(m[2]) };
+}
+
+/** Arc + Cartridge stats added up: [{ stat, value }] in a stable order. */
+export function bonusStats(arc, cartStats) {
+  const totals = new Map();
+  const add = (stat, value) => {
+    if (!stat || !Number.isFinite(Number(value)) || Number(value) === 0) return;
+    totals.set(stat, (totals.get(stat) ?? 0) + Number(value));
+  };
+  if (arc) {
+    add('ATK', arc.atk);
+    const sub = parseArcSub(arc.sub);
+    if (sub) add(sub.stat, sub.value);
+  }
+  if (cartStats) {
+    if (cartStats.main) add(cartStats.main.stat, cartStats.main.value);
+    for (const sub of cartStats.subs ?? []) if (sub) add(sub.stat, sub.value);
+  }
+  return [...totals].map(([stat, value]) => ({ stat, value: Math.round(value * 100) / 100 }));
+}

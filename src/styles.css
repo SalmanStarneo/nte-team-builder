@@ -2602,3 +2602,66 @@ th[aria-sort='descending'] .th-btn {
   align-items: center;
   gap: 6px;
 }
+
+/* Cartridge stats editor */
+.cstats {
+  display: grid;
+  gap: 6px;
+}
+@media (min-width: 760px) {
+  .cstats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cstats .cstat:first-child {
+    grid-column: 1 / -1;
+  }
+}
+.cstat {
+  display: grid;
+  grid-template-columns: 3.6em minmax(0, 1fr) 6.5em;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+.cstat--on {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--el) 50%, var(--line));
+  background: color-mix(in srgb, var(--el) 8%, var(--surface));
+}
+.cstat__label {
+  font: 600 0.68rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.cstat select,
+.cstat input {
+  min-width: 0;
+  width: 100%;
+  padding: 5px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.85rem;
+}
+.cstat__value {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.cstat input {
+  font-family: var(--font-mono);
+  text-align: right;
+}
+.cstat input:disabled {
+  opacity: 0.5;
+}
+.cstat__unit {
+  width: 0.9em;
+  font: 600 0.8rem var(--font-mono);
+  color: var(--muted);
+}

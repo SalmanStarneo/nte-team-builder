@@ -3,7 +3,7 @@
 import { CHARACTER_BY_ID } from '../data/characters.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import { ARC_BY_ID, arcTag } from '../data/arcs.js';
-import { CARTRIDGE_BY_ID, MODULE_TYPES, cartridgesFor } from '../data/gear.js';
+import { CARTRIDGE_BY_ID, bonusStats, cartridgesFor, isPercentStat } from '../data/gear.js';
 import { loadoutOf } from './teamsReducer.js';
 import { analyzeTeam } from './analyze.js';
 import { activeResonance } from '../data/awakenings.js';
@@ -43,19 +43,24 @@ const STAT_SHORT = {
   'HP%': 'HP%',
   'ATK%': 'ATK%',
   'DEF%': 'DEF%',
-  'CRIT Rate': 'CRIT R',
-  'CRIT DMG': 'CRIT D',
-  'Cycle Intensity': 'CYCLE',
-  'Break Intensity': 'BREAK',
-  'Healing%': 'HEAL%',
-  'Cosmos DMG%': 'COSMOS',
-  'Anima DMG%': 'ANIMA',
-  'Incantation DMG%': 'INCANT',
-  'Chaos DMG%': 'CHAOS',
-  'Psyche DMG%': 'PSYCHE',
-  'Lakshana DMG%': 'LAKSH',
-  'Mental DMG%': 'MENTAL',
-}
+  HP: 'HP',
+  ATK: 'ATK',
+  DEF: 'DEF',
+  'DMG%': 'DMG%',
+  'CRIT Rate': 'CRIT RATE',
+  'CRIT DMG': 'CRIT DMG',
+  'Cycle Intensity': 'CYCLE INT.',
+  'Break Intensity': 'BREAK INT.',
+  'Healing%': 'HEALING%',
+  'Cosmos DMG%': 'COSMOS DMG%',
+  'Anima DMG%': 'ANIMA DMG%',
+  'Incantation DMG%': 'INCANT. DMG%',
+  'Chaos DMG%': 'CHAOS DMG%',
+  'Psyche DMG%': 'PSYCHE DMG%',
+  'Lakshana DMG%': 'LAKSH. DMG%',
+  'Mental DMG%': 'MENTAL DMG%',
+  'Charge Efficiency%': 'CHARGE EFF.',
+};
 
 function loadImage(src) {
   return new Promise((resolve) => {
@@ -441,10 +446,10 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     ctx.lineTo(gx + gw, gy - 12);
     ctx.stroke();
 
-    const modules = (gear.modules ?? []).slice(0, 4);
-    const hasModules = modules.some(Boolean);
-    // With modules shown, names stay on one line so the module row has room.
-    const maxLines = hasModules ? 1 : 2;
+    const bonus = bonusStats(arc, gear.cartStats);
+    const hasBonus = bonus.length > 0;
+    // With bonus stats shown, names stay on one line so the stats have room.
+    const maxLines = hasBonus ? 1 : 2;
 
     const gearRow = (label, value, tag, extra, icon) => {
       ctx.fillStyle = C.muted;
@@ -483,42 +488,38 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     gearRow('ARC', arc?.name, arc ? arcTag(arc, c) : null, arc && gear.arcDupes ? `+${gear.arcDupes}` : null);
     gearRow('CARTRIDGE', cart?.name, cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null, null, cart && cartIcons[cart.id]);
 
-    // Console modules: four tiles along the bottom of the panel.
-    if (hasModules) {
-      const tileGap = 6;
-      const tileW = (gw - tileGap * 3) / 4;
-      const tileH = 38;
-      const ty = top + ch - 14 - tileH;
+    // Bonus stats: Arc + Cartridge, two columns along the bottom of the panel.
+    if (hasBonus) {
+      // Sits right under the Cartridge row: label, then up to 4 rows x 2 columns.
+      const rows = 4;
+      const lineH = 13;
+      const colW = (gw - 10) / 2;
+      const by = gy + 8;
       ctx.fillStyle = C.muted;
       ctx.font = `500 11px ${MONO}`;
-      ctx.fillText('MODULES', gx, ty - 8);
-      modules.forEach((m, k) => {
-        const tx = gx + k * (tileW + tileGap);
-        roundRect(ctx, tx, ty, tileW, tileH, 6);
-        if (!m) {
-          ctx.strokeStyle = C.line;
-          ctx.setLineDash([3, 3]);
-          ctx.stroke();
-          ctx.setLineDash([]);
-          return;
-        }
-        ctx.fillStyle = C.panel2;
-        ctx.fill();
-        // Size: lit cells out of four, in the character's element colour.
-        const cells = MODULE_TYPES.find((t) => t.id === m.type)?.cells ?? 0;
-        const cellW = (tileW - 16 - 3 * 3) / 4;
-        for (let n = 0; n < 4; n += 1) {
-          ctx.fillStyle = n < cells ? el : C.line;
-          roundRect(ctx, tx + 8 + n * (cellW + 3), ty + 7, cellW, 5, 2);
-          ctx.fill();
-        }
+      ctx.fillText('BONUS STATS', gx, gy - 6);
+      const shown = bonus.length > rows * 2 ? bonus.slice(0, rows * 2 - 1) : bonus;
+      shown.forEach((b, k) => {
+        const bx = gx + Math.floor(k / rows) * (colW + 10);
+        const yy = by + (k % rows) * lineH;
+        const v = Number.isInteger(b.value) ? String(b.value) : b.value.toFixed(2).replace(/0$/, '');
+        const valText = `${v}${isPercentStat(b.stat) ? '%' : ''}`;
+        ctx.font = `700 12px ${MONO}`;
+        const vw = ctx.measureText(valText).width;
+        ctx.fillStyle = C.muted;
+        ctx.font = `500 11px ${MONO}`;
+        ctx.fillText(wrap(ctx, STAT_SHORT[b.stat] ?? b.stat, colW - vw - 6, 1)[0], bx, yy);
         ctx.fillStyle = C.fg;
-        ctx.font = `700 11px ${MONO}`;
-        ctx.textAlign = 'center';
-        const label = STAT_SHORT[m.stat] ?? m.stat;
-        ctx.fillText(wrap(ctx, label, tileW - 6, 1)[0], tx + tileW / 2, ty + 29);
+        ctx.font = `700 12px ${MONO}`;
+        ctx.textAlign = 'right';
+        ctx.fillText(valText, bx + colW, yy);
         ctx.textAlign = 'left';
       });
+      if (shown.length < bonus.length) {
+        ctx.fillStyle = C.muted;
+        ctx.font = `500 11px ${MONO}`;
+        ctx.fillText(`+${bonus.length - shown.length} more`, gx + colW + 10, by + (rows - 1) * lineH);
+      }
     }
   });
 
@@ -557,31 +558,44 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   }
 
   // Footer: legal line on the left, card code on the right.
-  // A long code (full gear) pushes the legal line up so both stay readable.
+  // Long codes (full gear) move the legal line up and wrap onto two lines.
   const LEGAL = 'Unofficial fan project. Neverness to Everness \u00a9 Hotta Studio / Perfect World Games.';
   const code = encodeCardCode(team, loadoutOf);
   ctx.font = `400 12px ${BODY}`;
   const legalW = ctx.measureText(LEGAL).width;
-  ctx.font = `600 20px ${MONO}`;
-  let codeW = ctx.measureText(code).width;
   const labelW = 46;
-  const sideBySide = PAD + legalW + 32 + labelW + codeW <= CARD_W - PAD;
+  const fits = (text, size) => {
+    ctx.font = `600 ${size}px ${MONO}`;
+    return ctx.measureText(text).width;
+  };
+  const maxW = CARD_W - PAD * 2 - labelW;
   let codeSize = 20;
+  let codeLines = [code];
+  const sideBySide = PAD + legalW + 32 + labelW + fits(code, 20) <= CARD_W - PAD;
   if (!sideBySide) {
-    codeSize = Math.max(14, Math.min(20, Math.floor((20 * (CARD_W - PAD * 2 - labelW)) / codeW)));
+    codeSize = Math.max(15, Math.min(20, Math.floor((20 * maxW) / fits(code, 20))));
+    if (fits(code, codeSize) > maxW) {
+      // Two lines, split between groups.
+      const groups = code.split('-');
+      const half = Math.ceil(groups.length / 2);
+      codeLines = [groups.slice(0, half).join('-') + '-', groups.slice(half).join('-')];
+      codeSize = Math.max(13, Math.min(18, Math.floor((codeSize * maxW) / fits(codeLines[0], codeSize))));
+    }
   }
+  const lineGap = codeSize + 4;
+  const codeTop = CARD_H - 22 - (codeLines.length - 1) * lineGap;
   ctx.fillStyle = C.muted;
   ctx.font = `400 12px ${BODY}`;
-  ctx.fillText(LEGAL, PAD, sideBySide ? CARD_H - 24 : CARD_H - 52);
+  ctx.fillText(LEGAL, PAD, sideBySide ? CARD_H - 24 : codeTop - codeSize - 10);
   // Card code: type it into the builder to rebuild this team and its gear.
   ctx.textAlign = 'right';
   ctx.font = `600 ${codeSize}px ${MONO}`;
   ctx.fillStyle = C.fg;
-  ctx.fillText(code, CARD_W - PAD, CARD_H - 22);
-  codeW = ctx.measureText(code).width;
+  codeLines.forEach((ln, i) => ctx.fillText(ln, CARD_W - PAD, codeTop + i * lineGap));
+  const firstW = ctx.measureText(codeLines[0]).width;
   ctx.font = `500 11px ${MONO}`;
   ctx.fillStyle = C.muted;
-  ctx.fillText('CODE', CARD_W - PAD - codeW - 12, CARD_H - 24);
+  ctx.fillText('CODE', CARD_W - PAD - firstW - 12, codeTop - 2);
   if (site) {
     ctx.font = `500 12px ${MONO}`;
     ctx.fillText(site, CARD_W - PAD, CARD_H - 52);

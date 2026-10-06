@@ -57,13 +57,13 @@ export default function SharePanel({ team, dispatch }) {
       </label>
 
       <div className="field">
-        <label htmlFor="card-code">Card code <span className="muted">· team, duplicates, Arcs, Cartridges and modules</span></label>
+        <label htmlFor="card-code">Card code <span className="muted">· team, duplicates, Arcs, Cartridges and their stats</span></label>
         <div className="code-row">
           <textarea
             id="card-code"
             className="code code--card"
             readOnly
-            rows={cardCode.length > 14 ? 2 : 1}
+            rows={cardCode.length > 60 ? 3 : cardCode.length > 14 ? 2 : 1}
             value={cardCode}
             onFocus={(e) => e.target.select()}
           />

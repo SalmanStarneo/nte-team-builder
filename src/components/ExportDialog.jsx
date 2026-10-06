@@ -25,7 +25,10 @@ export default function ExportDialog({ team, onClose }) {
         setBlob(b);
         setUrl(objectUrl);
       })
-      .catch(() => setStatus('Couldn’t create the image. Try again.'));
+      .catch((err) => {
+        console.error('Team image failed', err);
+        setStatus('Couldn’t create the image. Try again.');
+      });
     return () => {
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);

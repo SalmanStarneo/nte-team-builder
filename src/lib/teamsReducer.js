@@ -1,7 +1,7 @@
 import { TEAM_SIZE } from './analyze.js';
 import { CHARACTER_BY_ID } from '../data/characters.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
-import { LEGACY_MODULE_STATS, MODULE_SLOTS, MODULE_STATS } from '../data/gear.js';
+import { CARTRIDGE_SUB_SLOTS, LEGACY_MODULE_STATS, MODULE_SLOTS, MODULE_STATS } from '../data/gear.js';
 import { MAX_ARC_DUPES, MAX_DUPES } from '../data/awakenings.js';
 
 // All team changes go through this reducer, so the rules live in one place.
@@ -24,6 +24,8 @@ export const emptyLoadout = () => ({
   arcDupes: 0,
   cartridge: null,
   modules: Array(MODULE_SLOTS).fill(null),
+  // Cartridge attributes: { main: { stat, value } | null, subs: [{ stat, value } | null x4] }
+  cartStats: { main: null, subs: Array(CARTRIDGE_SUB_SLOTS).fill(null) },
   dupes: 0,
   awakenings: [],
 });
@@ -44,7 +46,13 @@ const fixModule = (m, charId) => {
 export function loadoutOf(team, charId) {
   // Merge with defaults so loadouts saved before new fields existed still work.
   const lo = { ...emptyLoadout(), ...(team.loadouts?.[charId] ?? {}) };
-  return { ...lo, modules: (lo.modules ?? []).map((m) => fixModule(m, charId)) };
+  const cs = lo.cartStats ?? {};
+  const subs = Array.from({ length: CARTRIDGE_SUB_SLOTS }, (_, i) => cs.subs?.[i] ?? null);
+  return {
+    ...lo,
+    modules: (lo.modules ?? []).map((m) => fixModule(m, charId)),
+    cartStats: { main: cs.main ?? null, subs },
+  };
 }
 
 export function initialState(saved) {

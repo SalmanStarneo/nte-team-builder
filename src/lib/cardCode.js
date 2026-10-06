@@ -1,12 +1,12 @@
 import { ARCS, ARC_BY_ID } from '../data/arcs.js';
 import { CHARACTER_BY_ID } from '../data/characters.js';
 import { MAX_DUPES } from '../data/awakenings.js';
-import { CARTRIDGES, MODULE_SLOTS, MODULE_STATS, MODULE_TYPES } from '../data/gear.js';
+import { CARTRIDGES, CARTRIDGE_SUB_SLOTS, MODULE_STATS, MODULE_SUB_STATS, isPercentStat } from '../data/gear.js';
 import { TEAM_SIZE } from './analyze.js';
 
 // Card codes: the code printed on exported team cards, e.g.
 //   700B-00C0-140B                 team, duplicates and Arcs
-//   700B-00C0-140B-5GQ2-0000       ... plus Cartridges and Console modules
+//   700B-00C0-140B-5GQ2-0000       ... plus Cartridge sets and Cartridge stats
 //
 // HEAD (always 12 characters, 60 bits):
 //   per member, 14 bits: character (6) · duplicates (3) · Arc (5)
@@ -14,9 +14,12 @@ import { TEAM_SIZE } from './analyze.js';
 //
 // GEAR TAIL (only when some gear is set; groups of 4 characters):
 //   5-bit check value, then for each filled team slot:
-//     has Cartridge (1) · has modules (1)
-//     Cartridge (5)                          if set
-//     slot mask (4), then per filled slot:   module type (2) · main stat (4)
+//     has Cartridge set (1) · has Cartridge stats (1)
+//     Cartridge set (5)                                    if set
+//     has main (1), main stat (4) + value                  if stats
+//     sub mask (4), then per sub: sub stat (4) + value
+//   value = hundredths for % stats, whole numbers for flat stats,
+//           written as size class (2) + 8 / 11 / 14 / 17 bits.
 //   padded with zeros to a whole group.
 //
 // IMPORTANT: every list below is APPEND-ONLY. Codes refer to positions in
@@ -50,18 +53,23 @@ const CART_ORDER = [
   'street-boxer', 'theas-night-tavern', 'tiny-big-adventure',
 ];
 
-const MODULE_TYPE_ORDER = ['II', 'III', 'IV'];
-
-const MODULE_STAT_ORDER = [
+// Cartridge main attributes.
+const MAIN_STAT_ORDER = [
   'HP%', 'ATK%', 'DEF%', 'CRIT Rate', 'CRIT DMG', 'Cycle Intensity', 'Break Intensity',
   'Healing%', 'Cosmos DMG%', 'Anima DMG%', 'Incantation DMG%', 'Chaos DMG%', 'Psyche DMG%',
   'Lakshana DMG%', 'Mental DMG%',
-]
+];
+
+// Cartridge sub attributes.
+const SUB_STAT_ORDER = [
+  'HP', 'HP%', 'ATK', 'ATK%', 'DEF', 'DEF%', 'Break Intensity', 'Cycle Intensity', 'DMG%',
+  'CRIT Rate', 'CRIT DMG',
+];
 
 // Crockford base 32: no I, L, O or U, so codes are easy to read and type.
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 const HEAD_SALT = 0x9; // change if a layout ever changes, so old and new codes can't be confused
-const TAIL_SALT = 0x0b; // v2: module stats follow the in-game attribute list
+const TAIL_SALT = 0x1d; // v3: Cartridge stats (older tails are rejected, heads still work)
 const HEAD_CHARS = 12;
 const GROUP = 4;
 
@@ -182,6 +190,23 @@ function tailCheck(head, bits) {
   return (sum % 32) ^ TAIL_SALT;
 }
 
+// Percentages are stored in hundredths, flat stats as whole numbers.
+const VALUE_BITS = [8, 11, 14, 17];
+
+function writeValue(w, stat, value) {
+  const scale = isPercentStat(stat) ? 100 : 1;
+  const v = Math.max(0, Math.min(2 ** 17 - 1, Math.round(Number(value || 0) * scale)));
+  const cls = VALUE_BITS.findIndex((b) => v < 2 ** b);
+  w.write(cls, 2);
+  w.write(v, VALUE_BITS[cls]);
+}
+
+function readValue(r, stat) {
+  return r.read(VALUE_BITS[r.read(2)]) / (isPercentStat(stat) ? 100 : 1);
+}
+
+const validStat = (x, list) => x && list.includes(x.stat);
+
 function encodeTail(head, team, loadoutOf) {
   const w = new BitWriter();
   let anyGear = false;
@@ -189,21 +214,28 @@ function encodeTail(head, team, loadoutOf) {
     if (!id || !CHAR_ORDER.includes(id)) continue;
     const lo = loadoutOf(team, id);
     const cart = CART_ORDER.indexOf(lo.cartridge);
-    const mods = (lo.modules ?? []).slice(0, MODULE_SLOTS).map((m) =>
-      m && MODULE_TYPE_ORDER.includes(m.type) && MODULE_STAT_ORDER.includes(m.stat) ? m : null,
-    );
+    const main = validStat(lo.cartStats?.main, MAIN_STAT_ORDER) ? lo.cartStats.main : null;
+    const subs = Array.from({ length: CARTRIDGE_SUB_SLOTS }, (_, i) => {
+      const x = lo.cartStats?.subs?.[i];
+      return validStat(x, SUB_STAT_ORDER) ? x : null;
+    });
     const hasCart = cart >= 0;
-    const hasMods = mods.some(Boolean);
-    anyGear ||= hasCart || hasMods;
+    const hasStats = Boolean(main) || subs.some(Boolean);
+    anyGear ||= hasCart || hasStats;
     w.write(hasCart ? 1 : 0, 1);
-    w.write(hasMods ? 1 : 0, 1);
+    w.write(hasStats ? 1 : 0, 1);
     if (hasCart) w.write(cart, 5);
-    if (hasMods) {
-      mods.forEach((m) => w.write(m ? 1 : 0, 1));
-      for (const m of mods) {
-        if (!m) continue;
-        w.write(MODULE_TYPE_ORDER.indexOf(m.type) + 1, 2);
-        w.write(MODULE_STAT_ORDER.indexOf(m.stat), 4);
+    if (hasStats) {
+      w.write(main ? 1 : 0, 1);
+      if (main) {
+        w.write(MAIN_STAT_ORDER.indexOf(main.stat), 4);
+        writeValue(w, main.stat, main.value);
+      }
+      subs.forEach((x) => w.write(x ? 1 : 0, 1));
+      for (const x of subs) {
+        if (!x) continue;
+        w.write(SUB_STAT_ORDER.indexOf(x.stat), 4);
+        writeValue(w, x.stat, x.value);
       }
     }
   }
@@ -227,21 +259,27 @@ function decodeTail(head, chars, base) {
     for (const id of base.members) {
       if (!id) continue;
       const hasCart = r.read(1);
-      const hasMods = r.read(1);
+      const hasStats = r.read(1);
       if (hasCart) {
         const cart = CART_ORDER[r.read(5)];
         if (!cart) return null;
         base.loadouts[id].cartridge = cart;
       }
-      if (hasMods) {
-        const mask = [r.read(1), r.read(1), r.read(1), r.read(1)];
-        base.loadouts[id].modules = mask.map((on) => {
+      if (hasStats) {
+        let main = null;
+        if (r.read(1)) {
+          const stat = MAIN_STAT_ORDER[r.read(4)];
+          if (!stat) throw new Error('bad stat');
+          main = { stat, value: readValue(r, stat) };
+        }
+        const mask = Array.from({ length: CARTRIDGE_SUB_SLOTS }, () => r.read(1));
+        const subs = mask.map((on) => {
           if (!on) return null;
-          const type = MODULE_TYPE_ORDER[r.read(2) - 1];
-          const stat = MODULE_STAT_ORDER[r.read(4)];
-          if (!type || !stat) throw new Error('bad module');
-          return { type, stat };
+          const stat = SUB_STAT_ORDER[r.read(4)];
+          if (!stat) throw new Error('bad stat');
+          return { stat, value: readValue(r, stat) };
         });
+        base.loadouts[id].cartStats = { main, subs };
       }
     }
   } catch {
@@ -280,8 +318,8 @@ if (import.meta.env.DEV) {
     ...Object.keys(CHARACTER_BY_ID).filter((id) => !CHAR_ORDER.includes(id)),
     ...ARCS.map((a) => a.id).filter((id) => !ARC_ORDER.includes(id)),
     ...CARTRIDGES.map((c) => c.id).filter((id) => !CART_ORDER.includes(id)),
-    ...MODULE_TYPES.map((t) => t.id).filter((id) => !MODULE_TYPE_ORDER.includes(id)),
-    ...MODULE_STATS.filter((s) => !MODULE_STAT_ORDER.includes(s)),
+    ...MODULE_STATS.filter((s) => !MAIN_STAT_ORDER.includes(s)),
+    ...MODULE_SUB_STATS.filter((s) => !SUB_STAT_ORDER.includes(s)),
   ];
   if (missing.length) console.warn('cardCode.js: add these to the end of the code lists:', missing);
 }

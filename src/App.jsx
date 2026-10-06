@@ -142,7 +142,7 @@ export default function App() {
               />
             ) : (
               active.members.some(Boolean) && (
-                <p className="hint">Select a team member to equip an Arc, Cartridge set and modules.</p>
+                <p className="hint">Select a team member to equip an Arc, Cartridge set and Cartridge stats.</p>
               )
             )}
 
