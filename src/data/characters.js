@@ -23,12 +23,12 @@ export const CHARACTERS = [
   },
   {
     id: 'blackbird', name: 'Blackbird', rarity: 'S', element: 'psyche', roles: ['Damage', 'Buff'],
-    arcType: 'Gas', faction: 'Yggash Court', ability: null,
+    arcType: 'Gas', faction: 'Yggash Court', ability: 'Naenia Merula',
     tags: ['Main DPS', 'Team ATK Buff'], stats: null,
   },
   {
     id: 'chaos', name: 'Chaos', rarity: 'S', element: 'lakshana', roles: ['Damage'],
-    arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: null,
+    arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: 'In the beginning, none could tell heaven from earth.',
     tags: ['Main DPS'], stats: null,
   },
   {
@@ -63,7 +63,7 @@ export const CHARACTERS = [
   },
   {
     id: 'iroi', name: 'Iroi', rarity: 'S', element: 'anima', roles: ['Survival', 'Buff'],
-    arcType: 'Liquid', faction: 'Bureau of Anomaly Control', unit: 'CSU-2', ability: null,
+    arcType: 'Liquid', faction: 'Bureau of Anomaly Control', unit: 'CSU-2', ability: 'Infant Dream',
     tags: ['Survival', 'Team ATK Buff'], stats: null,
   },
   {
@@ -78,12 +78,12 @@ export const CHARACTERS = [
   },
   {
     id: 'linko', name: 'Linko', rarity: 'S', element: 'anima', roles: ['Damage', 'Buff'],
-    arcType: 'Plasma', faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: null,
+    arcType: 'Plasma', faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: 'Telepathy',
     tags: ['Sub-DPS', 'RES Shred'], stats: null,
   },
   {
     id: 'nanally', name: 'Nanally', rarity: 'S', element: 'anima', roles: ['Damage'],
-    arcType: 'Plasma', faction: null, ability: 'Genius Ichi-daime: Earth Flip',
+    arcType: 'Plasma', faction: 'Eibon Antique Shop', ability: 'Genius Ichi-daime: Earth Flip',
     tags: ['Main DPS', 'Follow-up Attack'], stats: stats(1320, 80, 75),
   },
   {
@@ -93,12 +93,12 @@ export const CHARACTERS = [
   },
   {
     id: 'shinku', name: 'Shinku', rarity: 'S', element: 'cosmos', roles: ['Damage'],
-    arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'CSU-2', ability: null,
+    arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'CSU-2', ability: 'Moonlit Crimson Dragon',
     tags: ['Main DPS'], stats: null,
   },
   {
     id: 'zankou', name: 'Zankou', rarity: 'S', element: 'incantation', roles: ['Damage'],
-    arcType: 'Gas', faction: null, formerFaction: 'The Scarlet Letter', ability: null,
+    arcType: 'Gas', faction: null, formerFaction: 'The Scarlet Letter', ability: 'Eye of Delusion',
     tags: ['Main DPS', 'DoT'], stats: null,
   },
   {

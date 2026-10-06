@@ -13,9 +13,9 @@ const VIEW_KEY = 'nte-team-builder:charView';
 
 function loadView() {
   try {
-    return localStorage.getItem(VIEW_KEY) === 'grid' ? 'grid' : 'list';
+    return localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'grid';
   } catch {
-    return 'list';
+    return 'grid';
   }
 }
 
@@ -165,12 +165,6 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
             </label>
           )}
           <div className="view-toggle" role="group" aria-label="Layout">
-            <button className="view-toggle__btn" aria-pressed={view === 'list'} onClick={() => setView('list')} title="List view">
-              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-                <path d="M2 3.5h12M2 8h12M2 12.5h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-              List
-            </button>
             <button className="view-toggle__btn" aria-pressed={view === 'grid'} onClick={() => setView('grid')} title="Grid view">
               <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
                 <rect x="2" y="2" width="5" height="5" rx="1.2" fill="currentColor" />
@@ -179,6 +173,12 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                 <rect x="9" y="9" width="5" height="5" rx="1.2" fill="currentColor" />
               </svg>
               Grid
+            </button>
+            <button className="view-toggle__btn" aria-pressed={view === 'list'} onClick={() => setView('list')} title="List view">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M2 3.5h12M2 8h12M2 12.5h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+              List
             </button>
           </div>
         </div>
