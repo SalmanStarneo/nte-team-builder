@@ -249,13 +249,13 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
 
   drawBands(ctx);
 
-  // Muted gold stripe across the top with soft smoke wisps.
-  const gold = ctx.createLinearGradient(0, 0, CARD_W, 0);
+  // Muted silver stripe across the top with soft smoke wisps.
+  const silver = ctx.createLinearGradient(0, 0, CARD_W, 0);
   [
-    [0, '#5e3f12'], [0.18, '#8a6424'], [0.36, '#b08a42'], [0.5, '#c7a35e'],
-    [0.64, '#a8823c'], [0.82, '#7f5a1f'], [1, '#5a3c11'],
-  ].forEach(([at, col]) => gold.addColorStop(at, col));
-  ctx.fillStyle = gold;
+    [0, '#4a4f5c'], [0.18, '#727886'], [0.36, '#9ea4b1'], [0.5, '#c3c8d2'],
+    [0.64, '#979dab'], [0.82, '#6b7180'], [1, '#464b57'],
+  ].forEach(([at, col]) => silver.addColorStop(at, col));
+  ctx.fillStyle = silver;
   ctx.fillRect(0, 0, CARD_W, 8);
   // Wisps: soft light ellipses, placed by a fixed pseudo-random sequence so
   // every export looks the same.
@@ -272,7 +272,7 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     const rx = 14 + rand() * 40;
     const ry = 1.5 + rand() * 3.5;
     const a = dark ? 0.18 + rand() * 0.2 : 0.14 + rand() * 0.26;
-    const tint = dark ? '40, 24, 6' : '255, 240, 205';
+    const tint = dark ? '22, 24, 32' : '245, 247, 252';
     ctx.save();
     ctx.translate(cx, cy);
     ctx.scale(1, ry / rx);

@@ -154,18 +154,18 @@ button {
   height: 6px;
   border-radius: 3px;
   overflow: visible;
-  /* Muted gold: antique bronze to soft gold, no hard highlights */
+  /* Muted silver: gunmetal to soft platinum, no hard highlights */
   background: linear-gradient(
     90deg,
-    #5e3f12 0%,
-    #8a6424 18%,
-    #b08a42 36%,
-    #c7a35e 50%,
-    #a8823c 64%,
-    #7f5a1f 82%,
-    #5a3c11 100%
+    #4a4f5c 0%,
+    #727886 18%,
+    #9ea4b1 36%,
+    #c3c8d2 50%,
+    #979dab 64%,
+    #6b7180 82%,
+    #464b57 100%
   );
-  box-shadow: 0 0 8px rgba(176, 138, 66, 0.22);
+  box-shadow: 0 0 8px rgba(190, 196, 210, 0.2);
 }
 /* Drifting smoke wisps over the line: pale streaks over dark curls */
 .masthead__line::before,
@@ -176,14 +176,14 @@ button {
   border-radius: 6px;
   pointer-events: none;
   background:
-    radial-gradient(9% 60% at 6% 50%, rgba(255, 240, 205, 0.55), transparent 72%),
-    radial-gradient(6% 45% at 17% 35%, rgba(40, 24, 6, 0.45), transparent 75%),
-    radial-gradient(11% 55% at 30% 60%, rgba(250, 232, 190, 0.5), transparent 72%),
-    radial-gradient(7% 50% at 43% 42%, rgba(40, 24, 6, 0.4), transparent 75%),
-    radial-gradient(10% 60% at 57% 55%, rgba(255, 240, 205, 0.5), transparent 72%),
-    radial-gradient(6% 45% at 70% 38%, rgba(40, 24, 6, 0.42), transparent 75%),
-    radial-gradient(12% 55% at 84% 58%, rgba(250, 232, 190, 0.52), transparent 72%),
-    radial-gradient(7% 50% at 95% 45%, rgba(40, 24, 6, 0.4), transparent 75%);
+    radial-gradient(9% 60% at 6% 50%, rgba(245, 247, 252, 0.55), transparent 72%),
+    radial-gradient(6% 45% at 17% 35%, rgba(22, 24, 32, 0.45), transparent 75%),
+    radial-gradient(11% 55% at 30% 60%, rgba(235, 238, 246, 0.5), transparent 72%),
+    radial-gradient(7% 50% at 43% 42%, rgba(22, 24, 32, 0.4), transparent 75%),
+    radial-gradient(10% 60% at 57% 55%, rgba(245, 247, 252, 0.5), transparent 72%),
+    radial-gradient(6% 45% at 70% 38%, rgba(22, 24, 32, 0.42), transparent 75%),
+    radial-gradient(12% 55% at 84% 58%, rgba(235, 238, 246, 0.52), transparent 72%),
+    radial-gradient(7% 50% at 95% 45%, rgba(22, 24, 32, 0.4), transparent 75%);
   background-size: 640px 100%;
   background-repeat: repeat-x;
   filter: blur(1.2px);
