@@ -8,6 +8,9 @@ export const arcTypeIconUrl = (type) => `${BASE}icons/arc-types/${type.toLowerCa
 
 // Material icons we have files for (public/icons/materials/<slug>.webp).
 const MATERIAL_ICONS = new Set([
+  'colorful-ticket-stub',
+  'eternal-memory',
+  'fons',
   'a-page-from-delusions-shore',
   'beetle-coin',
   'black-hat',
