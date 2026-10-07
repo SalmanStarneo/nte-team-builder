@@ -9,7 +9,7 @@ Plan squads, browse every character, see which elemental reactions they trigger 
 ## Features
 
 - **Multiple saved teams.** Create, rename, duplicate and delete as many four-character teams as you need. Characters already used in another team are flagged, which helps when planning two-team endgame content.
-- **Loadouts.** Equip each team member with an Arc (filtered to their Arc type, signature Arcs marked), a Cartridge set with its 2- and 4-piece bonuses, and the Cartridge's main and sub stats. Arc and Cartridge stats are added up as Bonus stats on the team image. Loadouts are saved per team.
+- **Loadouts.** Equip each team member with an Arc (filtered to their Arc type, signature Arcs marked), a Cartridge set with its 2- and 4-piece bonuses, and a Console build: the suggested layout for that character or one you saved in the Console tab, including the Cartridge's main and sub stats. Arc and Cartridge stats are added up as Bonus stats on the team image. Loadouts are saved per team.
 - **Resonance.** R3 and R6 light up when 3 and 6 awakenings are on; click either to read its effect. Character pages list both.
 - **Duplicates and awakenings.** Set how many duplicates each team member has (0 to 6) and turn on any awakenings up to that number, in any order. Arcs track duplicate copies too (up to +4). Character pages list all six awakenings.
 - **Multi-role characters.** Characters list every role they cover, such as Hotori as Buff and Damage, and role coverage counts all of them.
@@ -17,7 +17,7 @@ Plan squads, browse every character, see which elemental reactions they trigger 
 - **Roster with smart hints.** Filter by element, role and rank. Each character card shows which new reactions it would add to the current team.
 - **Community presets.** Load well-known team archetypes as a starting point.
 - **Team images.** Export any team as a 1200×675 card with portraits, gear and reactions, then save it, copy it to the clipboard, or share it from a phone.
-- **Console planner.** Each character's 5×5 Console grid with its blocked cells. Place Type II, III and IV modules, see Cartridge set progress (2 and 4 matching modules) and the character's per-module bonus, save layouts and equip them on any team member with the same grid.
+- **Console planner.** Each character's 5×5 Console grid with its blocked cells. Place Type II, III and IV modules, see Cartridge set progress (2 and 4 matching modules) and the character's per-module bonus, enter the Cartridge's main and sub stats, start from a suggested build, save layouts and equip them on any team member with the same grid.
 - **Team codes.** Every exported card carries a card code (for example `700B-00C0-140B`) that rebuilds the team, duplicate counts and Arcs when typed into the builder. When Cartridge sets or Cartridge stats are set, the code grows to carry them too (including the stat values). Link codes (`#nte1~…`) carry the team and its name and import automatically when opened.
 - **Character index.** A sortable, filterable table of every Esper with rank, element, role, Arc type and base stats. Each character has a detail view with faction, Esper ability, reactions and featured teams.
 - **Arcs.** All Arcs with tabs for each Arc type (Solid, Liquid, Gas, Plasma, Condensate), rank filter, search, and the characters each Arc is the signature of or recommended for.

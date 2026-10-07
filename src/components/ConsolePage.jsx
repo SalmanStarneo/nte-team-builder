@@ -8,20 +8,15 @@ import {
 import { navigate } from '../lib/route.js';
 import { loadoutOf } from '../lib/teamsReducer.js';
 import CartridgeIcon from './CartridgeIcon.jsx';
+import CartStatsEditor from './CartStatsEditor.jsx';
+import { suggestedBuild } from '../data/consoleBuilds.js';
+import { loadSavedConsoles, storeSavedConsoles } from '../lib/consoles.js';
+import { CARTRIDGE_SUB_SLOTS } from '../data/gear.js';
 import Portrait from './Portrait.jsx';
 
-const SAVED_KEY = 'nte-team-builder:consoles';
 const TYPE_NAMES = { 2: 'Type Ⅱ', 3: 'Type Ⅲ', 4: 'Type Ⅳ' };
 const PLAYABLE = CHARACTERS.filter((c) => CHARACTER_CONSOLE[c.id]);
-
-function loadSaved() {
-  try {
-    const list = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
-    return Array.isArray(list) ? list : [];
-  } catch {
-    return [];
-  }
-}
+const emptyStats = () => ({ main: null, subs: Array(CARTRIDGE_SUB_SLOTS).fill(null) });
 
 // Small drawing of a module shape.
 export function ShapeGlyph({ shape, size = 10, className = '' }) {
@@ -53,7 +48,8 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
   const [cartridge, setCartridge] = useState(null);
   const [selected, setSelected] = useState('Hen3');
   const [hover, setHover] = useState(null);
-  const [saved, setSaved] = useState(loadSaved);
+  const [saved, setSaved] = useState(loadSavedConsoles);
+  const [cartStats, setCartStats] = useState(emptyStats);
   const [name, setName] = useState('');
   const [status, setStatus] = useState('');
 
@@ -64,17 +60,19 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
     const lo = inTeam ? loadoutOf(activeTeam, charId) : null;
     setPieces(lo?.console ?? []);
     setCartridge(lo?.cartridge ?? null);
+    setCartStats(lo?.cartStats ?? emptyStats());
     setStatus('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [charId]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(SAVED_KEY, JSON.stringify(saved));
-    } catch {
-      /* storage unavailable */
-    }
-  }, [saved]);
+  useEffect(() => storeSavedConsoles(saved), [saved]);
+
+  const suggested = suggestedBuild(charId);
+  function applyBuild(b) {
+    setPieces(b.pieces);
+    setCartridge(b.cartridge);
+    setCartStats(b.cartStats ?? emptyStats());
+  }
 
   const occ = occupancy(pieces);
   const used = usedCells(pieces);
@@ -126,13 +124,13 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
 
   function save() {
     const label = name.trim() || `${character.name} console`;
-    setSaved([{ id: `c${Date.now().toString(36)}`, name: label.slice(0, 40), layout, pieces, cartridge }, ...saved]);
+    setSaved([{ id: `c${Date.now().toString(36)}`, name: label.slice(0, 40), layout, pieces, cartridge, cartStats }, ...saved]);
     setName('');
     setStatus(`Saved “${label}”.`);
   }
 
   function equip(targetId) {
-    onEquip(targetId, { console: pieces, cartridge: cartridge ?? loadoutOf(activeTeam, targetId).cartridge });
+    onEquip(targetId, { console: pieces, cartridge: cartridge ?? loadoutOf(activeTeam, targetId).cartridge, cartStats });
     setStatus(`Equipped on ${CHARACTER_BY_ID[targetId].name} in “${activeTeam.name}”.`);
   }
 
@@ -172,9 +170,23 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
               <h3 className="mini-title">{character.name} <span>{LAYOUT_NAMES[layout]} grid</span></h3>
               <p className="console-fill"><b>{used}</b> / {FREE_CELLS} cells</p>
             </div>
-            <button type="button" className="btn btn--quiet" onClick={() => setPieces([])} disabled={!pieces.length}>
-              Clear
-            </button>
+            <div className="console-board__actions">
+              {suggested && (
+                <button
+                  type="button"
+                  className="btn btn--quiet"
+                  onClick={() => {
+                    applyBuild(suggested);
+                    setStatus('Loaded the suggested build. Add your stat values below the set.');
+                  }}
+                >
+                  Use suggested
+                </button>
+              )}
+              <button type="button" className="btn btn--quiet" onClick={() => setPieces([])} disabled={!pieces.length}>
+                Clear
+              </button>
+            </div>
           </div>
           <div className="console-grid" onMouseLeave={() => setHover(null)}>
             {mask.map((row, r) =>
@@ -258,7 +270,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
                 <div className="console-set__head">
                   <CartridgeIcon id={cart.id} size={28} />
                   <b>{cart.name}</b>
-                  <span className="console-set__count">{set.count} / 4</span>
+                  <span className="console-set__count">{Math.min(set.count, 4)} / 4</span>
                 </div>
                 <div className="console-set__shapes">
                   {set.shapes.map((s) => (
@@ -274,6 +286,15 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
                 </ul>
               </div>
             )}
+          </section>
+
+          <section aria-labelledby="console-cstats">
+            <h3 id="console-cstats" className="mini-title">Cartridge stats <span>1 main · {CARTRIDGE_SUB_SLOTS} sub</span></h3>
+            <CartStatsEditor value={cartStats} onChange={setCartStats} idPrefix="ccs" />
+            <p className="muted small">
+              Enter the values shown on your Cartridge. They’re added to the Arc’s stats under Bonus stats on the
+              team image.
+            </p>
           </section>
 
           {spec && (
@@ -337,7 +358,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
                     <b>{s.name}</b>
                     <span className="muted small">
                       {usedCells(s.pieces)}/{FREE_CELLS} cells
-                      {sc && <> · <CartridgeIcon id={sc.id} size={14} /> {sc.name} {setProgress(sc.id, s.pieces).count}/4</>}
+                      {sc && <> · <CartridgeIcon id={sc.id} size={14} /> {sc.name} {Math.min(setProgress(sc.id, s.pieces).count, 4)}/4</>}
                     </span>
                     <span className="muted small">
                       Fits: {charactersWithLayout(s.layout).map((id) => CHARACTER_BY_ID[id].name).join(', ')}
@@ -350,8 +371,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
                       disabled={!fits}
                       title={fits ? 'Load into this grid' : `Doesn’t fit ${character.name}’s grid`}
                       onClick={() => {
-                        setPieces(s.pieces);
-                        setCartridge(s.cartridge);
+                        applyBuild(s);
                         setStatus(`Loaded “${s.name}”.`);
                       }}
                     >
