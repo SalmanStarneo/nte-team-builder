@@ -2786,7 +2786,7 @@ th[aria-sort='descending'] .th-btn {
   font-size: 1.1rem;
 }
 .console-grid {
-  --cs: min(64px, calc((100vw - 76px) / 5));
+  --cs: min(64px, calc((100vw - 120px) / 5));
   display: grid;
   grid-template-columns: repeat(5, var(--cs));
   grid-template-rows: repeat(5, var(--cs));
