@@ -4,7 +4,9 @@ import { MAX_DUPES } from '../data/awakenings.js';
 import { CARTRIDGES, CARTRIDGE_SUB_SLOTS, MODULE_STATS, MODULE_SUB_STATS, isPercentStat } from '../data/gear.js';
 import { TEAM_SIZE } from './analyze.js';
 
-// Card codes: the code printed on exported team cards, e.g.
+// Card codes: the code printed on exported team cards.
+// Current format (v5, see below): 4 segments of 5 characters, e.g. 5A0B2-00C0K-140B7-QE3W2.
+// Older formats in 4-character groups are still accepted when importing:
 //   700B-00C0-140B                 team, duplicates and Arcs
 //   700B-00C0-140B-5GQ2-0000       ... plus Cartridge sets and Cartridge stats
 //
@@ -191,7 +193,7 @@ function tailCheck(head, bits) {
 }
 
 // Percentages are stored in hundredths, flat stats as whole numbers.
-const VALUE_BITS = [8, 11, 14, 17];
+const VALUE_BITS = [8, 11, 14, 17]; // legacy tails
 
 function writeValue(w, stat, value) {
   const scale = isPercentStat(stat) ? 100 : 1;
@@ -288,29 +290,106 @@ function decodeTail(head, chars, base) {
   return base;
 }
 
-// ---- public API ----------------------------------------------------------
+// ---- current format (v5): 4 segments of 5 characters ---------------------
+//
+// 100 bits = 20 Crockford base-32 characters, shown as XXXXX-XXXXX-XXXXX-XXXXX:
+//   version (4) = 0b0101
+//   per member, 22 bits: character (6) · duplicates (3) · Arc (5) · Arc copies (3) · Cartridge set (5)
+//   check value (8)
+// Cartridge stats and Console layouts travel in Console codes (lib/consoleCode.js).
 
-/** team + loadoutOf(team, id) → 'XXXX-XXXX-XXXX[-XXXX…]' */
-export function encodeCardCode(team, loadoutOf) {
-  const head = encodeHead(team, loadoutOf);
-  return group(head + encodeTail(head, team, loadoutOf));
+const V5 = 0b0101;
+const V5_CHARS = 20;
+const SEG = 5;
+const segment = (str) => str.match(new RegExp(`.{1,${SEG}}`, 'g')).join('-');
+
+/** 8-bit check over 5-bit chunks, so most typos are caught. */
+export function checkByte(bits, salt) {
+  let sum = 0;
+  for (let i = 0; i < bits.length; i += 5) {
+    let v = 0;
+    for (let k = 0; k < 5; k += 1) v = (v << 1) | (bits[i + k] ?? 0);
+    sum = (sum * 31 + v + i) % 251;
+  }
+  return sum ^ salt;
 }
 
-/** Returns { members, loadouts } or null if the code isn't a valid card code. */
+function encodeV5(team, loadoutOf) {
+  const w = new BitWriter();
+  w.write(V5, 4);
+  for (let i = 0; i < TEAM_SIZE; i += 1) {
+    const id = team.members[i];
+    if (!id || !CHAR_ORDER.includes(id)) {
+      w.write(0, 22);
+      continue;
+    }
+    const lo = loadoutOf(team, id);
+    const list = arcsOfType(CHARACTER_BY_ID[id].arcType);
+    w.write(CHAR_ORDER.indexOf(id) + 1, 6);
+    w.write(Math.min(Math.max(lo.dupes | 0, 0), MAX_DUPES), 3);
+    w.write(lo.arc ? list.indexOf(lo.arc) + 1 : 0, 5);
+    w.write(Math.min(Math.max(lo.arcDupes | 0, 0), 7), 3);
+    w.write(CART_ORDER.indexOf(lo.cartridge) + 1, 5);
+  }
+  w.write(checkByte(w.bits, 0x5a), 8);
+  return segment(toChars(w.bits));
+}
+
+function decodeV5(clean) {
+  if (clean.length !== V5_CHARS) return null;
+  const bits = toBits(clean);
+  const body = bits.slice(0, 92);
+  const r = new BitReader(bits);
+  if (r.read(4) !== V5) return null;
+  const members = [];
+  const loadouts = {};
+  for (let i = 0; i < TEAM_SIZE; i += 1) {
+    const c = r.read(6), d = r.read(3), a = r.read(5), ad = r.read(3), ct = r.read(5);
+    if (c === 0) {
+      members.push(null);
+      continue;
+    }
+    const id = CHAR_ORDER[c - 1];
+    if (!id || !CHARACTER_BY_ID[id] || members.includes(id) || d > MAX_DUPES) return null;
+    const list = arcsOfType(CHARACTER_BY_ID[id].arcType);
+    if (a > list.length || (ct && !CART_ORDER[ct - 1])) return null;
+    members.push(id);
+    loadouts[id] = { dupes: d, arc: a ? list[a - 1] : null, arcDupes: a ? ad : 0, cartridge: ct ? CART_ORDER[ct - 1] : null };
+  }
+  if (r.read(8) !== checkByte(body, 0x5a)) return null;
+  if (!members.some(Boolean)) return null;
+  return { members, loadouts };
+}
+
+// ---- public API ----------------------------------------------------------
+
+/** Cleans a typed code: case, spaces, dashes and look-alike letters. */
+export const cleanCode = (input) =>
+  (input ?? '').toUpperCase().replace(/[\s-]/g, '').replace(/[IL]/g, '1').replace(/O/g, '0');
+
+/** team + loadoutOf(team, id) → 'XXXXX-XXXXX-XXXXX-XXXXX' */
+export function encodeCardCode(team, loadoutOf) {
+  return encodeV5(team, loadoutOf);
+}
+
+/** Returns { members, loadouts } or null. Accepts the current and all older formats. */
 export function decodeCardCode(input) {
   if (!input) return null;
-  const clean = input
-    .toUpperCase()
-    .replace(/[\s-]/g, '')
-    .replace(/[IL]/g, '1')
-    .replace(/O/g, '0');
-  if (clean.length < HEAD_CHARS || [...clean].some((ch) => !ALPHABET.includes(ch))) return null;
+  const clean = cleanCode(input);
+  if ([...clean].some((ch) => !ALPHABET.includes(ch))) return null;
+  const v5 = decodeV5(clean);
+  if (v5) return v5;
+  // Older 4-character-group codes.
+  if (clean.length < HEAD_CHARS) return null;
   const head = clean.slice(0, HEAD_CHARS);
   const base = decodeHead(head);
   if (!base) return null;
   const tail = clean.slice(HEAD_CHARS);
   return tail ? decodeTail(head, tail, base) : base;
 }
+
+// Shared with lib/consoleCode.js.
+export { ALPHABET, BitReader, BitWriter, CART_ORDER, MAIN_STAT_ORDER, SUB_STAT_ORDER, segment, toBits, toChars };
 
 // Keep the code lists in step with the data during development.
 if (import.meta.env.DEV) {

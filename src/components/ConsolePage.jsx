@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { decodeConsoleCode, encodeConsoleCode } from '../lib/consoleCode.js';
 import { CHARACTERS, CHARACTER_BY_ID } from '../data/characters.js';
 import { CARTRIDGES, CARTRIDGE_BY_ID } from '../data/gear.js';
 import {
@@ -57,7 +58,20 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
   const inTeam = activeTeam.members.includes(charId);
 
   // Switching character loads the console they wear in the current team, if any.
+  // A pasted console code for another grid waits here until we switch to a character who fits.
+  const pendingImport = useRef(null);
+
   useEffect(() => {
+    const pending = pendingImport.current;
+    pendingImport.current = null;
+    if (pending && pending.layout === layout) {
+      setPieces(pending.pieces);
+      setCartridge(pending.cartridge);
+      setCartStats(pending.cartStats);
+      setActive(null);
+      setStatus(`Loaded the console code on ${character.name}.`);
+      return;
+    }
     const lo = inTeam ? loadoutOf(activeTeam, charId) : null;
     setPieces(lo?.console ?? []);
     setCartridge(lo?.cartridge ?? null);
@@ -68,6 +82,40 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
   }, [charId]);
 
   useEffect(() => storeSavedConsoles(saved), [saved]);
+
+  const [codeInput, setCodeInput] = useState('');
+  const [copied, setCopied] = useState(null);
+  const consoleCode = pieces.length || cartridge ? encodeConsoleCode({ layout, cartridge, cartStats, pieces }) : '';
+  async function copyText(text, key) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(key);
+      setTimeout(() => setCopied(null), 1600);
+    } catch {
+      setStatus('Copy blocked by the browser. Select the code and copy it by hand.');
+    }
+  }
+  function importCode(e) {
+    e.preventDefault();
+    const d = decodeConsoleCode(codeInput);
+    if (!d) {
+      setStatus('That console code isn’t valid.');
+      return;
+    }
+    setCodeInput('');
+    if (d.layout === layout) {
+      setActive(null);
+      setPieces(d.pieces);
+      setCartridge(d.cartridge);
+      setCartStats(d.cartStats);
+      setStatus('Loaded the console code. Module stats aren’t part of codes, so enter your own rolls.');
+      return;
+    }
+    // Different grid: open the first character who can use it.
+    const target = charactersWithLayout(d.layout)[0];
+    pendingImport.current = d;
+    navigate(`console-${target}`);
+  }
 
   const suggested = suggestedBuild(charId);
   function applyBuild(b) {
@@ -341,6 +389,35 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
             })()}
           </section>
 
+          <section aria-labelledby="console-code">
+            <h3 id="console-code" className="mini-title">Console code <span>layout, set and Cartridge stats</span></h3>
+            {consoleCode ? (
+              <div className="code-row">
+                <input id="console-code-out" className="code code--card" readOnly value={consoleCode} onFocus={(e) => e.target.select()} />
+                <button type="button" className="btn" onClick={() => copyText(consoleCode, 'current')}>
+                  {copied === 'current' ? 'Copied' : 'Copy'}
+                </button>
+              </div>
+            ) : (
+              <p className="muted small">Place modules or pick a set to get a code.</p>
+            )}
+            <form className="code-row console-code-in" onSubmit={importCode}>
+              <label className="sr-only" htmlFor="console-code-in">Paste a console code</label>
+              <input
+                id="console-code-in"
+                className="code"
+                placeholder="Paste a console code"
+                value={codeInput}
+                onChange={(e) => setCodeInput(e.target.value)}
+              />
+              <button type="submit" className="btn" disabled={!codeInput.trim()}>Load</button>
+            </form>
+            <p className="muted small">
+              Share a build without sharing a team. Codes carry the grid, set and Cartridge stats; module stats stay
+              with you. A code for another grid opens on a character who fits it.
+            </p>
+          </section>
+
           <section aria-labelledby="console-save">
             <h3 id="console-save" className="mini-title">Save &amp; equip</h3>
             <div className="code-row">
@@ -397,6 +474,13 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
                     </span>
                   </div>
                   <div className="saved-item__actions">
+                    <button
+                      type="button"
+                      className="btn btn--quiet"
+                      onClick={() => copyText(encodeConsoleCode({ layout: s.layout, cartridge: s.cartridge, cartStats: s.cartStats, pieces: s.pieces }), s.id)}
+                    >
+                      {copied === s.id ? 'Copied' : 'Copy code'}
+                    </button>
                     <button
                       type="button"
                       className="btn btn--quiet"

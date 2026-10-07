@@ -27,7 +27,7 @@ export default function SharePanel({ team, dispatch }) {
     const card = decodeCardCode(input);
     const team = card ? { name: 'Imported team', ...card } : decodeTeam(input);
     if (!team) {
-      setError('That code isn’t valid. Use a card code like 1JHK-JJBN-2345, or a link code starting with nte1~');
+      setError('That code isn’t valid. Use a card code (4 groups of 5) or a link code starting with nte1~. Console codes go in the Console tab.');
       return;
     }
     setError('');
@@ -57,7 +57,7 @@ export default function SharePanel({ team, dispatch }) {
       </label>
 
       <div className="field">
-        <label htmlFor="card-code">Card code <span className="muted">· team, duplicates, Arcs, Cartridges and their stats</span></label>
+        <label htmlFor="card-code">Card code <span className="muted">· team, duplicates, Arcs and Cartridge sets</span></label>
         <div className="code-row">
           <textarea
             id="card-code"
@@ -85,7 +85,7 @@ export default function SharePanel({ team, dispatch }) {
           <input
             id="import-code"
             className="code"
-            placeholder="1JHK-JJBN-2345 or nte1~…"
+            placeholder="Card code or nte1~…"
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />

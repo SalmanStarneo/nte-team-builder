@@ -3147,3 +3147,6 @@ th[aria-sort='descending'] .th-btn {
   gap: 4px 12px;
   font: 600 0.85rem var(--font-mono);
 }
+.console-code-in {
+  margin-top: 8px;
+}
