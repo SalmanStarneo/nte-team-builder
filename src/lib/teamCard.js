@@ -249,12 +249,19 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
 
   drawBands(ctx);
 
-  // Element stripe: Charge trio on the left, Discord trio on the right
-  const order = ['lakshana', 'cosmos', 'anima', 'incantation', 'chaos', 'psyche'];
-  order.forEach((el, i) => {
-    ctx.fillStyle = EL[el];
-    ctx.fillRect((CARD_W / 6) * i, 0, CARD_W / 6 + 1, 8);
-  });
+  // Gold aurora stripe across the top, with a soft glow underneath.
+  const gold = ctx.createLinearGradient(0, 0, CARD_W, 0);
+  [
+    [0, '#8a5a12'], [0.14, '#c98b1e'], [0.3, '#f3c74a'], [0.44, '#fff1b8'],
+    [0.56, '#f6d36b'], [0.7, '#d79a2b'], [0.84, '#ffe7a0'], [1, '#b07419'],
+  ].forEach(([at, col]) => gold.addColorStop(at, col));
+  const glow = ctx.createLinearGradient(0, 8, 0, 40);
+  glow.addColorStop(0, 'rgba(243, 199, 74, 0.28)');
+  glow.addColorStop(1, 'rgba(243, 199, 74, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 8, CARD_W, 32);
+  ctx.fillStyle = gold;
+  ctx.fillRect(0, 0, CARD_W, 8);
 
   // Header
   const PAD = 48;

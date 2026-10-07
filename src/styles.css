@@ -150,18 +150,31 @@ button {
 }
 
 .masthead__line {
+  position: relative;
   height: 6px;
   border-radius: 3px;
+  /* Gold aurora: deep amber through bright gold to pale champagne and back */
   background: linear-gradient(
     90deg,
-    /* Charge trio on the left, Discord trio on the right */
-    var(--el-lakshana) 0 16.66%,
-    var(--el-cosmos) 16.66% 33.33%,
-    var(--el-anima) 33.33% 50%,
-    var(--el-incantation) 50% 66.66%,
-    var(--el-chaos) 66.66% 83.33%,
-    var(--el-psyche) 83.33% 100%
+    #8a5a12 0%,
+    #c98b1e 14%,
+    #f3c74a 30%,
+    #fff1b8 44%,
+    #f6d36b 56%,
+    #d79a2b 70%,
+    #ffe7a0 84%,
+    #b07419 100%
   );
+  background-size: 200% 100%;
+  box-shadow: 0 0 10px rgba(243, 199, 74, 0.45), 0 0 22px rgba(255, 225, 140, 0.2);
+  animation: aurora-gold 12s ease-in-out infinite alternate;
+}
+@keyframes aurora-gold {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .masthead__line { animation: none; }
 }
 
 .brand {
