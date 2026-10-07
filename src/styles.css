@@ -2679,3 +2679,14 @@ th[aria-sort='descending'] .th-btn {
   max-width: 100%;
   white-space: normal;
 }
+
+/* Character page: facts and reactions share the left column */
+.detail__main {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  min-width: 0;
+}
+.detail__reacts .mini-title {
+  margin-top: 0;
+}

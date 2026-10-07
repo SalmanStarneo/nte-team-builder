@@ -46,53 +46,101 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
       </header>
 
       <div className="detail__grid">
-        <dl className="facts">
-          <div><dt>Arc type</dt><dd>
-            {c.arcType ? (
-              <>
-                {c.arcType}{' '}
-                <a className="muted" href={`#arcs-${c.arcType.toLowerCase()}`}>· {arcCount} Arcs</a>
-              </>
-            ) : (
-              <span className="muted">Not announced yet</span>
+        <div className="detail__main">
+          <dl className="facts">
+            <div><dt>Arc type</dt><dd>
+              {c.arcType ? (
+                <>
+                  {c.arcType}{' '}
+                  <a className="muted" href={`#arcs-${c.arcType.toLowerCase()}`}>· {arcCount} Arcs</a>
+                </>
+              ) : (
+                <span className="muted">Not announced yet</span>
+              )}
+            </dd></div>
+            {signature && <div><dt>Signature Arc</dt><dd>{signature.name}</dd></div>}
+            {RECOMMENDED[c.id]?.length > 0 && (
+              <div>
+                <dt>Recommended Arcs</dt>
+                <dd>
+                  {RECOMMENDED[c.id]
+                    .filter((id) => ARC_BY_ID[id].signature !== c.id)
+                    .map((id) => ARC_BY_ID[id].name)
+                    .join(', ')}
+                </dd>
+              </div>
             )}
-          </dd></div>
-          {signature && <div><dt>Signature Arc</dt><dd>{signature.name}</dd></div>}
-          {RECOMMENDED[c.id]?.length > 0 && (
+            <div><dt>Faction</dt><dd>
+              {c.faction ?? (c.formerFaction ? '' : '—')}
+              {c.unit && <span className="muted"> · {c.unit}</span>}
+              {c.formerFaction && (
+                <span className="former">
+                  {c.faction && ' '}
+                  <span className="former__tag">Former</span> {c.formerFaction}
+                </span>
+              )}
+            </dd></div>
+            <div><dt>Esper ability</dt><dd>{c.ability ?? '—'}</dd></div>
             <div>
-              <dt>Recommended Arcs</dt>
-              <dd>
-                {RECOMMENDED[c.id]
-                  .filter((id) => ARC_BY_ID[id].signature !== c.id)
-                  .map((id) => ARC_BY_ID[id].name)
-                  .join(', ')}
+              <dt>Recommended Cartridges</dt>
+              <dd className="cart-list">
+                {cartridgesFor(c).map((id) => (
+                  <span key={id} className="cart-list__item">
+                    <CartridgeIcon id={id} size={22} />
+                    {CARTRIDGE_BY_ID[id].name}
+                  </span>
+                ))}
               </dd>
             </div>
-          )}
-          <div><dt>Faction</dt><dd>
-            {c.faction ?? (c.formerFaction ? '' : '—')}
-            {c.unit && <span className="muted"> · {c.unit}</span>}
-            {c.formerFaction && (
-              <span className="former">
-                {c.faction && ' '}
-                <span className="former__tag">Former</span> {c.formerFaction}
-              </span>
-            )}
-          </dd></div>
-          <div><dt>Esper ability</dt><dd>{c.ability ?? '—'}</dd></div>
-          <div>
-            <dt>Recommended Cartridges</dt>
-            <dd className="cart-list">
-              {cartridgesFor(c).map((id) => (
-                <span key={id} className="cart-list__item">
-                  <CartridgeIcon id={id} size={22} />
-                  {CARTRIDGE_BY_ID[id].name}
+            {c.upcoming && <div><dt>Status</dt><dd>Upcoming</dd></div>}
+          </dl>
+
+        <section className="detail__reacts">
+          <h3 className="mini-title">Reacts with</h3>
+          <p className="muted small">
+            {element.name} sits between {neighbours[0].name} and {neighbours[1].name} on the Esper Cycle.
+          </p>
+          <ul className="detail__reactions">
+            {reactions.map((r) => {
+              const other = r.elements.find((e) => e !== c.element);
+              return (
+                <li key={r.id}>
+                  <ElementGlyph element={other} size={14} />
+                  <b>{r.name}</b>
+                  <span className="muted">with {ELEMENT_BY_ID[other].name}</span>
+                </li>
+              );
+            })}
+            {trios.map((t) => (
+              <li key={t.id}>
+                <span className="trio-dots">
+                  {t.elements.map((e) => <ElementGlyph key={e} element={e} size={11} />)}
                 </span>
+                <b>{t.name}</b>
+                <span className="muted">trio</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {presets.length > 0 && (
+          <section>
+            <h3 className="mini-title">Featured in</h3>
+            <ul className="detail__presets">
+              {presets.map((p) => (
+                <li key={p.name}>
+                  <span className="detail__preset-name">{p.name}</span>
+                  <span className="detail__preset-team">
+                    {p.members.map((id) => (
+                      <Portrait key={id} character={CHARACTER_BY_ID[id]} size="sm" />
+                    ))}
+                  </span>
+                </li>
               ))}
-            </dd>
-          </div>
-          {c.upcoming && <div><dt>Status</dt><dd>Upcoming</dd></div>}
-        </dl>
+            </ul>
+          </section>
+        )}
+        </div>
 
         <div className="stats">
           {MAX_STATS[c.id] ? (
@@ -105,34 +153,6 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
           )}
         </div>
       </div>
-
-      <section>
-        <h3 className="mini-title">Reacts with</h3>
-        <p className="muted small">
-          {element.name} sits between {neighbours[0].name} and {neighbours[1].name} on the Esper Cycle.
-        </p>
-        <ul className="detail__reactions">
-          {reactions.map((r) => {
-            const other = r.elements.find((e) => e !== c.element);
-            return (
-              <li key={r.id}>
-                <ElementGlyph element={other} size={14} />
-                <b>{r.name}</b>
-                <span className="muted">with {ELEMENT_BY_ID[other].name}</span>
-              </li>
-            );
-          })}
-          {trios.map((t) => (
-            <li key={t.id}>
-              <span className="trio-dots">
-                {t.elements.map((e) => <ElementGlyph key={e} element={e} size={11} />)}
-              </span>
-              <b>{t.name}</b>
-              <span className="muted">trio</span>
-            </li>
-          ))}
-        </ul>
-      </section>
 
       <section>
         <h3 className="mini-title">Awakenings</h3>
@@ -179,23 +199,7 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
 
       <AscensionPlanner key={c.id} character={c} />
 
-      {presets.length > 0 && (
-        <section>
-          <h3 className="mini-title">Featured in</h3>
-          <ul className="detail__presets">
-            {presets.map((p) => (
-              <li key={p.name}>
-                <span className="detail__preset-name">{p.name}</span>
-                <span className="detail__preset-team">
-                  {p.members.map((id) => (
-                    <Portrait key={id} character={CHARACTER_BY_ID[id]} size="sm" />
-                  ))}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+
 
       <div className="detail__actions">
         <button className="btn btn--primary" onClick={onAdd} disabled={inActiveTeam || teamFull}>
