@@ -2748,6 +2748,7 @@ th[aria-sort='descending'] .th-btn {
 }
 .console-layout {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
   align-items: start;
 }
@@ -3149,4 +3150,8 @@ th[aria-sort='descending'] .th-btn {
 }
 .console-code-in {
   margin-top: 8px;
+}
+.console-side > section,
+.console-board {
+  min-width: 0;
 }
