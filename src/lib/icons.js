@@ -20,7 +20,7 @@ const MATERIAL_ICONS = new Set([
   'distorted-numeral',
   'doves-flutter',
   'dreamless-seed',
-  'dress-sleeves-of-vanity',
+  'dress-hem-of-vanity',
   'elite-hunter-guide',
   'expansion-core',
   'fading-silhouette',
