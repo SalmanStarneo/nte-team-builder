@@ -3,7 +3,7 @@ import { CHARACTERS, CHARACTER_BY_ID } from '../data/characters.js';
 import { CARTRIDGES, CARTRIDGE_BY_ID } from '../data/gear.js';
 import {
   CHARACTER_CONSOLE, CONSOLE_SIZE, FREE_CELLS, LAYOUT_NAMES, SET_SHAPES, SHAPES, SHAPE_ORDER,
-  canPlace, charactersWithLayout, footprint, maskOf, occupancy, setProgress, specBonus, usedCells,
+  canPlace, charactersWithLayout, consoleStats, footprint, maskOf, occupancy, setProgress, specBonus, usedCells,
 } from '../data/console.js';
 import { navigate } from '../lib/route.js';
 import { loadoutOf } from '../lib/teamsReducer.js';
@@ -11,7 +11,7 @@ import CartridgeIcon from './CartridgeIcon.jsx';
 import CartStatsEditor from './CartStatsEditor.jsx';
 import { suggestedBuild } from '../data/consoleBuilds.js';
 import { loadSavedConsoles, storeSavedConsoles } from '../lib/consoles.js';
-import { CARTRIDGE_SUB_SLOTS } from '../data/gear.js';
+import { CARTRIDGE_SUB_SLOTS, MODULE_SUB_STATS, bonusStats, formatStat, isPercentStat, moduleRange } from '../data/gear.js';
 import Portrait from './Portrait.jsx';
 
 const TYPE_NAMES = { 2: 'Type Ⅱ', 3: 'Type Ⅲ', 4: 'Type Ⅳ' };
@@ -50,6 +50,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
   const [hover, setHover] = useState(null);
   const [saved, setSaved] = useState(loadSavedConsoles);
   const [cartStats, setCartStats] = useState(emptyStats);
+  const [active, setActive] = useState(null); // index of the module being edited
   const [name, setName] = useState('');
   const [status, setStatus] = useState('');
 
@@ -61,6 +62,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
     setPieces(lo?.console ?? []);
     setCartridge(lo?.cartridge ?? null);
     setCartStats(lo?.cartStats ?? emptyStats());
+    setActive(null);
     setStatus('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [charId]);
@@ -69,6 +71,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
 
   const suggested = suggestedBuild(charId);
   function applyBuild(b) {
+    setActive(null);
     setPieces(b.pieces);
     setCartridge(b.cartridge);
     setCartStats(b.cartStats ?? emptyStats());
@@ -99,13 +102,14 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
     if (!mask[r][c]) return;
     const at = occ[r][c];
     if (at !== -1) {
-      setPieces(pieces.filter((_, i) => i !== at));
+      setActive(at === active ? null : at);
       return;
     }
     if (!selected) return;
     const [r0, c0] = origin(selected, r, c);
     if (canPlace(layout, pieces, selected, r0, c0)) {
       setPieces([...pieces, { shape: selected, r: r0, c: c0 }]);
+      setActive(null);
       setStatus('');
     } else {
       setStatus('That module doesn’t fit there.');
@@ -183,7 +187,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
                   Use suggested
                 </button>
               )}
-              <button type="button" className="btn btn--quiet" onClick={() => setPieces([])} disabled={!pieces.length}>
+              <button type="button" className="btn btn--quiet" onClick={() => { setPieces([]); setActive(null); }} disabled={!pieces.length}>
                 Clear
               </button>
             </div>
@@ -200,6 +204,8 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
                   p && `ccell--t${SHAPES[p.shape].type}`,
                   p && set?.perShape && p.shape in set.perShape && 'ccell--set',
                   inPreview && (preview.ok ? 'ccell--ok' : 'ccell--bad'),
+                  at !== -1 && at === active && 'ccell--active',
+                  p?.stats && 'ccell--has-stats',
                   edgeClass(r, c),
                 ].filter(Boolean).join(' ');
                 return (
@@ -213,7 +219,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
                     onClick={() => clickCell(r, c)}
                     aria-label={
                       !free ? 'Blocked cell'
-                        : p ? `${TYPE_NAMES[SHAPES[p.shape].type]} module, remove`
+                        : p ? `${TYPE_NAMES[SHAPES[p.shape].type]} module, edit stats`
                           : `Empty cell, row ${r + 1} column ${c + 1}`
                     }
                   />
@@ -222,9 +228,21 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
             )}
           </div>
           <p className="muted small">
-            Tap a shape, then tap a cell to place it. Tap a placed module to remove it.
+            Tap a shape, then tap a cell to place it. Tap a placed module to enter its stats or remove it.
           </p>
           <p className="console-status" role="status" aria-live="polite">{status}</p>
+          {active !== null && pieces[active] && (
+            <ModuleEditor
+              piece={pieces[active]}
+              index={active}
+              onChange={(next) => setPieces(pieces.map((p, i) => (i === active ? next : p)))}
+              onRemove={() => {
+                setPieces(pieces.filter((_, i) => i !== active));
+                setActive(null);
+              }}
+              onClose={() => setActive(null)}
+            />
+          )}
         </section>
 
         <div className="console-side">
@@ -308,6 +326,20 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
               </p>
             </section>
           )}
+
+          <section aria-labelledby="console-totals">
+            <h3 id="console-totals" className="mini-title">Console totals <span>modules, Cartridge, bonuses</span></h3>
+            {(() => {
+              const totals = bonusStats(null, cartStats, consoleStats(charId, pieces, cartridge));
+              return totals.length ? (
+                <ul className="console-totals">
+                  {totals.map((t) => <li key={t.stat}>{formatStat(t.stat, t.value)}</li>)}
+                </ul>
+              ) : (
+                <p className="muted small">Enter module and Cartridge stats to see the totals.</p>
+              );
+            })()}
+          </section>
 
           <section aria-labelledby="console-save">
             <h3 id="console-save" className="mini-title">Save &amp; equip</h3>
@@ -428,5 +460,91 @@ export function MiniBoard({ layout, pieces, cell = 9 }) {
         }),
       )}
     </svg>
+  );
+}
+
+// Stats of one placed module: 2 main (flat HP, flat ATK) and 4 sub attributes.
+function ModuleEditor({ piece, index, onChange, onRemove, onClose }) {
+  const st = piece.stats ?? { hp: 0, atk: 0, subs: [null, null, null, null] };
+  const set = (patch) => onChange({ ...piece, stats: { ...st, ...patch } });
+  const num = (kind, stat, raw) => {
+    const [, max] = moduleRange(kind, stat);
+    const n = Math.max(0, Math.min(max, Number(raw) || 0));
+    return Math.round(n * 10) / 10;
+  };
+  const typeName = TYPE_NAMES[SHAPES[piece.shape].type];
+  return (
+    <div className="module-editor" role="group" aria-label={`Module ${index + 1} stats`}>
+      <div className="module-editor__head">
+        <ShapeGlyph shape={piece.shape} size={9} />
+        <b>{typeName} module</b>
+        <button type="button" className="btn btn--quiet" onClick={onRemove}>Remove</button>
+        <button type="button" className="btn btn--quiet" onClick={onClose}>Done</button>
+      </div>
+      <div className="module-editor__mains">
+        {[['hp', 'HP'], ['atk', 'ATK']].map(([key, label]) => {
+          const [min, max] = moduleRange('main', label);
+          return (
+            <label key={key} className="cstat cstat--on">
+              <span className="cstat__label">Main</span>
+              <span>{label}</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                min={min}
+                max={max}
+                placeholder={`${min}–${max}`}
+                value={st[key] || ''}
+                onChange={(e) => set({ [key]: num('main', label, e.target.value) })}
+              />
+            </label>
+          );
+        })}
+      </div>
+      <div className="module-editor__subs">
+        {st.subs.map((sub, i) => {
+          const [min, max] = sub ? moduleRange('sub', sub.stat) : [0, 0];
+          const pct = sub && isPercentStat(sub.stat);
+          return (
+            <div key={i} className={sub ? 'cstat cstat--on' : 'cstat'}>
+              <span className="cstat__label">Sub {i + 1}</span>
+              <select
+                aria-label={`Sub ${i + 1} stat`}
+                value={sub?.stat ?? ''}
+                onChange={(e) => {
+                  const stat = e.target.value;
+                  const next = stat ? { stat, value: stat === 'Cycle Intensity' ? 18 : sub?.value ?? 0 } : null;
+                  set({ subs: st.subs.map((x, j) => (j === i ? next : x)) });
+                }}
+              >
+                <option value="">—</option>
+                {MODULE_SUB_STATS.map((o) => <option key={o} value={o}>{o}</option>)}
+              </select>
+              <span className="cstat__value">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  aria-label={`Sub ${i + 1} value`}
+                  min={min}
+                  max={max}
+                  step={pct ? '0.1' : '1'}
+                  disabled={!sub}
+                  placeholder={sub ? `${min}–${max}` : ''}
+                  value={sub?.value || ''}
+                  onChange={(e) => set({
+                    subs: st.subs.map((x, j) => (j === i ? { ...x, value: num('sub', x.stat, e.target.value) } : x)),
+                  })}
+                />
+                <span className="cstat__unit" aria-hidden="true">{pct ? '%' : ''}</span>
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="muted small">
+        Typical rolls: main HP 100–1,200 and ATK 10–90; sub HP up to 500, ATK and DEF 10–90, Cycle Intensity 18,
+        percentages 1.0–9.9%.
+      </p>
+    </div>
   );
 }

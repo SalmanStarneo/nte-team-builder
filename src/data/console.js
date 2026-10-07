@@ -5,6 +5,8 @@
 // Source (Oct 2026): game data as compiled for the Icy Veins NTE Console Tool
 // (grid layouts, shapes, set shape requirements, specialisations).
 
+import { CARTRIDGE_BY_ID, parseSetBonus } from './gear.js';
+
 export const CONSOLE_SIZE = 5;
 
 // Grid layouts: '#' blocked, '.' free. Every layout has 20 free cells.
@@ -136,3 +138,30 @@ export const FREE_CELLS = 20;
 /** Characters sharing a layout, so a saved console can be equipped on any of them. */
 export const charactersWithLayout = (layoutId) =>
   Object.entries(CHARACTER_CONSOLE).filter(([, v]) => v.layout === layoutId).map(([id]) => id);
+
+// The character bonus names, written the way the stat lists name them.
+const SPEC_STAT = { ATK: 'ATK%', DEF: 'DEF%', HP: 'HP%' };
+const specStatName = (stat) => SPEC_STAT[stat] ?? (stat.endsWith('DMG') && !stat.startsWith('CRIT') ? `${stat}%` : stat);
+
+/**
+ * Everything the Console adds: module main and sub stats, the character's
+ * per-module bonus and the Cartridge set's 2-piece bonus once it is active.
+ * Returns [{ stat, value, from }].
+ */
+export function consoleStats(characterId, pieces, cartridgeId) {
+  const out = [];
+  for (const p of pieces ?? []) {
+    const st = p.stats;
+    if (!st) continue;
+    if (st.hp) out.push({ stat: 'HP', value: st.hp, from: 'module' });
+    if (st.atk) out.push({ stat: 'ATK', value: st.atk, from: 'module' });
+    for (const sub of st.subs ?? []) if (sub?.value) out.push({ stat: sub.stat, value: sub.value, from: 'module' });
+  }
+  const spec = specBonus(characterId, pieces ?? []);
+  if (spec && spec.total) out.push({ stat: specStatName(spec.stat), value: spec.total, from: 'bonus' });
+  if (cartridgeId && setProgress(cartridgeId, pieces ?? []).two) {
+    const b = parseSetBonus(CARTRIDGE_BY_ID[cartridgeId]?.two);
+    if (b) out.push({ ...b, from: 'set' });
+  }
+  return out;
+}

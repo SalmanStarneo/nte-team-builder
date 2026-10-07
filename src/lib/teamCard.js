@@ -8,6 +8,7 @@ import { loadoutOf } from './teamsReducer.js';
 import { analyzeTeam } from './analyze.js';
 import { activeResonance } from '../data/awakenings.js';
 import { encodeCardCode } from './cardCode.js';
+import { consoleStats } from '../data/console.js';
 
 export const CARD_W = 1200;
 export const CARD_H = 675;
@@ -446,7 +447,7 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     ctx.lineTo(gx + gw, gy - 12);
     ctx.stroke();
 
-    const bonus = bonusStats(arc, gear.cartStats);
+    const bonus = bonusStats(arc, gear.cartStats, consoleStats(c.id, gear.console, gear.cartridge));
     const hasBonus = bonus.length > 0;
     // With bonus stats shown, names stay on one line so the stats have room.
     const maxLines = hasBonus ? 1 : 2;

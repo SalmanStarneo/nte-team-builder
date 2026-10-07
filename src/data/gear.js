@@ -124,7 +124,7 @@ export function parseArcSub(text) {
 }
 
 /** Arc + Cartridge stats added up: [{ stat, value }] in a stable order. */
-export function bonusStats(arc, cartStats) {
+export function bonusStats(arc, cartStats, extras = []) {
   const totals = new Map();
   const add = (stat, value) => {
     if (!stat || !Number.isFinite(Number(value)) || Number(value) === 0) return;
@@ -139,5 +139,27 @@ export function bonusStats(arc, cartStats) {
     if (cartStats.main) add(cartStats.main.stat, cartStats.main.value);
     for (const sub of cartStats.subs ?? []) if (sub) add(sub.stat, sub.value);
   }
+  for (const x of extras) add(x.stat, x.value);
   return [...totals].map(([stat, value]) => ({ stat, value: Math.round(value * 100) / 100 }));
+}
+
+// Typical ranges for Console module attributes (from in-game observation).
+// Percent stats roll 1.0–9.9%; Cycle Intensity is always 18 on modules.
+export const MODULE_MAIN_STATS = ['HP', 'ATK'];
+const MODULE_RANGES = {
+  main: { HP: [100, 1200], ATK: [10, 90] },
+  sub: { HP: [1, 500], ATK: [10, 90], DEF: [10, 90], 'Cycle Intensity': [18, 18], 'Break Intensity': [1, 99] },
+};
+export function moduleRange(kind, stat) {
+  if (MODULE_RANGES[kind][stat]) return MODULE_RANGES[kind][stat];
+  return isPercentStat(stat) ? [1, 9.9] : [1, 999];
+}
+
+/** "Chaos DMG +10%" (a set's 2-piece text) → { stat: 'Chaos DMG%', value: 10 }. */
+export function parseSetBonus(text) {
+  const m = /^(.*?)\s*\+([\d.]+)%$/.exec(text ?? '');
+  if (!m) return null;
+  const name = m[1].trim();
+  const map = { ATK: 'ATK%', HP: 'HP%', DEF: 'DEF%' };
+  return { stat: map[name] ?? `${name}%`, value: Number(m[2]) };
 }
