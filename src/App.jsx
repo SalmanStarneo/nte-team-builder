@@ -63,10 +63,19 @@ export default function App() {
       <header className="masthead">
         <div className="masthead__line" aria-hidden="true" />
         <div className="masthead__row">
-          <h1 className="brand">
-            <span className="brand__small">Neverness to Everness</span>
-            Team Builder
-          </h1>
+          <div className="brand-wrap">
+            <img
+              src={`${import.meta.env.BASE_URL}mascot.webp`}
+              alt=""
+              className="brand__mascot"
+              width="200"
+              height="253"
+            />
+            <h1 className="brand">
+              <span className="brand__small">Neverness to Everness</span>
+              Team Builder
+            </h1>
+          </div>
           <nav className="nav" aria-label="Sections">
             {VIEWS.map((v) => (
               <a

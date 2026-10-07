@@ -207,6 +207,20 @@ button {
   .masthead__line::after { animation: none; }
 }
 
+.brand-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand__mascot {
+  flex: none;
+  width: auto;
+  height: clamp(64px, 11vw, 92px);
+  filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.35));
+}
+
 .brand {
   margin: 8px 0 0;
   font-family: var(--font-display);
