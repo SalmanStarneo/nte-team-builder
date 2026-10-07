@@ -2665,3 +2665,17 @@ th[aria-sort='descending'] .th-btn {
   font: 600 0.8rem var(--font-mono);
   color: var(--muted);
 }
+
+/* Max stats on the character page */
+.stats__sub {
+  margin-top: 14px;
+}
+.stats tr.is-zero th,
+.stats tr.is-zero td {
+  color: var(--muted);
+}
+.stats__toggle {
+  margin-top: 8px;
+  max-width: 100%;
+  white-space: normal;
+}

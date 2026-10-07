@@ -97,7 +97,7 @@ export const GLOSSARY = [
   {
     term: 'Base stats',
     category: 'Characters',
-    text: 'A character’s HP, ATK and DEF before gear. This app lists Level 1 values; all characters start with 5% Crit Rate and 50% Crit DMG.',
+    text: 'A character’s HP, ATK and DEF before gear. This app lists Level 80 values without Arc or Console, as shown on the in-game character screen.',
   },
 
   // Gear

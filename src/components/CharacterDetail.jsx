@@ -4,6 +4,8 @@ import { CHARACTER_BY_ID } from '../data/characters.js';
 import { ARCS, ARC_BY_ID, RECOMMENDED } from '../data/arcs.js';
 import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import CartridgeIcon from './CartridgeIcon.jsx';
+import MaxStats from './MaxStats.jsx';
+import { MAX_STATS } from '../data/maxStats.js';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import AscensionPlanner from './AscensionPlanner.jsx';
@@ -93,29 +95,13 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
         </dl>
 
         <div className="stats">
-          <h3 className="mini-title">Base stats <span>Level 1</span></h3>
-          {c.stats ? (
-            <table>
-              <tbody>
-                {[
-                  ['hp', 'HP', fmt(c.stats.hp)],
-                  ['atk', 'ATK', c.stats.atk],
-                  ['def', 'DEF', c.stats.def],
-                  ['critRate', 'Crit Rate', `${c.stats.critRate.toFixed(2)}%`],
-                  ['critDmg', 'Crit DMG', `${c.stats.critDmg.toFixed(2)}%`],
-                  ['dmgBonus', 'Universal DMG Bonus', '0.00%'],
-                ].map(([key, label, value]) => (
-                  <tr key={key}>
-                    <th scope="row">
-                      <span className="stat-label"><StatIcon stat={key} />{label}</span>
-                    </th>
-                    <td>{value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {MAX_STATS[c.id] ? (
+            <MaxStats stats={MAX_STATS[c.id]} />
           ) : (
-            <p className="muted">Stats pending. Not yet published by our data sources.</p>
+            <>
+              <h3 className="mini-title">Stats</h3>
+              <p className="muted">Level 80 stats not added yet.</p>
+            </>
           )}
         </div>
       </div>

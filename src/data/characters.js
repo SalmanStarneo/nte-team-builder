@@ -1,7 +1,7 @@
 // Character roster. Update this file when a new patch adds characters.
 // Sources (Oct 2026): neverness.gg and Icy Veins character lists (rank, element,
 // role, arc type; some sources call Condensate "Synthesis"); Dexerto wiki profiles (faction, Esper ability, role tags,
-// Level 1 base stats). Fields set to null are not yet published by those sources.
+// Level 1 base stats, kept for reference; the app shows Level 80 stats from maxStats.js). Fields set to null are not yet published by those sources.
 //
 // roles: the in-game role comes first; extra roles reflect what community
 // guides use the character for (e.g. Hotori is a Buffer who also burst-damages).

@@ -7,6 +7,7 @@ import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
 import RoleList from './RoleList.jsx';
+import { MAX_STATS, MAX_STATS_LEVEL } from '../data/maxStats.js';
 
 const BASE = import.meta.env.BASE_URL;
 const VIEW_KEY = 'nte-team-builder:charView';
@@ -25,9 +26,9 @@ const COLUMNS = [
   { id: 'rarity', label: 'Rank', get: (c) => c.rarity },
   { id: 'role', label: 'Roles', get: (c) => c.roles.join(', ') },
   { id: 'arcType', label: 'Arc type', get: (c) => c.arcType },
-  { id: 'hp', label: 'HP', get: (c) => c.stats?.hp, numeric: true },
-  { id: 'atk', label: 'ATK', get: (c) => c.stats?.atk, numeric: true },
-  { id: 'def', label: 'DEF', get: (c) => c.stats?.def, numeric: true },
+  { id: 'hp', label: 'HP', get: (c) => MAX_STATS[c.id]?.hp, numeric: true },
+  { id: 'atk', label: 'ATK', get: (c) => MAX_STATS[c.id]?.atk, numeric: true },
+  { id: 'def', label: 'DEF', get: (c) => MAX_STATS[c.id]?.def, numeric: true },
 ];
 
 function compare(a, b, col, dir) {
@@ -252,9 +253,9 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                 <td><RankBadge rank={c.rarity} size={22} /></td>
                 <td><RoleList roles={c.roles} size={14} /></td>
                 <td>{c.arcType ?? '—'}</td>
-                <td className="num">{c.stats ? c.stats.hp.toLocaleString('en-US') : '—'}</td>
-                <td className="num">{c.stats?.atk ?? '—'}</td>
-                <td className="num">{c.stats?.def ?? '—'}</td>
+                <td className="num">{MAX_STATS[c.id] ? MAX_STATS[c.id].hp.toLocaleString('en-US') : '—'}</td>
+                <td className="num">{MAX_STATS[c.id]?.atk.toLocaleString('en-US') ?? '—'}</td>
+                <td className="num">{MAX_STATS[c.id]?.def ?? '—'}</td>
               </tr>
             ))}
           </tbody>
@@ -262,7 +263,7 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
         {rows.length === 0 && <p className="empty">No characters match these filters.</p>}
       </div>
       )}
-      <p className="muted small">Base stats at Level 1. “—” means the value hasn’t been published yet.</p>
+      <p className="muted small">{`Stats at Level ${MAX_STATS_LEVEL}, without Arc or Console. “—” means they haven’t been added yet.`}</p>
     </div>
   );
 }
