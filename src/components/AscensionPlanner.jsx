@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import MaterialIcon from './MaterialIcon.jsx';
 import { ASCENSION_PHASES, MAX_LEVEL, ascensionCost, ascensionTable } from '../data/ascension.js';
 
 const CAPS = [20, 30, 40, 50, 60, 70, 80];
@@ -49,7 +50,8 @@ export default function AscensionPlanner({ character }) {
         <ul className="mats">
           {cost.map((m) => (
             <li key={m.name} className={`mat mat--${m.kind}`}>
-              <span className="mat__qty">{fmt(m.qty)}</span>
+              <MaterialIcon name={m.name} />
+                  <span className="mat__qty">{fmt(m.qty)}</span>
               <span className="mat__name">
                 {m.name}
                 {m.source && <span className="mat__src">{m.source}</span>}

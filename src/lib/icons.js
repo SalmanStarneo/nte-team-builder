@@ -4,3 +4,58 @@ const BASE = import.meta.env.BASE_URL;
 export const elementIconUrl = (elementId) => `${BASE}icons/elements/${elementId}.webp`;
 export const roleIconUrl = (role) => `${BASE}icons/roles/${role.toLowerCase()}.webp`;
 export const cartridgeIconUrl = (id) => `${BASE}icons/cartridges/${id}.webp`;
+export const arcTypeIconUrl = (type) => `${BASE}icons/arc-types/${type.toLowerCase()}.webp`;
+
+// Material icons we have files for (public/icons/materials/<slug>.webp).
+const MATERIAL_ICONS = new Set([
+  'a-page-from-delusions-shore',
+  'beetle-coin',
+  'black-hat',
+  'blurred-numeral',
+  'blurred-silhouette',
+  'chaos-silhouette',
+  'charging-knight-spark-plug',
+  'co',
+  'confessional-flower-seed',
+  'distorted-numeral',
+  'doves-flutter',
+  'dreamless-seed',
+  'dress-sleeves-of-vanity',
+  'elite-hunter-guide',
+  'expansion-core',
+  'fading-silhouette',
+  'first-expectations',
+  'fng',
+  'good-boy-stamp',
+  'heart-racing-night',
+  'hesitation-of-the-waves',
+  'known-weariness',
+  'lost-whispers',
+  'nest-guard-fragment',
+  'nestlings-longing',
+  'obscure-whispers',
+  'paradoxical-whispers',
+  'resonance-of-faith',
+  'rising-hunter-guide',
+  'senior-hunter-guide',
+  'suspended-delusions',
+  'suspended-whispers',
+  'synchronicity-of-thought',
+  'tear-of-the-sea',
+  'the-olive-branch',
+  'the-second-self',
+  'transcendent-delusions',
+  'unsolved-numeral',
+  'water-moon-pick',
+  'white-rose',
+  'yearning-delusions',
+]);
+
+export const materialSlug = (name) =>
+  name.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+/** URL of a material's icon, or null when we don't have one yet. */
+export function materialIconUrl(name) {
+  const slug = materialSlug(name);
+  return MATERIAL_ICONS.has(slug) ? `${BASE}icons/materials/${slug}.webp` : null;
+}

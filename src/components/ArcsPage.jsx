@@ -3,6 +3,7 @@ import { ARCS, RECOMMENDED } from '../data/arcs.js';
 import { ARC_TYPES, CHARACTERS, CHARACTER_BY_ID } from '../data/characters.js';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
+import ArcTypeIcon from './ArcTypeIcon.jsx';
 
 const RANKS = ['S', 'A', 'B'];
 const RANK_ORDER = { S: 0, A: 1, B: 2 };
@@ -58,6 +59,7 @@ export default function ArcsPage({ arcType }) {
             aria-selected={type === t}
             href={`#arcs-${t.toLowerCase()}`}
           >
+            <ArcTypeIcon type={t} size={18} />
             {t} <span>{counts[t]}</span>
           </a>
         ))}
@@ -111,7 +113,7 @@ export default function ArcsPage({ arcType }) {
                 <div className="arc-card__top">
                   <RankBadge rank={a.rarity} size={22} />
                   <h3 className="arc-card__name">{a.name}</h3>
-                  {type === 'all' && <span className="arc-card__type">{a.type}</span>}
+                  {type === 'all' && <span className="arc-card__type"><ArcTypeIcon type={a.type} size={16} />{a.type}</span>}
                 </div>
                 <dl className="gear-stats">
                   <div><dt>Base ATK</dt><dd>{a.atk}</dd></div>

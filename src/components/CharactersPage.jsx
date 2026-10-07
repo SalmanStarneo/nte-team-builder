@@ -7,6 +7,7 @@ import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
 import RoleList from './RoleList.jsx';
+import ArcTypeIcon from './ArcTypeIcon.jsx';
 import { MAX_STATS, MAX_STATS_LEVEL } from '../data/maxStats.js';
 
 const BASE = import.meta.env.BASE_URL;
@@ -252,7 +253,7 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                 </td>
                 <td><RankBadge rank={c.rarity} size={22} /></td>
                 <td><RoleList roles={c.roles} size={14} /></td>
-                <td>{c.arcType ?? '—'}</td>
+                <td>{c.arcType ? <span className="cell-el"><ArcTypeIcon type={c.arcType} size={16} />{c.arcType}</span> : '—'}</td>
                 <td className="num">{MAX_STATS[c.id] ? MAX_STATS[c.id].hp.toLocaleString('en-US') : '—'}</td>
                 <td className="num">{MAX_STATS[c.id]?.atk.toLocaleString('en-US') ?? '—'}</td>
                 <td className="num">{MAX_STATS[c.id]?.def ?? '—'}</td>

@@ -5,6 +5,7 @@ import { ARCS, ARC_BY_ID, RECOMMENDED } from '../data/arcs.js';
 import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import CartridgeIcon from './CartridgeIcon.jsx';
 import MaxStats from './MaxStats.jsx';
+import ArcTypeIcon from './ArcTypeIcon.jsx';
 import { MAX_STATS } from '../data/maxStats.js';
 import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
@@ -51,6 +52,7 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
             <div><dt>Arc type</dt><dd>
               {c.arcType ? (
                 <>
+                  <ArcTypeIcon type={c.arcType} size={18} />
                   {c.arcType}{' '}
                   <a className="muted" href={`#arcs-${c.arcType.toLowerCase()}`}>· {arcCount} Arcs</a>
                 </>

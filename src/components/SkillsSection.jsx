@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import MaterialIcon from './MaterialIcon.jsx';
 import { LIFE_MAX, SKILL_LEVEL_COSTS, SKILL_MAX, SKILLS, skillCost } from '../data/skills.js';
 
 const fmt = (n) => n.toLocaleString('en-US');
@@ -104,6 +105,7 @@ export default function SkillsSection({ character }) {
             <ul className="mats">
               {cost.map((m) => (
                 <li key={`${m.name}-${m.source ?? ''}`} className={`mat mat--${m.kind}`}>
+                  <MaterialIcon name={m.name} />
                   <span className="mat__qty">{fmt(m.qty)}</span>
                   <span className="mat__name">
                     {m.name}

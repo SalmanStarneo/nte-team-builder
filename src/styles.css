@@ -2690,3 +2690,28 @@ th[aria-sort='descending'] .th-btn {
 .detail__reacts .mini-title {
   margin-top: 0;
 }
+
+/* Arc type and material icons */
+.arctype-icon {
+  flex: none;
+  border-radius: 50%;
+  vertical-align: -3px;
+  margin-right: 4px;
+}
+.type-tab .arctype-icon {
+  margin-right: 2px;
+}
+.arc-card__type {
+  display: inline-flex;
+  align-items: center;
+}
+.mat-icon {
+  flex: none;
+  border-radius: 6px;
+  object-fit: contain;
+}
+.mat-icon--none {
+  display: inline-block;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+}

@@ -1,5 +1,6 @@
 import { ARC_BY_ID, arcTag, arcsFor } from '../data/arcs.js';
 import CartridgeIcon from './CartridgeIcon.jsx';
+import ArcTypeIcon from './ArcTypeIcon.jsx';
 import {
   CARTRIDGES, CARTRIDGE_BY_ID, CARTRIDGE_MAIN_STATS, CARTRIDGE_SUB_SLOTS, MODULE_SUB_STATS, cartridgesFor, isPercentStat,
 } from '../data/gear.js';
@@ -114,7 +115,7 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
         {/* Arc */}
         <div className="gear-block">
           <label className="mini-title" htmlFor="gear-arc">
-            Arc <span>{c.arcType ? `${c.arcType} only` : 'Arc type not announced'}</span>
+            Arc <span>{c.arcType ? <><ArcTypeIcon type={c.arcType} size={14} /> {c.arcType} only</> : 'Arc type not announced'}</span>
           </label>
           <select
             id="gear-arc"
