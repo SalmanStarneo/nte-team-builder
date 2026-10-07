@@ -4,9 +4,9 @@ import ArcTypeIcon from './ArcTypeIcon.jsx';
 import { MiniBoard } from './ConsolePage.jsx';
 import { CHARACTER_CONSOLE, FREE_CELLS, setProgress, specBonus, usedCells } from '../data/console.js';
 import { CARTRIDGES, CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
-import { suggestedBuild } from '../data/consoleBuilds.js';
+import { suggestedBuild, suggestedCartStats } from '../data/consoleBuilds.js';
 import { loadSavedConsoles } from '../lib/consoles.js';
-import { CartStatsList } from './CartStatsEditor.jsx';
+import CartStatsEditor from './CartStatsEditor.jsx';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
@@ -232,36 +232,54 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
           )}
         </div>
 
-        {/* Console build: modules + Cartridge set + Cartridge stats */}
+        {/* Console build: modules + Cartridge stats, following the chosen Cartridge set */}
         {CHARACTER_CONSOLE[c.id] && (() => {
           const layout = CHARACTER_CONSOLE[c.id].layout;
-          const suggested = suggestedBuild(c.id);
-          const builds = [suggested, ...loadSavedConsoles().filter((b) => b.layout === layout)].filter(Boolean);
-          const same = (b) =>
-            JSON.stringify(b.pieces) === JSON.stringify(loadout.console) &&
-            b.cartridge === loadout.cartridge &&
-            JSON.stringify(b.cartStats ?? null) === JSON.stringify(loadout.cartStats);
+          const suggested = suggestedBuild(c.id, loadout.cartridge);
+          const saved = loadSavedConsoles().filter(
+            (b) => b.layout === layout && (!loadout.cartridge || b.cartridge === loadout.cartridge),
+          );
+          const builds = [...saved, suggested].filter(Boolean);
+          const samePieces = (b) => JSON.stringify(b.pieces) === JSON.stringify(loadout.console);
           // Saved builds win over the suggested one when both match.
-          const current = [...builds.filter((b) => !b.suggested), ...builds.filter((b) => b.suggested)].find(same);
+          const current = builds.find(samePieces);
           const sb = specBonus(c.id, loadout.console);
+          const setName = cart ? cart.name : 'the recommended set';
+          // Keep values the person already entered for the same stat.
+          const withValues = (st) => {
+            const old = [loadout.cartStats.main, ...loadout.cartStats.subs].filter(Boolean);
+            const keep = (x) => x && { ...x, value: x.value || old.find((o) => o.stat === x.stat)?.value || 0 };
+            return { main: keep(st.main), subs: st.subs.map(keep) };
+          };
           return (
             <div className="gear-block gear-block--wide">
-              <label className="mini-title" htmlFor="gear-console">Console build</label>
+              <label className="mini-title" htmlFor="gear-console">
+                Console build <span>for {setName}</span>
+              </label>
               <select
                 id="gear-console"
                 value={current?.id ?? (loadout.console.length ? 'custom' : '')}
                 onChange={(e) => {
                   const b = builds.find((x) => x.id === e.target.value);
-                  if (b) onChange({ console: b.pieces, cartridge: b.cartridge, cartStats: b.cartStats ?? loadout.cartStats });
-                  if (!e.target.value) onChange({ console: [] });
+                  if (b) {
+                    onChange({
+                      console: b.pieces,
+                      cartridge: b.cartridge,
+                      cartStats: b.suggested ? withValues(b.cartStats) : b.cartStats ?? loadout.cartStats,
+                    });
+                  } else if (!e.target.value) {
+                    onChange({ console: [] });
+                  }
                 }}
               >
                 <option value="">No console</option>
-                {!current && loadout.console.length > 0 && <option value="custom">Custom (edited in Console)</option>}
-                {suggested && <option value={suggested.id}>Suggested · {CARTRIDGE_BY_ID[suggested.cartridge].name}</option>}
-                {builds.filter((b) => !b.suggested).length > 0 && (
+                {!current && loadout.console.length > 0 && <option value="custom">Current layout (custom)</option>}
+                {suggested && (
+                  <option value={suggested.id}>Suggested · best layout for {CARTRIDGE_BY_ID[suggested.cartridge].name}</option>
+                )}
+                {saved.length > 0 && (
                   <optgroup label="Your saved consoles">
-                    {builds.filter((b) => !b.suggested).map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                    {saved.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                   </optgroup>
                 )}
               </select>
@@ -282,14 +300,22 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
                   </a>
                 </div>
               </div>
-              <p className="mini-title console-stats-title">Cartridge stats</p>
-              <CartStatsList value={loadout.cartStats} />
-              {current?.suggested && (
-                <p className="muted small">
-                  Suggested build: fills the grid, reaches the 4-piece set and uses as many of {c.name}’s bonus-Type
-                  modules as possible. Stats show what to look for; add your values in the Console tab.
-                </p>
-              )}
+
+              <div className="cstats-head">
+                <p className="mini-title">Cartridge stats <span>1 main · 4 sub</span></p>
+                <button
+                  type="button"
+                  className="btn btn--quiet"
+                  onClick={() => onChange({ cartStats: withValues(suggestedCartStats(c)) })}
+                >
+                  Use suggested stats
+                </button>
+              </div>
+              <CartStatsEditor value={loadout.cartStats} onChange={(v) => onChange({ cartStats: v })} idPrefix="lcs" />
+              <p className="muted small">
+                Suggested stats follow {c.name}’s main role; adjust them and enter the values from your Cartridge.
+                Module stats are entered per module in the Console tab.
+              </p>
             </div>
           );
         })()}

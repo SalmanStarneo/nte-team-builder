@@ -117,7 +117,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
     navigate(`console-${target}`);
   }
 
-  const suggested = suggestedBuild(charId);
+  const suggested = suggestedBuild(charId, cartridge);
   function applyBuild(b) {
     setActive(null);
     setPieces(b.pieces);
@@ -228,8 +228,11 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
                   type="button"
                   className="btn btn--quiet"
                   onClick={() => {
-                    applyBuild(suggested);
-                    setStatus('Loaded the suggested build. Add your stat values below the set.');
+                    // Keep values already entered for the same stats.
+                    const old = [cartStats.main, ...cartStats.subs].filter(Boolean);
+                    const keep = (x) => x && { ...x, value: x.value || old.find((o) => o.stat === x.stat)?.value || 0 };
+                    applyBuild({ ...suggested, cartStats: { main: keep(suggested.cartStats.main), subs: suggested.cartStats.subs.map(keep) } });
+                    setStatus(`Loaded the suggested layout for ${CARTRIDGE_BY_ID[suggested.cartridge].name}. Adjust the stats below the set.`);
                   }}
                 >
                   Use suggested

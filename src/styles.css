@@ -3155,3 +3155,13 @@ th[aria-sort='descending'] .th-btn {
 .console-board {
   min-width: 0;
 }
+.cstats-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 12px 0 6px;
+}
+.cstats-head .mini-title {
+  margin: 0;
+}
