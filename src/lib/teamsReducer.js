@@ -26,6 +26,8 @@ export const emptyLoadout = () => ({
   modules: Array(MODULE_SLOTS).fill(null),
   // Cartridge attributes: { main: { stat, value } | null, subs: [{ stat, value } | null x4] }
   cartStats: { main: null, subs: Array(CARTRIDGE_SUB_SLOTS).fill(null) },
+  // Console layout: placed modules [{ shape, r, c }] (see data/console.js).
+  console: [],
   dupes: 0,
   awakenings: [],
 });

@@ -1,6 +1,8 @@
 import { ARC_BY_ID, arcTag, arcsFor } from '../data/arcs.js';
 import CartridgeIcon from './CartridgeIcon.jsx';
 import ArcTypeIcon from './ArcTypeIcon.jsx';
+import { MiniBoard } from './ConsolePage.jsx';
+import { CHARACTER_CONSOLE, FREE_CELLS, setProgress, specBonus, usedCells } from '../data/console.js';
 import {
   CARTRIDGES, CARTRIDGE_BY_ID, CARTRIDGE_MAIN_STATS, CARTRIDGE_SUB_SLOTS, MODULE_SUB_STATS, cartridgesFor, isPercentStat,
 } from '../data/gear.js';
@@ -232,6 +234,33 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
             </>
           )}
         </div>
+
+        {/* Console */}
+        {CHARACTER_CONSOLE[c.id] && (
+          <div className="gear-block gear-block--wide">
+            <p className="mini-title">Console</p>
+            <div className="console-summary">
+              <MiniBoard layout={CHARACTER_CONSOLE[c.id].layout} pieces={loadout.console} cell={11} />
+              <div className="console-summary__body">
+                {loadout.console.length ? (
+                  <>
+                    <span><b>{usedCells(loadout.console)}</b> / {FREE_CELLS} cells · {loadout.console.length} modules</span>
+                    {cart && <span className="muted small">{cart.name}: {setProgress(cart.id, loadout.console).count} / 4 set modules</span>}
+                    {(() => {
+                      const sb = specBonus(c.id, loadout.console);
+                      return sb && sb.count > 0 && <span className="muted small">Bonus: +{sb.total}% {sb.stat}</span>;
+                    })()}
+                  </>
+                ) : (
+                  <span className="muted small">No modules placed yet.</span>
+                )}
+                <a className="btn btn--quiet console-summary__link" href={`#console-${c.id}`}>
+                  {loadout.console.length ? 'Edit console' : 'Build console'}
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Cartridge attributes */}
         <div className="gear-block gear-block--wide">

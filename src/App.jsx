@@ -12,6 +12,7 @@ import CharactersPage from './components/CharactersPage.jsx';
 import ExportDialog from './components/ExportDialog.jsx';
 import LoadoutPanel from './components/LoadoutPanel.jsx';
 import GlossaryPage from './components/GlossaryPage.jsx';
+import ConsolePage from './components/ConsolePage.jsx';
 import Portrait from './components/Portrait.jsx';
 import Roster from './components/Roster.jsx';
 import SharePanel from './components/SharePanel.jsx';
@@ -105,6 +106,14 @@ export default function App() {
       )}
 
       {route.view === 'arcs' && <ArcsPage arcType={route.arcType} />}
+
+      {route.view === 'console' && (
+        <ConsolePage
+          characterId={route.characterId}
+          activeTeam={active}
+          onEquip={(charId, patch) => dispatch({ type: 'setLoadout', charId, patch })}
+        />
+      )}
 
       {route.view === 'glossary' && <GlossaryPage />}
 
