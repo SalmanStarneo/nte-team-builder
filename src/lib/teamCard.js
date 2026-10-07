@@ -249,19 +249,43 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
 
   drawBands(ctx);
 
-  // Gold aurora stripe across the top, with a soft glow underneath.
+  // Muted gold stripe across the top with soft smoke wisps.
   const gold = ctx.createLinearGradient(0, 0, CARD_W, 0);
   [
-    [0, '#8a5a12'], [0.14, '#c98b1e'], [0.3, '#f3c74a'], [0.44, '#fff1b8'],
-    [0.56, '#f6d36b'], [0.7, '#d79a2b'], [0.84, '#ffe7a0'], [1, '#b07419'],
+    [0, '#5e3f12'], [0.18, '#8a6424'], [0.36, '#b08a42'], [0.5, '#c7a35e'],
+    [0.64, '#a8823c'], [0.82, '#7f5a1f'], [1, '#5a3c11'],
   ].forEach(([at, col]) => gold.addColorStop(at, col));
-  const glow = ctx.createLinearGradient(0, 8, 0, 40);
-  glow.addColorStop(0, 'rgba(243, 199, 74, 0.28)');
-  glow.addColorStop(1, 'rgba(243, 199, 74, 0)');
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 8, CARD_W, 32);
   ctx.fillStyle = gold;
   ctx.fillRect(0, 0, CARD_W, 8);
+  // Wisps: soft light ellipses, placed by a fixed pseudo-random sequence so
+  // every export looks the same.
+  let seed = 7;
+  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, CARD_W, 8);
+  ctx.clip();
+  for (let i = 0; i < 70; i += 1) {
+    const dark = i % 3 === 2;
+    const cx = rand() * CARD_W;
+    const cy = 1 + rand() * 8;
+    const rx = 14 + rand() * 40;
+    const ry = 1.5 + rand() * 3.5;
+    const a = dark ? 0.18 + rand() * 0.2 : 0.14 + rand() * 0.26;
+    const tint = dark ? '40, 24, 6' : '255, 240, 205';
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(1, ry / rx);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+    g.addColorStop(0, `rgba(${tint}, ${a})`);
+    g.addColorStop(1, `rgba(${tint}, 0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, 0, rx, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
 
   // Header
   const PAD = 48;
