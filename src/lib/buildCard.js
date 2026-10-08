@@ -104,8 +104,8 @@ function goldCells(ctx, x, y, cells, size, gap) {
     const cx = x + c * (size + gap);
     const cy = y + r * (size + gap);
     const g = ctx.createLinearGradient(cx, cy, cx + size, cy + size);
-    g.addColorStop(0, '#ffe08a');
-    g.addColorStop(1, K.goldDeep);
+    g.addColorStop(0, '#f8c27a');
+    g.addColorStop(1, '#c46a2c');
     ctx.fillStyle = g;
     roundRect(ctx, cx, cy, size, size, Math.max(2, size * 0.18));
     ctx.fill();
@@ -117,7 +117,7 @@ function moduleTile(ctx, x, y, size, shape, level) {
   ctx.fillStyle = K.goldTile;
   roundRect(ctx, x, y, size, size, 10);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(242, 193, 78, 0.55)';
+  ctx.strokeStyle = 'rgba(232, 150, 84, 0.6)';
   ctx.lineWidth = 1.5;
   ctx.stroke();
   const cells = SHAPES[shape].cells;
@@ -301,8 +301,9 @@ function consoleGrid(ctx, x, y, cell, layout, pieces) {
     ctx.save();
     roundedPolygon(ctx, outline, radius);
     const g = ctx.createLinearGradient(x0, y0, x1, y1);
-    g.addColorStop(0, '#ffe08a');
-    g.addColorStop(1, '#d0912a');
+    g.addColorStop(0, '#f8c27a');
+    g.addColorStop(0.55, '#e4954c');
+    g.addColorStop(1, '#c46a2c');
     ctx.fillStyle = g;
     ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
     ctx.shadowBlur = 6;
@@ -313,25 +314,34 @@ function consoleGrid(ctx, x, y, cell, layout, pieces) {
     ctx.save();
     roundedPolygon(ctx, outline, radius);
     ctx.clip();
-    // Soft sheen ring on each square, like the game's tiles.
-    ctx.strokeStyle = 'rgba(255, 246, 214, 0.32)';
+    // Faint large circles across the module, like the game's tile pattern.
+    const cxm = (x0 + x1) / 2;
+    const cym = (y0 + y1) / 2;
+    ctx.strokeStyle = 'rgba(255, 228, 196, 0.22)';
+    ctx.lineWidth = 1.4;
+    for (const k of [0.55, 1.05, 1.6]) {
+      ctx.beginPath();
+      ctx.arc(cxm + cell * 0.35, cym + cell * 0.3, cell * k, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    // Light rim just inside each square.
+    ctx.strokeStyle = 'rgba(255, 226, 196, 0.38)';
     ctx.lineWidth = 1.2;
     for (const [r, c] of cells) {
-      ctx.beginPath();
-      ctx.arc(at(r, c) + cell * 0.72, atY(r) + cell * 0.74, cell * 0.42, Math.PI, Math.PI * 1.5);
+      roundRect(ctx, at(r, c) + 3, atY(r) + 3, cell - 6, cell - 6, Math.max(1.5, cell * 0.05));
       ctx.stroke();
     }
     // Engraved grooves between the squares of one module: a dark cut with a
     // light lip beside it, running edge to edge so they notch the outline.
     const groove = (ax, ay, bx, by, horizontal) => {
       ctx.lineCap = 'round';
-      ctx.strokeStyle = 'rgba(112, 68, 6, 0.85)';
+      ctx.strokeStyle = 'rgba(112, 50, 16, 0.85)';
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.moveTo(ax, ay);
       ctx.lineTo(bx, by);
       ctx.stroke();
-      ctx.strokeStyle = 'rgba(255, 244, 205, 0.6)';
+      ctx.strokeStyle = 'rgba(255, 222, 190, 0.55)';
       ctx.lineWidth = 1.2;
       const o = 2.2;
       ctx.beginPath();
@@ -356,12 +366,12 @@ function consoleGrid(ctx, x, y, cell, layout, pieces) {
     // Bevel: light inner edge on top/left, dark on bottom/right.
     roundedPolygon(ctx, outline, radius);
     ctx.lineWidth = 3;
-    ctx.strokeStyle = 'rgba(255, 248, 220, 0.35)';
+    ctx.strokeStyle = 'rgba(255, 230, 200, 0.35)';
     ctx.stroke();
     ctx.restore();
     roundedPolygon(ctx, outline, radius);
     ctx.lineWidth = 1.6;
-    ctx.strokeStyle = 'rgba(110, 68, 8, 0.95)';
+    ctx.strokeStyle = 'rgba(104, 46, 14, 0.95)';
     ctx.stroke();
   });
   return CONSOLE_SIZE * cell + (CONSOLE_SIZE - 1) * gap;
