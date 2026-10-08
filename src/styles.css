@@ -3193,6 +3193,26 @@ th[aria-sort='descending'] .th-btn {
   display: grid;
   gap: 6px;
 }
+.module-editor__level {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.cstat--locked {
+  opacity: 0.6;
+  border-style: dashed;
+}
+.cstat__lock {
+  grid-column: 2 / -1;
+  font: 500 0.78rem var(--font-mono);
+  color: var(--muted);
+}
+.cstat__lock--note {
+  grid-column: 1 / -1;
+}
 .module-editor__mains .cstat {
   grid-template-columns: 3.6em minmax(0, 1fr) 6.5em;
 }

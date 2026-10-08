@@ -143,16 +143,28 @@ export function bonusStats(arc, cartStats, extras = []) {
   return [...totals].map(([stat, value]) => ({ stat, value: Math.round(value * 100) / 100 }));
 }
 
-// Typical ranges for Console module attributes (from in-game observation).
-// Percent stats roll 1.0–9.9%; Cycle Intensity is always 18 on modules.
-export const MODULE_MAIN_STATS = ['HP', 'ATK'];
+// Console module (the Tetris-like pieces) attributes, from in-game observation.
+// Two main stats, always ATK then HP, and up to 4 random sub stats. Sub slots
+// unlock as the piece levels up: Lv 5, 10, 15 and 20.
+export const MODULE_MAIN_STATS = ['ATK', 'HP'];
+export const MODULE_MAX_LEVEL = 20;
+export const SUB_UNLOCK_LEVELS = [5, 10, 15, 20];
+/** A piece's level; pieces saved before levels existed count as max level. */
+export const moduleLevel = (stats) => {
+  const n = Number(stats?.level);
+  return Number.isFinite(n) && stats?.level != null ? Math.max(0, Math.min(MODULE_MAX_LEVEL, n)) : MODULE_MAX_LEVEL;
+};
+export const unlockedSubs = (level) => SUB_UNLOCK_LEVELS.filter((l) => level >= l).length;
+
+// Flat ATK, flat DEF, Cycle Intensity and Break Intensity roll 10–50;
+// percentage stats roll 2.00–9.00%.
 const MODULE_RANGES = {
   main: { HP: [100, 1200], ATK: [10, 90] },
-  sub: { HP: [1, 500], ATK: [10, 90], DEF: [10, 90], 'Cycle Intensity': [18, 18], 'Break Intensity': [1, 99] },
+  sub: { HP: [1, 500], ATK: [10, 50], DEF: [10, 50], 'Cycle Intensity': [10, 50], 'Break Intensity': [10, 50] },
 };
 export function moduleRange(kind, stat) {
   if (MODULE_RANGES[kind][stat]) return MODULE_RANGES[kind][stat];
-  return isPercentStat(stat) ? [1, 9.9] : [1, 999];
+  return isPercentStat(stat) ? [2, 9] : [1, 999];
 }
 
 /** "Chaos DMG +10%" (a set's 2-piece text) → { stat: 'Chaos DMG%', value: 10 }. */

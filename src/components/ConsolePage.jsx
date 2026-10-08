@@ -12,7 +12,10 @@ import CartridgeIcon from './CartridgeIcon.jsx';
 import CartStatsEditor from './CartStatsEditor.jsx';
 import { suggestedBuild } from '../data/consoleBuilds.js';
 import { loadSavedConsoles, storeSavedConsoles } from '../lib/consoles.js';
-import { CARTRIDGE_SUB_SLOTS, MODULE_SUB_STATS, bonusStats, formatStat, isPercentStat, moduleRange } from '../data/gear.js';
+import {
+  CARTRIDGE_SUB_SLOTS, MODULE_MAX_LEVEL, MODULE_SUB_STATS, SUB_UNLOCK_LEVELS, bonusStats, formatStat, isPercentStat,
+  moduleLevel, moduleRange, unlockedSubs,
+} from '../data/gear.js';
 import Portrait from './Portrait.jsx';
 
 const TYPE_NAMES = { 2: 'Type Ⅱ', 3: 'Type Ⅲ', 4: 'Type Ⅳ' };
@@ -550,14 +553,19 @@ export function MiniBoard({ layout, pieces, cell = 9 }) {
   );
 }
 
-// Stats of one placed module: 2 main (flat HP, flat ATK) and 4 sub attributes.
+// Stats of one placed module: 2 main (ATK, then HP) and 4 sub attributes that
+// unlock at module Lv 5, 10, 15 and 20.
+const MODULE_LEVELS = Array.from({ length: MODULE_MAX_LEVEL + 1 }, (_, i) => i);
+
 function ModuleEditor({ piece, index, onChange, onRemove, onClose }) {
   const st = piece.stats ?? { hp: 0, atk: 0, subs: [null, null, null, null] };
-  const set = (patch) => onChange({ ...piece, stats: { ...st, ...patch } });
+  const level = moduleLevel(st);
+  const open = unlockedSubs(level);
+  const set = (patch) => onChange({ ...piece, stats: { ...st, level, ...patch } });
   const num = (kind, stat, raw) => {
     const [, max] = moduleRange(kind, stat);
     const n = Math.max(0, Math.min(max, Number(raw) || 0));
-    return Math.round(n * 10) / 10;
+    return Math.round(n * 100) / 100;
   };
   const typeName = TYPE_NAMES[SHAPES[piece.shape].type];
   return (
@@ -568,8 +576,19 @@ function ModuleEditor({ piece, index, onChange, onRemove, onClose }) {
         <button type="button" className="btn btn--quiet" onClick={onRemove}>Remove</button>
         <button type="button" className="btn btn--quiet" onClick={onClose}>Done</button>
       </div>
+      <label className="module-editor__level">
+        <span>Module level</span>
+        <select
+          id={`module-${index}-level`}
+          value={level}
+          onChange={(e) => set({ level: Number(e.target.value) })}
+        >
+          {MODULE_LEVELS.map((l) => <option key={l} value={l}>Lv {l}</option>)}
+        </select>
+        <span className="muted small">{open} of 4 sub stats unlocked</span>
+      </label>
       <div className="module-editor__mains">
-        {[['hp', 'HP'], ['atk', 'ATK']].map(([key, label]) => {
+        {[['atk', 'ATK'], ['hp', 'HP']].map(([key, label]) => {
           const [min, max] = moduleRange('main', label);
           return (
             <label key={key} className="cstat cstat--on">
@@ -590,47 +609,56 @@ function ModuleEditor({ piece, index, onChange, onRemove, onClose }) {
       </div>
       <div className="module-editor__subs">
         {st.subs.map((sub, i) => {
+          const locked = i >= open;
           const [min, max] = sub ? moduleRange('sub', sub.stat) : [0, 0];
           const pct = sub && isPercentStat(sub.stat);
           return (
-            <div key={i} className={sub ? 'cstat cstat--on' : 'cstat'}>
+            <div key={i} className={locked ? 'cstat cstat--locked' : sub ? 'cstat cstat--on' : 'cstat'}>
               <span className="cstat__label">Sub {i + 1}</span>
-              <select
-                aria-label={`Sub ${i + 1} stat`}
-                value={sub?.stat ?? ''}
-                onChange={(e) => {
-                  const stat = e.target.value;
-                  const next = stat ? { stat, value: stat === 'Cycle Intensity' ? 18 : sub?.value ?? 0 } : null;
-                  set({ subs: st.subs.map((x, j) => (j === i ? next : x)) });
-                }}
-              >
-                <option value="">—</option>
-                {MODULE_SUB_STATS.map((o) => <option key={o} value={o}>{o}</option>)}
-              </select>
-              <span className="cstat__value">
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  aria-label={`Sub ${i + 1} value`}
-                  min={min}
-                  max={max}
-                  step={pct ? '0.1' : '1'}
-                  disabled={!sub}
-                  placeholder={sub ? `${min}–${max}` : ''}
-                  value={sub?.value || ''}
-                  onChange={(e) => set({
-                    subs: st.subs.map((x, j) => (j === i ? { ...x, value: num('sub', x.stat, e.target.value) } : x)),
-                  })}
-                />
-                <span className="cstat__unit" aria-hidden="true">{pct ? '%' : ''}</span>
-              </span>
+              {locked && !sub ? (
+                <span className="cstat__lock">Unlocks at Lv {SUB_UNLOCK_LEVELS[i]}</span>
+              ) : (
+                <>
+                  <select
+                    aria-label={`Sub ${i + 1} stat`}
+                    value={sub?.stat ?? ''}
+                    disabled={locked}
+                    onChange={(e) => {
+                      const stat = e.target.value;
+                      const next = stat ? { stat, value: sub && isPercentStat(sub.stat) === isPercentStat(stat) ? sub.value : 0 } : null;
+                      set({ subs: st.subs.map((x, j) => (j === i ? next : x)) });
+                    }}
+                  >
+                    <option value="">—</option>
+                    {MODULE_SUB_STATS.map((o) => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                  <span className="cstat__value">
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      aria-label={`Sub ${i + 1} value`}
+                      min={min}
+                      max={max}
+                      step={pct ? '0.01' : '1'}
+                      disabled={!sub || locked}
+                      placeholder={sub ? `${min}–${max}` : ''}
+                      value={sub?.value || ''}
+                      onChange={(e) => set({
+                        subs: st.subs.map((x, j) => (j === i ? { ...x, value: num('sub', x.stat, e.target.value) } : x)),
+                      })}
+                    />
+                    <span className="cstat__unit" aria-hidden="true">{pct ? '%' : ''}</span>
+                  </span>
+                  {locked && <span className="cstat__lock cstat__lock--note">Locked until Lv {SUB_UNLOCK_LEVELS[i]}, not counted</span>}
+                </>
+              )}
             </div>
           );
         })}
       </div>
       <p className="muted small">
-        Typical rolls: main HP 100–1,200 and ATK 10–90; sub HP up to 500, ATK and DEF 10–90, Cycle Intensity 18,
-        percentages 1.0–9.9%.
+        Main ATK 10–90 and HP 100–1,200. Sub stats: HP up to 500; flat ATK, flat DEF, Cycle Intensity and
+        Break Intensity 10–50; percentages 2.00–9.00%.
       </p>
     </div>
   );

@@ -5,7 +5,7 @@
 // Source (Oct 2026): game data as compiled for the Icy Veins NTE Console Tool
 // (grid layouts, shapes, set shape requirements, specialisations).
 
-import { CARTRIDGE_BY_ID, parseSetBonus } from './gear.js';
+import { CARTRIDGE_BY_ID, moduleLevel, parseSetBonus, unlockedSubs } from './gear.js';
 
 export const CONSOLE_SIZE = 5;
 
@@ -153,9 +153,13 @@ export function consoleStats(characterId, pieces, cartridgeId) {
   for (const p of pieces ?? []) {
     const st = p.stats;
     if (!st) continue;
-    if (st.hp) out.push({ stat: 'HP', value: st.hp, from: 'module' });
     if (st.atk) out.push({ stat: 'ATK', value: st.atk, from: 'module' });
-    for (const sub of st.subs ?? []) if (sub?.value) out.push({ stat: sub.stat, value: sub.value, from: 'module' });
+    if (st.hp) out.push({ stat: 'HP', value: st.hp, from: 'module' });
+    // Sub slots still locked at the piece's level don't count.
+    const open = unlockedSubs(moduleLevel(st));
+    (st.subs ?? []).slice(0, open).forEach((sub) => {
+      if (sub?.value) out.push({ stat: sub.stat, value: sub.value, from: 'module' });
+    });
   }
   const spec = specBonus(characterId, pieces ?? []);
   if (spec && spec.total) out.push({ stat: specStatName(spec.stat), value: spec.total, from: 'bonus' });
