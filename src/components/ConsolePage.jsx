@@ -10,6 +10,7 @@ import { navigate } from '../lib/route.js';
 import { loadoutOf } from '../lib/teamsReducer.js';
 import CartridgeIcon from './CartridgeIcon.jsx';
 import CartStatsEditor from './CartStatsEditor.jsx';
+import StatAdvice from './StatAdvice.jsx';
 import { suggestedBuild } from '../data/consoleBuilds.js';
 import { loadSavedConsoles, storeSavedConsoles } from '../lib/consoles.js';
 import {
@@ -366,6 +367,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
           <section aria-labelledby="console-cstats">
             <h3 id="console-cstats" className="mini-title">Cartridge stats <span>1 main · {CARTRIDGE_SUB_SLOTS} sub</span></h3>
             <CartStatsEditor value={cartStats} onChange={setCartStats} idPrefix="ccs" />
+            <StatAdvice character={character} cartridge={cartridge} />
             <p className="muted small">
               Enter the values shown on your Cartridge. They’re added to the Arc’s stats under Bonus stats on the
               team image.

@@ -5,6 +5,7 @@ import { MiniBoard } from './ConsolePage.jsx';
 import { CHARACTER_CONSOLE, FREE_CELLS, setProgress, specBonus, usedCells } from '../data/console.js';
 import { CARTRIDGES, CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import { suggestedBuild, suggestedCartStats } from '../data/consoleBuilds.js';
+import StatAdvice from './StatAdvice.jsx';
 import { loadSavedConsoles } from '../lib/consoles.js';
 import CartStatsEditor from './CartStatsEditor.jsx';
 import { ELEMENT_BY_ID } from '../data/elements.js';
@@ -306,15 +307,16 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
                 <button
                   type="button"
                   className="btn btn--quiet"
-                  onClick={() => onChange({ cartStats: withValues(suggestedCartStats(c)) })}
+                  onClick={() => onChange({ cartStats: withValues(suggestedCartStats(c, loadout.cartridge)) })}
                 >
                   Use suggested stats
                 </button>
               </div>
               <CartStatsEditor value={loadout.cartStats} onChange={(v) => onChange({ cartStats: v })} idPrefix="lcs" />
+              <StatAdvice character={c} cartridge={loadout.cartridge} />
               <p className="muted small">
-                Suggested stats follow {c.name}’s main role; adjust them and enter the values from your Cartridge.
-                Module stats are entered per module in the Console tab.
+                Adjust the stats and enter the values from your Cartridge. Module stats are entered per module in
+                the Console tab.
               </p>
             </div>
           );

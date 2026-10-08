@@ -80,7 +80,7 @@ export function characterBuild(character, { team = null, current = null } = {}) 
     cartStats,
     pieces,
     recommended: rec,
-    recStats: suggestedCartStats(character),
+    recStats: suggestedCartStats(character, cartridge ?? rec?.cartridge ?? null),
   };
 }
 

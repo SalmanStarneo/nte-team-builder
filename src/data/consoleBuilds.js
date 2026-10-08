@@ -2,13 +2,13 @@
 // community-tested build. Layouts were found by an exhaustive search over each
 // character's grid (see data/console.js) that fills all 20 cells, reaches the
 // chosen Cartridge set's 4-piece bonus, then uses as many modules of the
-// character's bonus Type as possible. There is one per Cartridge set. Stats follow the character's main role;
+// character's bonus Type as possible. There is one per Cartridge set. Stats come from recommendStats() in buildProfiles.js;
 // values are left blank because they depend on your Cartridge's rolls.
 
 import { CHARACTER_BY_ID } from './characters.js';
-import { ELEMENT_BY_ID } from './elements.js';
 import { CHARACTER_CONSOLE, SHAPE_ORDER } from './console.js';
 import { cartridgesFor } from './gear.js';
+import { recommendStats } from './buildProfiles.js';
 
 // Best layout per grid, bonus module Type and Cartridge set.
 // Key: 'layout:type:set'. Value: 3 characters per module = shape index (hex,
@@ -91,18 +91,6 @@ const LAYOUTS = {
 const decodeLayout = (str) =>
   (str.match(/.{3}/g) ?? []).map(([sh, r, col]) => ({ shape: SHAPE_ORDER[parseInt(sh, 16)], r: Number(r), c: Number(col) }));
 
-// Main stat and 4 sub stats to look for, by main role.
-function suggestedStats(c) {
-  const role = c.roles[0];
-  const el = `${ELEMENT_BY_ID[c.element].name} DMG%`;
-  if (role === 'Survival') {
-    const main = c.id === 'adler' ? 'DEF%' : 'HP%';
-    return { main, subs: ['HP%', 'DEF%', 'Cycle Intensity', 'HP'] };
-  }
-  if (role === 'Buff') return { main: 'ATK%', subs: ['ATK%', 'CRIT Rate', 'Cycle Intensity', 'HP%'] };
-  return { main: c.element ? el : 'CRIT DMG', subs: ['CRIT Rate', 'CRIT DMG', 'ATK%', 'DMG%'] };
-}
-
 /**
  * Suggested build for a character and Cartridge set (defaults to their
  * recommended set): { id, name, suggested, cartridge, pieces, cartStats } or null.
@@ -114,20 +102,19 @@ export function suggestedBuild(characterId, cartridgeId) {
   const cartridge = cartridgeId || cartridgesFor(c)[0];
   const layout = LAYOUTS[`${info.layout}:${info.spec.type}:${cartridge}`];
   if (!layout) return null;
-  const st = suggestedStats(c);
   return {
     id: `suggested-${characterId}-${cartridge}`,
     name: 'Suggested build',
     suggested: true,
     cartridge,
     pieces: decodeLayout(layout),
-    cartStats: suggestedCartStats(c),
+    cartStats: suggestedCartStats(c, cartridge),
   };
 }
 
-/** Suggested Cartridge main + sub stats for a character (values left at 0). */
-export function suggestedCartStats(c) {
-  const st = suggestedStats(c);
+/** Suggested Cartridge main + sub stats for a character and set (values left at 0). */
+export function suggestedCartStats(c, cartridgeId = null) {
+  const st = recommendStats(c, cartridgeId);
   return {
     main: { stat: st.main, value: 0 },
     subs: st.subs.map((stat) => ({ stat, value: 0 })),

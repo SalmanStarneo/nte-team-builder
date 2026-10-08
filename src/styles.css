@@ -3247,3 +3247,31 @@ th[aria-sort='descending'] .th-btn {
 .cstats-head .mini-title {
   margin: 0;
 }
+
+/* Suggested Cartridge stats with reasons */
+.stat-advice {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--accent, #8e9cff);
+  border-radius: 0 8px 8px 0;
+  background: color-mix(in srgb, var(--accent, #8e9cff) 8%, transparent);
+  font-size: 0.85rem;
+}
+.stat-advice__picks {
+  margin: 0;
+}
+.stat-advice__label {
+  margin-right: 6px;
+  font: 600 0.68rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.stat-advice__why {
+  margin: 4px 0 0;
+  padding-left: 1.1em;
+  color: var(--muted);
+}
+.stat-advice__why li + li {
+  margin-top: 2px;
+}
