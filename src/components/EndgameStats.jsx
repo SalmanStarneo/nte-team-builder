@@ -1,5 +1,5 @@
 import { ELEMENT_BY_ID } from '../data/elements.js';
-import { ENDGAME, ENDGAME_STATS, endgameUrl, parsePriority } from '../data/endgame.js';
+import { ENDGAME, ENDGAME_STATS, parsePriority } from '../data/endgame.js';
 
 const label = (key, c) => (key === 'element' ? `${ELEMENT_BY_ID[c.element].name} DMG` : ENDGAME_STATS.find(([k]) => k === key)[1]);
 
@@ -48,33 +48,37 @@ export default function EndgameStats({ character: c }) {
       <StatList stats={e.endgame} character={c} />
       {e.alt?.endgame && (
         <>
+          <hr className="endgame__rule endgame__rule--section" />
           <p className="endgame__alt-title">{e.alt.label}</p>
           <StatList stats={e.alt.endgame} character={c} />
         </>
       )}
       {e.notes?.map((n) => <p key={n} className="muted small endgame__note">{n}</p>)}
 
+      <hr className="endgame__rule endgame__rule--section" />
       <h3 className="mini-title endgame__best">Best Cartridge stats</h3>
       <Priority title="Main" text={e.main} />
+      <hr className="endgame__rule" />
       <Priority title="Sub" text={e.subs} />
       {e.alt?.main && (
         <>
+          <hr className="endgame__rule endgame__rule--section" />
           <p className="endgame__alt-title">{e.alt.label}</p>
           <Priority title="Main" text={e.alt.main} />
+          <hr className="endgame__rule" />
           <Priority title="Sub" text={e.alt.subs} />
         </>
       )}
       {e.builds?.map((b) => (
         <div key={b.label}>
+          <hr className="endgame__rule endgame__rule--section" />
           <p className="endgame__alt-title">{b.label}</p>
           <Priority title="Main" text={b.main} />
+          <hr className="endgame__rule" />
           <Priority title="Sub" text={b.subs} />
         </div>
       ))}
-      <p className="muted small">
-        From <a href={endgameUrl(c.id)} target="_blank" rel="noreferrer">Prydwen’s {c.name} guide</a>, tuned for the
-        signature Arc.
-      </p>
+      <p className="muted small">Tuned for the signature Arc.</p>
     </section>
   );
 }

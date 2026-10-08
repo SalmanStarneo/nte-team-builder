@@ -3347,3 +3347,24 @@ th[aria-sort='descending'] .th-btn {
   white-space: nowrap;
   color: var(--muted);
 }
+
+/* Divider lines between Main and Sub stats, and between sections */
+.endgame__rule,
+.cstats__rule {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 8px 0;
+}
+.endgame__rule--section {
+  margin: 14px 0 4px;
+}
+.cstats__rule {
+  grid-column: 1 / -1;
+  margin: 2px 0;
+}
+.endgame__best {
+  margin-top: 6px;
+}
+.endgame__alt-title {
+  margin-top: 6px;
+}

@@ -279,9 +279,7 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
       </div>
       )}
       <p className="muted small">
-        Recommended endgame stats from{' '}
-        <a href="https://www.prydwen.gg/neverness-to-everness/characters" target="_blank" rel="noreferrer">Prydwen</a>,
-        tuned for each character’s signature Arc. Elem. DMG is the character’s own element. “—” means not published yet.
+        Recommended endgame stats, tuned for each character’s signature Arc. Elem. DMG is the character’s own element. “—” means not published yet.
       </p>
     </div>
   );

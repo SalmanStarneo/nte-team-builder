@@ -153,17 +153,17 @@ export function recommendStats(characterOrId, cartridgeId = null) {
   const gSubs = guide && [...new Set(fromGuide(guide.subs, SUB_SET))];
   const useGuide = guide && !profile.override && gMain.length;
   if (guide && profile.override && gMain.length) {
-    reasons.push(`Prydwen suggests instead: main ${guide.main}; subs ${guide.subs}.`);
+    reasons.push(`Guides suggest instead: main ${guide.main}; subs ${guide.subs}.`);
   }
   if (useGuide) {
     const droppedCycle = profile.instantCycle && /cycle intensity/i.test(`${guide.main} ${guide.subs}`);
     if (!droppedCycle) reasons.splice(reasons.indexOf(profile.note), profile.note ? 1 : 0);
-    reasons.push(`Follows Prydwen’s priority: main ${guide.main}; subs ${guide.subs}.${droppedCycle ? ' Cycle Intensity left out.' : ''}`);
+    reasons.push(`Recommended priority: main ${guide.main}; subs ${guide.subs}.${droppedCycle ? ' Cycle Intensity left out.' : ''}`);
   }
   const main = useGuide ? gMain[0] : ranked(MAIN_SET)[0] ?? 'ATK%';
   const subs = (useGuide ? [...gSubs, ...ranked(SUB_SET).filter((s) => !gSubs.includes(s))] : ranked(SUB_SET)).slice(0, 4);
   while (subs.length < 4) subs.push(['ATK%', 'HP%', 'CRIT Rate', 'DEF%'].find((s) => !subs.includes(s)));
-  if (useGuide) reasons.splice(0, reasons.length, ...reasons.filter((r) => r === profile.note || r.startsWith('Follows Prydwen')));
+  if (useGuide) reasons.splice(0, reasons.length, ...reasons.filter((r) => r === profile.note || r.startsWith('Recommended priority')));
   for (const [stat, text] of useGuide ? [] : tied) if (main === stat || subs.includes(stat)) reasons.push(text);
   if (!reasons.length) reasons.push(`Follows ${c.name}’s ${c.roles.join(' / ')} role${c.roles.length > 1 ? 's' : ''}.`);
   return { main, subs, reasons };

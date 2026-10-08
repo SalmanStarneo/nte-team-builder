@@ -669,9 +669,18 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     ctx.fillText('suggested priorities', LCX + LCW - 18, cY + 30);
     ctx.textAlign = 'left';
   }
-  const rowH = Math.min(30, (cH - 50) / 5);
+  const rowH = Math.min(30, (cH - 58) / 5);
   list.slice(0, 5).forEach((r, i) => {
-    const ry = cY + 44 + i * rowH;
+    const ry = cY + 44 + i * rowH + (i ? 8 : 0);
+    if (i === 1) {
+      // Divider between the main stat and the sub stats.
+      ctx.strokeStyle = K.line;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(LCX + 18, ry - 6.5);
+      ctx.lineTo(LCX + LCW - 18, ry - 6.5);
+      ctx.stroke();
+    }
     ctx.fillStyle = i === 0 ? 'rgba(242, 193, 78, 0.12)' : K.inset;
     roundRect(ctx, LCX + 18, ry, LCW - 36, rowH - 5, 6);
     ctx.fill();
@@ -714,9 +723,18 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
   if (info) consoleGrid(ctx, gx, y + 30, cell, info.layout, gridPieces);
   const recList = [build.recStats.main.stat, ...build.recStats.subs.map((s) => s.stat)];
   const lw = gx - innerX - 16;
-  const lh = Math.min(38, (gridSize) / recList.length);
+  const lh = Math.min(38, (gridSize - 8) / recList.length);
   recList.forEach((stat, i) => {
-    const ry = y + 30 + i * lh;
+    const ry = y + 30 + i * lh + (i ? 8 : 0);
+    if (i === 1) {
+      // Divider between the main stat and the sub stats.
+      ctx.strokeStyle = K.line;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(innerX, ry - 7);
+      ctx.lineTo(innerX + lw, ry - 7);
+      ctx.stroke();
+    }
     ctx.fillStyle = K.inset;
     roundRect(ctx, innerX, ry, lw, lh - 6, 8);
     ctx.fill();

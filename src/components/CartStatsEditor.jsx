@@ -11,6 +11,7 @@ export default function CartStatsEditor({ value, onChange, idPrefix = 'cs' }) {
         value={value.main}
         onChange={(v) => onChange({ ...value, main: v })}
       />
+      <hr className="cstats__rule" aria-hidden="true" />
       {value.subs.map((sub, i) => (
         <StatRow
           key={i}
