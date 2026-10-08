@@ -234,6 +234,24 @@ function consoleGrid(ctx, x, y, cell, layout, pieces) {
       ctx.rect(at(r, c) - l, atY(r) - t, cell + l, cell + t);
     }
     ctx.fill();
+    // Thin seams between the squares of one module, so its size can be counted
+    // (the thicker outline below still marks where each module ends).
+    ctx.strokeStyle = 'rgba(128, 82, 12, 0.55)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (const [r, c] of cells) {
+      if (same(r, c + 1, me)) {
+        const x = at(r, c) + cell + gap / 2;
+        ctx.moveTo(x, atY(r) + 4);
+        ctx.lineTo(x, atY(r) + cell - 4);
+      }
+      if (same(r + 1, c, me)) {
+        const y2 = atY(r) + cell + gap / 2;
+        ctx.moveTo(at(r, c) + 4, y2);
+        ctx.lineTo(at(r, c) + cell - 4, y2);
+      }
+    }
+    ctx.stroke();
     // Soft sheen ring on each cell, like the game's tiles.
     ctx.strokeStyle = 'rgba(255, 246, 214, 0.32)';
     ctx.lineWidth = 1.2;
