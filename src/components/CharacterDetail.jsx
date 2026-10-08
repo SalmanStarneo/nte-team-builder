@@ -14,10 +14,15 @@ import SkillsSection from './SkillsSection.jsx';
 import StatIcon from './StatIcon.jsx';
 import { AWAKENINGS, RESONANCES } from '../data/awakenings.js';
 import RoleList from './RoleList.jsx';
+import { useState } from 'react';
+import ExportDialog from './ExportDialog.jsx';
+import { characterBuild, renderBuildCard } from '../lib/buildCard.js';
+import { CHARACTER_CONSOLE } from '../data/console.js';
 
 const fmt = (n) => n.toLocaleString('en-US');
 
-export default function CharacterDetail({ character: c, inActiveTeam, teamFull, onAdd, onClose }) {
+export default function CharacterDetail({ character: c, activeTeam, inActiveTeam, teamFull, onAdd, onClose }) {
+  const [sharing, setSharing] = useState(false);
   const element = ELEMENT_BY_ID[c.element];
   const index = ELEMENTS.findIndex((e) => e.id === c.element);
   const neighbours = [ELEMENTS[(index + 5) % 6], ELEMENTS[(index + 1) % 6]];
@@ -207,7 +212,21 @@ export default function CharacterDetail({ character: c, inActiveTeam, teamFull, 
         <button className="btn btn--primary" onClick={onAdd} disabled={inActiveTeam || teamFull}>
           {inActiveTeam ? 'Already in current team' : teamFull ? 'Current team is full' : 'Add to current team'}
         </button>
+        {CHARACTER_CONSOLE[c.id] && (
+          <button className="btn" onClick={() => setSharing(true)}>
+            Share build image
+          </button>
+        )}
       </div>
+      {sharing && (
+        <ExportDialog
+          title="Build image"
+          name={c.name}
+          suffix="nte-build"
+          onClose={() => setSharing(false)}
+          render={(opts) => renderBuildCard(characterBuild(c, { team: activeTeam }), opts)}
+        />
+      )}
     </article>
   );
 }

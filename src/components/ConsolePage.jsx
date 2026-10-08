@@ -17,6 +17,8 @@ import {
   moduleLevel, moduleRange, unlockedSubs,
 } from '../data/gear.js';
 import Portrait from './Portrait.jsx';
+import ExportDialog from './ExportDialog.jsx';
+import { characterBuild, renderBuildCard } from '../lib/buildCard.js';
 
 const TYPE_NAMES = { 2: 'Type Ⅱ', 3: 'Type Ⅲ', 4: 'Type Ⅳ' };
 const PLAYABLE = CHARACTERS.filter((c) => CHARACTER_CONSOLE[c.id]);
@@ -57,6 +59,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
   const [active, setActive] = useState(null); // index of the module being edited
   const [name, setName] = useState('');
   const [status, setStatus] = useState('');
+  const [sharing, setSharing] = useState(false);
 
   const inTeam = activeTeam.members.includes(charId);
 
@@ -418,6 +421,9 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
               />
               <button type="submit" className="btn" disabled={!codeInput.trim()}>Load</button>
             </form>
+            <button type="button" className="btn btn--primary console-share" onClick={() => setSharing(true)}>
+              Share build image
+            </button>
             <p className="muted small">
               Share a build without sharing a team. Codes carry the grid, set and Cartridge stats; module stats stay
               with you. A code for another grid opens on a character who fits it.
@@ -515,8 +521,23 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
       </section>
       <p className="muted small">
         Grid layouts, module shapes and set requirements follow game data compiled by the Icy Veins
-        Console Tool. Module stats aren’t tracked yet.
+        Console Tool.
       </p>
+      {sharing && (
+        <ExportDialog
+          title="Build image"
+          name={character.name}
+          suffix="nte-build"
+          onClose={() => setSharing(false)}
+          render={(opts) => renderBuildCard(
+            characterBuild(character, {
+              team: activeTeam,
+              current: { pieces, cartridge, cartStats, arc: inTeam ? loadoutOf(activeTeam, charId).arc : null },
+            }),
+            opts,
+          )}
+        />
+      )}
     </div>
   );
 }

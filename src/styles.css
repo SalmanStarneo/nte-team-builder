@@ -1314,7 +1314,12 @@ button {
 }
 .detail__actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: flex-end;
+}
+.console-share {
+  margin-top: 10px;
 }
 
 /* ---------- Index table ---------- */

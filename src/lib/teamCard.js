@@ -13,9 +13,9 @@ import { consoleStats } from '../data/console.js';
 export const CARD_W = 1200;
 export const CARD_H = 675;
 
-const DISPLAY = '"Big Shoulders Display", "Arial Narrow", sans-serif';
-const BODY = '"IBM Plex Sans", "Segoe UI", system-ui, sans-serif';
-const MONO = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
+export const DISPLAY = '"Big Shoulders Display", "Arial Narrow", sans-serif';
+export const BODY = '"IBM Plex Sans", "Segoe UI", system-ui, sans-serif';
+export const MONO = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
 
 // The card always uses the dark look, like the game's UI.
 const C = {
@@ -30,7 +30,7 @@ const C = {
 };
 
 // Bright element colours (same values as the --elb-* tokens).
-const EL = {
+export const EL = {
   cosmos: '#e6eaf2',
   anima: '#3fd3ad',
   incantation: '#f0576b',
@@ -63,7 +63,7 @@ const STAT_SHORT = {
   'Charge Efficiency%': 'CHARGE EFF.',
 };
 
-function loadImage(src) {
+export function loadImage(src) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve(img);
@@ -72,7 +72,7 @@ function loadImage(src) {
   });
 }
 
-function roundRect(ctx, x, y, w, h, r) {
+export function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -83,7 +83,7 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 
 // Fits text to maxWidth, wrapping onto at most `lines` lines with an ellipsis.
-function wrap(ctx, text, maxWidth, lines) {
+export function wrap(ctx, text, maxWidth, lines) {
   const words = text.split(' ');
   const out = [];
   let line = '';
@@ -106,7 +106,7 @@ function wrap(ctx, text, maxWidth, lines) {
   return out;
 }
 
-function pill(ctx, x, y, text, { bg, fg, font = `700 12px ${MONO}`, padX = 8, h = 22 }) {
+export function pill(ctx, x, y, text, { bg, fg, font = `700 12px ${MONO}`, padX = 8, h = 22 }) {
   ctx.font = font;
   const w = ctx.measureText(text).width + padX * 2;
   ctx.fillStyle = bg;
@@ -127,7 +127,7 @@ const RANK_GRADIENTS = {
   A: ['#ff7ad9', '#e04cff', '#9c46ff'],
   B: ['#c35bff', '#7f7dff', '#47d9ff'],
 };
-function drawRank(ctx, rank, x, centerY, size) {
+export function drawRank(ctx, rank, x, centerY, size) {
   const stops = RANK_GRADIENTS[rank] ?? ['#d7dbe4', '#a9b0bf', '#7d869a'];
   const r = size / 2;
   const cx = x + r;
@@ -187,7 +187,7 @@ function drawBands(ctx) {
   ctx.restore();
 }
 
-async function ensureFonts() {
+export async function ensureFonts() {
   if (!document.fonts?.load) return;
   try {
     await Promise.all([

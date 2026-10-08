@@ -91,6 +91,7 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
       {selected && (
         <CharacterDetail
           character={selected}
+          activeTeam={activeTeam}
           inActiveTeam={activeTeam.members.includes(selected.id)}
           teamFull={activeTeam.members.every(Boolean)}
           onAdd={() => onAdd(selected.id)}

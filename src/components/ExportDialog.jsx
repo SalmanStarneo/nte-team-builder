@@ -4,11 +4,13 @@ import { canvasToBlob, renderTeamCard } from '../lib/teamCard.js';
 const BASE = import.meta.env.BASE_URL;
 // The site address is left off the card while the app is in testing.
 
-const fileName = (name) =>
-  `${(name || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'team'}-nte-team.png`;
+const slug = (name) => (name || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'team';
 
-// Shows the rendered team card with ways to save, copy or share it.
-export default function ExportDialog({ team, onClose }) {
+// Shows a rendered card with ways to save, copy or share it. By default it
+// renders the team card; pass `render`, `title`, `name` and `suffix` for others.
+export default function ExportDialog({ team, onClose, render, title = 'Team image', name, suffix = 'nte-team' }) {
+  const label = name ?? team?.name;
+  const fileName = () => `${slug(label)}-${suffix}.png`;
   const [url, setUrl] = useState(null);
   const [blob, setBlob] = useState(null);
   const [status, setStatus] = useState('');
@@ -17,7 +19,7 @@ export default function ExportDialog({ team, onClose }) {
   useEffect(() => {
     let cancelled = false;
     let objectUrl;
-    renderTeamCard(team, { base: BASE })
+    (render ? render({ base: BASE }) : renderTeamCard(team, { base: BASE }))
       .then(canvasToBlob)
       .then((b) => {
         if (cancelled || !b) return;
@@ -26,13 +28,14 @@ export default function ExportDialog({ team, onClose }) {
         setUrl(objectUrl);
       })
       .catch((err) => {
-        console.error('Team image failed', err);
+        console.error('Image failed', err);
         setStatus('Couldn’t create the image. Try again.');
       });
     return () => {
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [team]);
 
   useEffect(() => {
@@ -43,7 +46,7 @@ export default function ExportDialog({ team, onClose }) {
   }, [onClose]);
 
   const canCopy = typeof window.ClipboardItem !== 'undefined' && !!navigator.clipboard?.write;
-  const file = blob && new File([blob], fileName(team.name), { type: 'image/png' });
+  const file = blob && new File([blob], fileName(), { type: 'image/png' });
   const canShare = !!(file && navigator.canShare?.({ files: [file] }));
 
   async function copy() {
@@ -57,7 +60,7 @@ export default function ExportDialog({ team, onClose }) {
 
   async function share() {
     try {
-      await navigator.share({ files: [file], title: team.name });
+      await navigator.share({ files: [file], title: label });
     } catch {
       /* share sheet closed */
     }
@@ -67,13 +70,13 @@ export default function ExportDialog({ team, onClose }) {
     <div className="dialog-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="export-title">
         <header className="dialog__head">
-          <h2 id="export-title" className="section-title">Team image</h2>
+          <h2 id="export-title" className="section-title">{title}</h2>
           <button ref={closeRef} className="btn btn--quiet" onClick={onClose}>Close</button>
         </header>
 
         <div className="dialog__preview">
           {url ? (
-            <img src={url} alt={`Team card for ${team.name}`} />
+            <img src={url} alt={`${title} for ${label}`} />
           ) : (
             <p className="muted">{status || 'Creating image…'}</p>
           )}
@@ -81,7 +84,7 @@ export default function ExportDialog({ team, onClose }) {
 
         <div className="dialog__actions">
           {url && (
-            <a className="btn btn--primary" href={url} download={fileName(team.name)}>
+            <a className="btn btn--primary" href={url} download={fileName()}>
               Save image
             </a>
           )}
