@@ -289,7 +289,7 @@ function consoleGrid(ctx, x, y, cell, layout, pieces) {
   pieces.forEach((p, me) => {
     const cells = SHAPES[p.shape].cells.map(([a, b]) => [p.r + a, p.c + b]);
     const outline = pieceOutline(cells, (r, c) => same(r, c, me), at, atY, cell, gap);
-    const radius = Math.max(4, cell * 0.2);
+    const radius = Math.max(2.5, cell * 0.09); // slight rounding, like the in-game template
     const xs = outline.map(([px]) => px);
     const ys = outline.map(([, py]) => py);
     const x0 = Math.min(...xs);
