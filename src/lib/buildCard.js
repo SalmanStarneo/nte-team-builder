@@ -3,7 +3,7 @@
 // Console bonus, build stats / Arc / Cartridge panels, and a Console
 // Development panel with current and recommended modules plus the grid.
 import { ELEMENT_BY_ID } from '../data/elements.js';
-import { ARC_BY_ID, RECOMMENDED, arcTag } from '../data/arcs.js';
+import { ARCS, ARC_BY_ID, RECOMMENDED, arcTag } from '../data/arcs.js';
 import { CARTRIDGE_BY_ID, bonusStats, isPercentStat, moduleLevel } from '../data/gear.js';
 import {
   CHARACTER_CONSOLE, CONSOLE_SIZE, SHAPES, consoleStats, maskOf, occupancy, setProgress,
@@ -61,10 +61,10 @@ const specText = (spec) => {
  * `current` (optional): { pieces, cartridge, cartStats, arc } from the Console page.
  * Otherwise the character's loadout in `team` is used, if they are in it.
  */
-export function characterBuild(character, { team = null, current = null } = {}) {
+export function characterBuild(character, { team = null, current = null, source = null, recStats = null } = {}) {
   const inTeam = team?.members.includes(character.id);
   const lo = inTeam ? loadoutOf(team, character.id) : null;
-  const recArcId = (RECOMMENDED[character.id] ?? [])[0];
+  const recArcId = ARCS.find((a) => a.signature === character.id)?.id ?? (RECOMMENDED[character.id] ?? [])[0];
   const arcId = current?.arc ?? lo?.arc ?? null;
   const arc = arcId ? ARC_BY_ID[arcId] : null;
   const pieces = current?.pieces ?? lo?.console ?? [];
@@ -73,7 +73,7 @@ export function characterBuild(character, { team = null, current = null } = {}) 
   const rec = suggestedBuild(character.id, cartridge);
   return {
     character,
-    source: current ? 'Console build' : inTeam ? `Team · ${team.name}` : 'Recommended build',
+    source: source ?? (current ? 'Console build' : inTeam ? `Team · ${team.name}` : 'Recommended build'),
     arc: arc ?? (recArcId ? ARC_BY_ID[recArcId] : null),
     arcState: arc ? 'Equipped' : 'Recommended',
     arcDupes: lo?.arcDupes ?? null,
@@ -81,7 +81,7 @@ export function characterBuild(character, { team = null, current = null } = {}) 
     cartStats,
     pieces,
     recommended: rec,
-    recStats: suggestedCartStats(character, cartridge ?? rec?.cartridge ?? null),
+    recStats: recStats ?? suggestedCartStats(character, cartridge ?? rec?.cartridge ?? null),
   };
 }
 
@@ -548,7 +548,7 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
       { stat: 'CRIT Rate', value: round(ms.critRate + take('CRIT Rate')) },
       { stat: 'CRIT DMG', value: round(ms.critDmg + take('CRIT DMG')) },
       { stat: elDmg, value: round((ms.dmg?.[c.element] ?? 0) + take(elDmg)) },
-      { stat: 'Universal DMG%', value: round((ms.universal ?? 0) + take('Universal DMG%')) },
+      { stat: 'Universal DMG%', value: round((ms.universal ?? 0) + take('Universal DMG%') + take('DMG%')) },
       ...stats,
     ];
     if (ms.cycle) stats.push({ stat: 'Cycle Intensity', value: round(ms.cycle + take('Cycle Intensity')) });
@@ -605,7 +605,8 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
       ctx.fillText(wrap(ctx, statLabel(st.stat), valueX - LCX - 130, 1)[0], LCX + 24, base);
       ctx.textAlign = 'right';
       ctx.font = `600 15px ${MONO}`;
-      const v = st.value == null ? '—' : isPercentStat(st.stat) ? statValue(st.stat, Number(st.value))
+      const capped = st.stat === 'CRIT Rate' && Number(st.value) > 100;
+      const v = st.value == null ? '—' : capped ? '100% (cap)' : isPercentStat(st.stat) ? statValue(st.stat, Number(st.value))
         : Number(st.value).toLocaleString('en-US');
       ctx.fillText(v, valueX, base);
       const t = target(st.stat);
@@ -629,7 +630,7 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     ctx.font = `700 22px ${BODY}`;
     const nm = wrap(ctx, a.name, LCW - 230, 1)[0];
     ctx.fillText(nm, LCX + 96, arcY + 66);
-    const tag = arcTag(a, c) === 'sig' ? 'Signature' : build.arcState;
+    const tag = arcTag(a, c) === 'sig' ? 'Signature' : build.source === 'Recommended build' ? 'Recommended' : build.arcState;
     ctx.font = `700 13px ${MONO}`;
     const tw = ctx.measureText(tag.toUpperCase()).width + 16;
     ctx.fillStyle = tag === 'Signature' ? K.gold : K.pinkSoft;
@@ -703,7 +704,10 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
   const innerX = RCX + 18;
   const innerW = RCW - 36;
   let y = top + 46;
-  const hasCurrent = build.pieces.length > 0;
+  const sameAsRec = build.recommended && build.cartridge === build.recommended.cartridge
+    && JSON.stringify(build.pieces.map(({ shape, r, c: col }) => [shape, r, col]))
+      === JSON.stringify(build.recommended.pieces.map(({ shape, r, c: col }) => [shape, r, col]));
+  const hasCurrent = build.pieces.length > 0 && !sameAsRec;
   if (hasCurrent) {
     y += moduleRow(ctx, innerX, y, innerW, 'Current', build.cartridge, build.pieces, cartImg) + 14;
   }

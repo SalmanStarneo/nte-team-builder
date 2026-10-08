@@ -160,11 +160,14 @@ export function recommendStats(characterOrId, cartridgeId = null) {
     if (!droppedCycle) reasons.splice(reasons.indexOf(profile.note), profile.note ? 1 : 0);
     reasons.push(`Recommended priority: main ${guide.main}; subs ${guide.subs}.${droppedCycle ? ' Cycle Intensity left out.' : ''}`);
   }
-  const main = useGuide ? gMain[0] : ranked(MAIN_SET)[0] ?? 'ATK%';
-  const subs = (useGuide ? [...gSubs, ...ranked(SUB_SET).filter((s) => !gSubs.includes(s))] : ranked(SUB_SET)).slice(0, 4);
+  // Full priority orders (best first), used to swap stats out when one is capped.
+  const mainOrder = useGuide ? [...gMain, ...ranked(MAIN_SET).filter((s) => !gMain.includes(s))] : ranked(MAIN_SET);
+  const subOrder = useGuide ? [...gSubs, ...ranked(SUB_SET).filter((s) => !gSubs.includes(s))] : ranked(SUB_SET);
+  const main = mainOrder[0] ?? 'ATK%';
+  const subs = subOrder.slice(0, 4);
   while (subs.length < 4) subs.push(['ATK%', 'HP%', 'CRIT Rate', 'DEF%'].find((s) => !subs.includes(s)));
   if (useGuide) reasons.splice(0, reasons.length, ...reasons.filter((r) => r === profile.note || r.startsWith('Recommended priority')));
   for (const [stat, text] of useGuide ? [] : tied) if (main === stat || subs.includes(stat)) reasons.push(text);
   if (!reasons.length) reasons.push(`Follows ${c.name}’s ${c.roles.join(' / ')} role${c.roles.length > 1 ? 's' : ''}.`);
-  return { main, subs, reasons };
+  return { main, subs, reasons, mainOrder, subOrder };
 }

@@ -19,6 +19,7 @@ import { useState } from 'react';
 import ExportDialog from './ExportDialog.jsx';
 import { characterBuild, renderBuildCard } from '../lib/buildCard.js';
 import { CHARACTER_CONSOLE } from '../data/console.js';
+import { bestBuild } from '../data/bestBuild.js';
 
 const fmt = (n) => n.toLocaleString('en-US');
 
@@ -226,7 +227,13 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
           name={c.name}
           suffix="nte-build"
           onClose={() => setSharing(false)}
-          render={(opts) => renderBuildCard(characterBuild(c, { team: activeTeam }), opts)}
+          render={(opts) => {
+            const best = bestBuild(c);
+            return renderBuildCard(
+              characterBuild(c, { current: best, source: 'Recommended build', recStats: best?.cartStats }),
+              opts,
+            );
+          }}
         />
       )}
     </article>
