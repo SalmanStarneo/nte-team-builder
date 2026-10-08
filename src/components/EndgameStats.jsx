@@ -1,0 +1,80 @@
+import { ELEMENT_BY_ID } from '../data/elements.js';
+import { ENDGAME, ENDGAME_STATS, endgameUrl, parsePriority } from '../data/endgame.js';
+
+const label = (key, c) => (key === 'element' ? `${ELEMENT_BY_ID[c.element].name} DMG` : ENDGAME_STATS.find(([k]) => k === key)[1]);
+
+function StatList({ stats, character }) {
+  return (
+    <dl className="endgame__list">
+      {ENDGAME_STATS.filter(([k]) => stats[k]).map(([k]) => (
+        <div key={k}>
+          <dt>{label(k, character)}</dt>
+          <dd>{stats[k]}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function Priority({ title, text }) {
+  const groups = parsePriority(text);
+  if (!groups.length) return null;
+  return (
+    <div className="endgame__prio">
+      <span className="endgame__prio-title">{title}</span>
+      <ol>
+        {groups.map((g, i) => <li key={i}>{g.join(' = ')}</li>)}
+      </ol>
+    </div>
+  );
+}
+
+// Prydwen's recommended endgame stats and Cartridge stat priorities.
+export default function EndgameStats({ character: c }) {
+  const e = ENDGAME[c.id];
+  if (!e) {
+    return (
+      <section className="endgame">
+        <h3 className="mini-title">Recommended endgame stats</h3>
+        <p className="muted small">Not published yet.</p>
+      </section>
+    );
+  }
+  return (
+    <section className="endgame" aria-labelledby="endgame-title">
+      <h3 id="endgame-title" className="mini-title">
+        Recommended endgame stats {e.endgameLabel && <span>{e.endgameLabel}</span>}
+      </h3>
+      <StatList stats={e.endgame} character={c} />
+      {e.alt?.endgame && (
+        <>
+          <p className="endgame__alt-title">{e.alt.label}</p>
+          <StatList stats={e.alt.endgame} character={c} />
+        </>
+      )}
+      {e.notes?.map((n) => <p key={n} className="muted small endgame__note">{n}</p>)}
+
+      <h3 className="mini-title endgame__best">Best Cartridge stats</h3>
+      <Priority title="Main" text={e.main} />
+      <Priority title="Sub" text={e.subs} />
+      {e.alt?.main && (
+        <>
+          <p className="endgame__alt-title">{e.alt.label}</p>
+          <Priority title="Main" text={e.alt.main} />
+          <Priority title="Sub" text={e.alt.subs} />
+        </>
+      )}
+      {e.builds?.map((b) => (
+        <div key={b.label}>
+          <p className="endgame__alt-title">{b.label}</p>
+          <Priority title="Main" text={b.main} />
+          <Priority title="Sub" text={b.subs} />
+        </div>
+      ))}
+      <p className="muted small">
+        From <a href={endgameUrl(c.id)} target="_blank" rel="noreferrer">Prydwen’s {c.name} guide</a>, tuned for the
+        signature Arc.
+      </p>
+    </section>
+  );
+}

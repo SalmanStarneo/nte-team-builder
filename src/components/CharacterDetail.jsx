@@ -5,6 +5,7 @@ import { ARCS, ARC_BY_ID, RECOMMENDED } from '../data/arcs.js';
 import { CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
 import CartridgeIcon from './CartridgeIcon.jsx';
 import MaxStats from './MaxStats.jsx';
+import EndgameStats from './EndgameStats.jsx';
 import ArcTypeIcon from './ArcTypeIcon.jsx';
 import { MAX_STATS } from '../data/maxStats.js';
 import ElementGlyph from './ElementGlyph.jsx';
@@ -158,6 +159,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
               <p className="muted">Level 80 stats not added yet.</p>
             </>
           )}
+          <EndgameStats character={c} />
         </div>
       </div>
 

@@ -9,11 +9,17 @@
 // The highest-weight main stat and the top 4 sub stats are suggested, with the
 // reasons shown next to them.
 //
-// Profiles: from the project owner's notes unless a source is given (Oct 2026).
+// When Prydwen has a "Best Stats" priority for the character (data/endgame.js)
+// it is used first; the weights only fill gaps. Profiles marked `override`
+// keep the project owner's reading of the kit instead, and show Prydwen's
+// priority as an alternative.
+//
+// Profiles: from the project owner's notes (Oct 2026).
 import { CHARACTER_BY_ID } from './characters.js';
 import { ELEMENT_BY_ID } from './elements.js';
 import { MAX_STATS, MAX_STATS_LEVEL } from './maxStats.js';
 import { CARTRIDGE_BY_ID, CARTRIDGE_MAIN_STATS, MODULE_SUB_STATS } from './gear.js';
+import { ENDGAME, parsePriority } from './endgame.js';
 
 // focus: 'break' | 'atk-scaling'
 // instantCycle: the kit triggers the Esper Cycle instantly (redirect skill),
@@ -21,10 +27,12 @@ import { CARTRIDGE_BY_ID, CARTRIDGE_MAIN_STATS, MODULE_SUB_STATS } from './gear.
 // main / subs: fixed priorities from a guide, used as given.
 export const BUILD_PROFILES = {
   daffodill: {
+    override: true,
     focus: 'break',
     note: 'Damage on paper, but mostly there to amplify Break for the team, so Break Intensity comes first.',
   },
   iroi: {
+    override: true,
     focus: 'atk-scaling',
     note: 'Her team buff scales with her own ATK, so ATK stats come before survival stats.',
   },
@@ -34,10 +42,7 @@ export const BUILD_PROFILES = {
   },
   blackbird: {
     instantCycle: true,
-    main: 'CRIT DMG',
-    subs: ['CRIT DMG', 'CRIT Rate', 'DMG%', 'ATK%'],
     note: 'Her redirect skill triggers the Cycle instantly, so Cycle Intensity isn’t needed.',
-    source: 'GuruGamer Blackbird build guide (1.4): main CRIT DMG > Psyche DMG > ATK%; subs CRIT DMG > CRIT Rate ≈ Universal DMG > ATK%.',
   },
 };
 
@@ -137,13 +142,29 @@ export function recommendStats(characterOrId, cartridgeId = null) {
   // Instant Cycle overrides everything else for Cycle Intensity.
   if (profile.instantCycle) w.set('Cycle Intensity', 0);
 
-  if (profile.source) reasons.push(`Source: ${profile.source}`);
 
   const ranked = (pool) => [...w].filter(([s, n]) => pool.has(s) && n > 0).sort((a, b) => b[1] - a[1]).map(([s]) => s);
-  const main = profile.main ?? ranked(MAIN_SET)[0] ?? 'ATK%';
-  const subs = (profile.subs ?? ranked(SUB_SET)).slice(0, 4);
+
+  // Prydwen's "Best Stats" priority, minus Cycle Intensity for instant-Cycle kits.
+  const guide = ENDGAME[c.id];
+  const fromGuide = (text, pool) => parsePriority(text).flat()
+    .filter((s) => pool.has(s) && !(profile.instantCycle && s === 'Cycle Intensity'));
+  const gMain = guide && fromGuide(guide.main, MAIN_SET);
+  const gSubs = guide && [...new Set(fromGuide(guide.subs, SUB_SET))];
+  const useGuide = guide && !profile.override && gMain.length;
+  if (guide && profile.override && gMain.length) {
+    reasons.push(`Prydwen suggests instead: main ${guide.main}; subs ${guide.subs}.`);
+  }
+  if (useGuide) {
+    const droppedCycle = profile.instantCycle && /cycle intensity/i.test(`${guide.main} ${guide.subs}`);
+    if (!droppedCycle) reasons.splice(reasons.indexOf(profile.note), profile.note ? 1 : 0);
+    reasons.push(`Follows Prydwen’s priority: main ${guide.main}; subs ${guide.subs}.${droppedCycle ? ' Cycle Intensity left out.' : ''}`);
+  }
+  const main = useGuide ? gMain[0] : ranked(MAIN_SET)[0] ?? 'ATK%';
+  const subs = (useGuide ? [...gSubs, ...ranked(SUB_SET).filter((s) => !gSubs.includes(s))] : ranked(SUB_SET)).slice(0, 4);
   while (subs.length < 4) subs.push(['ATK%', 'HP%', 'CRIT Rate', 'DEF%'].find((s) => !subs.includes(s)));
-  for (const [stat, text] of tied) if (main === stat || subs.includes(stat)) reasons.push(text);
+  if (useGuide) reasons.splice(0, reasons.length, ...reasons.filter((r) => r === profile.note || r.startsWith('Follows Prydwen')));
+  for (const [stat, text] of useGuide ? [] : tied) if (main === stat || subs.includes(stat)) reasons.push(text);
   if (!reasons.length) reasons.push(`Follows ${c.name}’s ${c.roles.join(' / ')} role${c.roles.length > 1 ? 's' : ''}.`);
   return { main, subs, reasons };
 }

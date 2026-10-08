@@ -3275,3 +3275,75 @@ th[aria-sort='descending'] .th-btn {
 .stat-advice__why li + li {
   margin-top: 2px;
 }
+
+/* Prydwen endgame stats on character profiles */
+.endgame {
+  margin-top: 18px;
+}
+.endgame__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+  gap: 6px;
+  margin: 8px 0 0;
+}
+.endgame__list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.endgame__list dt {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.endgame__list dd {
+  margin: 0;
+  font: 600 0.9rem var(--font-mono);
+  text-align: right;
+}
+.endgame__alt-title {
+  margin: 12px 0 0;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.endgame__note {
+  margin: 6px 0 0;
+}
+.endgame__best {
+  margin-top: 16px;
+}
+.endgame__prio {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 6px;
+}
+.endgame__prio-title {
+  flex: none;
+  width: 3em;
+  font: 600 0.68rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.endgame__prio ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+}
+.endgame__prio li:not(:last-child)::after {
+  content: '›';
+  margin-left: 4px;
+  color: var(--muted);
+}
+.cell-other {
+  white-space: nowrap;
+  color: var(--muted);
+}

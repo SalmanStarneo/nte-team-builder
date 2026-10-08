@@ -8,7 +8,7 @@ import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
 import RoleList from './RoleList.jsx';
 import ArcTypeIcon from './ArcTypeIcon.jsx';
-import { MAX_STATS, MAX_STATS_LEVEL } from '../data/maxStats.js';
+import { ENDGAME, endgameNumber } from '../data/endgame.js';
 
 const BASE = import.meta.env.BASE_URL;
 const VIEW_KEY = 'nte-team-builder:charView';
@@ -27,10 +27,22 @@ const COLUMNS = [
   { id: 'rarity', label: 'Rank', get: (c) => c.rarity },
   { id: 'role', label: 'Roles', get: (c) => c.roles.join(', ') },
   { id: 'arcType', label: 'Arc type', get: (c) => c.arcType },
-  { id: 'hp', label: 'HP', get: (c) => MAX_STATS[c.id]?.hp, numeric: true },
-  { id: 'atk', label: 'ATK', get: (c) => MAX_STATS[c.id]?.atk, numeric: true },
-  { id: 'def', label: 'DEF', get: (c) => MAX_STATS[c.id]?.def, numeric: true },
+  // Prydwen's recommended endgame stats; sorted by their first number.
+  ...[
+    ['hp', 'HP'], ['atk', 'ATK'], ['critRate', 'CRIT Rate'], ['critDmg', 'CRIT DMG'],
+    ['universal', 'Univ. DMG'], ['element', 'Elem. DMG'],
+  ].map(([key, label]) => ({
+    id: key, label, endgame: key, numeric: true, get: (c) => endgameNumber(ENDGAME[c.id]?.endgame[key]),
+  })),
+  { id: 'other', label: 'Also', get: (c) => otherStats(c) || null },
 ];
+
+// DEF, Cycle and Break targets, shown only for characters who need them.
+const OTHER = [['def', 'DEF'], ['cycle', 'Cycle'], ['break', 'Break']];
+const otherStats = (c) => {
+  const e = ENDGAME[c.id]?.endgame;
+  return e ? OTHER.filter(([k]) => e[k]).map(([k, l]) => `${l} ${e[k]}`).join(' · ') : '';
+};
 
 function compare(a, b, col, dir) {
   const va = col.get(a);
@@ -255,9 +267,10 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                 <td><RankBadge rank={c.rarity} size={22} /></td>
                 <td><RoleList roles={c.roles} size={14} /></td>
                 <td>{c.arcType ? <span className="cell-el"><ArcTypeIcon type={c.arcType} size={16} />{c.arcType}</span> : '—'}</td>
-                <td className="num">{MAX_STATS[c.id] ? MAX_STATS[c.id].hp.toLocaleString('en-US') : '—'}</td>
-                <td className="num">{MAX_STATS[c.id]?.atk.toLocaleString('en-US') ?? '—'}</td>
-                <td className="num">{MAX_STATS[c.id]?.def ?? '—'}</td>
+                {COLUMNS.filter((col) => col.endgame).map((col) => (
+                  <td key={col.id} className="num">{ENDGAME[c.id]?.endgame[col.endgame] ?? '—'}</td>
+                ))}
+                <td className="small cell-other">{otherStats(c) || '—'}</td>
               </tr>
             ))}
           </tbody>
@@ -265,7 +278,11 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
         {rows.length === 0 && <p className="empty">No characters match these filters.</p>}
       </div>
       )}
-      <p className="muted small">{`Stats at Level ${MAX_STATS_LEVEL}, without Arc or Console. “—” means they haven’t been added yet.`}</p>
+      <p className="muted small">
+        Recommended endgame stats from{' '}
+        <a href="https://www.prydwen.gg/neverness-to-everness/characters" target="_blank" rel="noreferrer">Prydwen</a>,
+        tuned for each character’s signature Arc. Elem. DMG is the character’s own element. “—” means not published yet.
+      </p>
     </div>
   );
 }

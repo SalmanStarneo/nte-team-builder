@@ -10,6 +10,7 @@ import {
 } from '../data/console.js';
 import { suggestedBuild, suggestedCartStats } from '../data/consoleBuilds.js';
 import { MAX_STATS, MAX_STATS_LEVEL } from '../data/maxStats.js';
+import { ENDGAME } from '../data/endgame.js';
 import { encodeConsoleCode } from './consoleCode.js';
 import { loadoutOf } from './teamsReducer.js';
 import {
@@ -433,39 +434,69 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
       { stat: 'Universal DMG%', value: round((ms.universal ?? 0) + take('Universal DMG%')) },
       ...stats,
     ];
+    if (ms.cycle) stats.push({ stat: 'Cycle Intensity', value: round(ms.cycle + take('Cycle Intensity')) });
+    if (ms.breakInt) stats.push({ stat: 'Break Intensity', value: round(ms.breakInt + take('Break Intensity')) });
   }
-  const statsH = 214;
+  // Prydwen's endgame targets, shown beside each value.
+  const eg = ENDGAME[c.id]?.endgame;
+  const targetKey = {
+    HP: 'hp', ATK: 'atk', DEF: 'def', 'CRIT Rate': 'critRate', 'CRIT DMG': 'critDmg',
+    'Universal DMG%': 'universal', [`${el.name} DMG%`]: 'element', 'Cycle Intensity': 'cycle', 'Break Intensity': 'break',
+  };
+  const target = (stat) => eg?.[targetKey[stat]] ?? null;
+  if (eg && !ms) {
+    // No Level 80 stats yet: list the targets on their own.
+    const have = new Set(stats.map((x) => x.stat));
+    for (const [stat, key] of Object.entries(targetKey)) if (eg[key] && !have.has(stat)) stats.push({ stat, value: null });
+  }
+  if (eg) {
+    // Rows with a target first, then the rest; drop base-only rows without a target or bonus.
+    const extraStats = new Set(extra.map((x) => x.stat));
+    stats = stats.filter((x) => target(x.stat) || extraStats.has(x.stat) || !ms);
+    stats.sort((a, b) => (target(b.stat) ? 1 : 0) - (target(a.stat) ? 1 : 0));
+  }
+  const statsH = eg ? 250 : 214;
   panel(ctx, LCX, top, LCW, statsH, 'Key attributes');
   ctx.textAlign = 'right';
   ctx.fillStyle = K.muted;
   ctx.font = `500 14px ${BODY}`;
-  ctx.fillText(ms ? `Lv ${MAX_STATS_LEVEL} base + build` : 'from this build', LCX + LCW - 18, top + 30);
+  ctx.fillText(
+    `${ms ? `Lv ${MAX_STATS_LEVEL} base + build` : 'from this build'}${eg ? ' / endgame target' : ''}`,
+    LCX + LCW - 18, top + 30,
+  );
   ctx.textAlign = 'left';
   if (!stats.length) {
     ctx.fillStyle = K.muted;
     ctx.font = `500 16px ${BODY}`;
     ctx.fillText('No stat values entered yet.', LCX + 18, top + 70);
   } else {
-    const colW = (LCW - 36 - 12) / 2;
-    stats.slice(0, 10).forEach((st, i) => {
-      const col = i % 2;
-      const row = Math.floor(i / 2);
-      const sx = LCX + 18 + col * (colW + 12);
-      const sy = top + 46 + row * 32;
-      ctx.fillStyle = K.inset;
-      roundRect(ctx, sx, sy, colW, 26, 6);
-      ctx.fill();
+    // One row per stat: name, value, endgame target (gold).
+    const maxRows = Math.floor((statsH - 52) / 22);
+    const rowH = Math.min(30, Math.floor((statsH - 52) / Math.min(stats.length, maxRows)));
+    const valueX = LCX + LCW - (eg ? 150 : 28);
+    const short = (t) => t.replace(/%?\s*~\s*/, '–');
+    stats.slice(0, maxRows).forEach((st, i) => {
+      const sy = top + 44 + i * rowH;
+      if (i % 2 === 0) {
+        ctx.fillStyle = K.inset;
+        roundRect(ctx, LCX + 12, sy, LCW - 24, rowH, 5);
+        ctx.fill();
+      }
+      const base = sy + rowH / 2 + 5;
       ctx.font = `500 15px ${BODY}`;
       ctx.fillStyle = K.fg;
-      // Drop "Bonus" when the full name doesn't fit beside the value.
-      let label = statLabel(st.stat);
-      if (ctx.measureText(label).width > colW - 84) label = label.replace(/ Bonus$/, '');
-      label = wrap(ctx, label, colW - 84, 1)[0];
-      ctx.fillText(label, sx + 10, sy + 18);
+      ctx.fillText(wrap(ctx, statLabel(st.stat), valueX - LCX - 130, 1)[0], LCX + 24, base);
       ctx.textAlign = 'right';
       ctx.font = `600 15px ${MONO}`;
-      const v = Number(st.value);
-      ctx.fillText(isPercentStat(st.stat) ? statValue(st.stat, v) : v.toLocaleString('en-US'), sx + colW - 10, sy + 18);
+      const v = st.value == null ? '—' : isPercentStat(st.stat) ? statValue(st.stat, Number(st.value))
+        : Number(st.value).toLocaleString('en-US');
+      ctx.fillText(v, valueX, base);
+      const t = target(st.stat);
+      if (t) {
+        ctx.font = `500 14px ${MONO}`;
+        ctx.fillStyle = K.gold;
+        ctx.fillText(short(t), LCX + LCW - 24, base);
+      }
       ctx.textAlign = 'left';
     });
   }

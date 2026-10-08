@@ -1,3 +1,4 @@
+import { ENDGAME } from './endgame.js';
 // Console gear: Cartridge sets and Module types.
 // Sources (Oct 2026): Mobalytics cartridge guide (set bonuses), thegameswiki
 // Console page (module sizes, stat pool), character build guides.
@@ -45,6 +46,11 @@ const SURVIVAL_SET = {
 const SURVIVAL_STYLE = { adler: 'shield', edgar: 'heal', iroi: 'heal', fadia: 'hp' };
 
 export function cartridgesFor(character) {
+  // Prydwen's ranking when it has one, by set name.
+  const named = ENDGAME[character.id]?.cartridges
+    ?.map((n) => CARTRIDGES.find((x) => x.name === n)?.id)
+    .filter(Boolean);
+  if (named?.length) return named;
   const sets = [];
   for (const role of character.roles) {
     if (role === 'Damage') sets.push(ELEMENT_SET[character.element]);
