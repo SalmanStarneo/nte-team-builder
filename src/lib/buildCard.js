@@ -194,6 +194,74 @@ function moduleRow(ctx, x, y, w, label, cartId, pieces, cartImg) {
 }
 
 // The 5x5 template: each module is one gold block, seams between modules,
+// Outline of a module on the grid as a clockwise list of corner points.
+// Each square spans [at, at + cell]; squares of the same module are joined
+// across the gap between them.
+function pieceOutline(cells, same, at, atY, cell, gap) {
+  // Sides run clockwise. A side's end reaches across the gap when the next
+  // square along it is in the module; its start reaches back across the gap
+  // at an inner corner. That way every side starts where the last one ended.
+  const segs = [];
+  for (const [r, c] of cells) {
+    const x0 = at(r, c);
+    const y0 = atY(r);
+    const x1 = x0 + cell;
+    const y1 = y0 + cell;
+    if (!same(r - 1, c)) {
+      const s0 = same(r, c - 1) && same(r - 1, c - 1) ? gap : 0;
+      const e0 = same(r, c + 1) ? gap : 0;
+      segs.push([[x0 - s0, y0], [x1 + e0, y0]]);
+    }
+    if (!same(r, c + 1)) {
+      const s0 = same(r - 1, c) && same(r - 1, c + 1) ? gap : 0;
+      const e0 = same(r + 1, c) ? gap : 0;
+      segs.push([[x1, y0 - s0], [x1, y1 + e0]]);
+    }
+    if (!same(r + 1, c)) {
+      const s0 = same(r, c + 1) && same(r + 1, c + 1) ? gap : 0;
+      const e0 = same(r, c - 1) ? gap : 0;
+      segs.push([[x1 + s0, y1], [x0 - e0, y1]]);
+    }
+    if (!same(r, c - 1)) {
+      const s0 = same(r + 1, c) && same(r + 1, c - 1) ? gap : 0;
+      const e0 = same(r - 1, c) ? gap : 0;
+      segs.push([[x0, y1 + s0], [x0, y0 - e0]]);
+    }
+  }
+  const key = ([px, py]) => `${Math.round(px * 10)},${Math.round(py * 10)}`;
+  const byStart = new Map(segs.map((sg) => [key(sg[0]), sg]));
+  const pts = [];
+  let cur = segs[0];
+  for (let guard = 0; guard <= segs.length && cur; guard += 1) {
+    pts.push(cur[0]);
+    cur = byStart.get(key(cur[1]));
+    if (cur === segs[0]) break;
+  }
+  // Drop points that sit on a straight line.
+  return pts.filter((pt, i) => {
+    const a = pts[(i - 1 + pts.length) % pts.length];
+    const b = pts[(i + 1) % pts.length];
+    return Math.abs((pt[0] - a[0]) * (b[1] - pt[1]) - (pt[1] - a[1]) * (b[0] - pt[0])) > 0.01;
+  });
+}
+
+// Closed path through `pts` with every corner rounded.
+function roundedPolygon(ctx, pts, radius) {
+  const n = pts.length;
+  ctx.beginPath();
+  const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  const start = mid(pts[n - 1], pts[0]);
+  ctx.moveTo(start[0], start[1]);
+  for (let i = 0; i < n; i += 1) {
+    const p = pts[i];
+    const q = pts[(i + 1) % n];
+    const prev = pts[(i - 1 + n) % n];
+    const r = Math.min(radius, Math.hypot(p[0] - prev[0], p[1] - prev[1]) / 2, Math.hypot(q[0] - p[0], q[1] - p[1]) / 2);
+    ctx.arcTo(p[0], p[1], q[0], q[1], r);
+  }
+  ctx.closePath();
+}
+
 // blocked cells left as faint outlines.
 function consoleGrid(ctx, x, y, cell, layout, pieces) {
   const mask = maskOf(layout);
@@ -220,39 +288,32 @@ function consoleGrid(ctx, x, y, cell, layout, pieces) {
   }
   pieces.forEach((p, me) => {
     const cells = SHAPES[p.shape].cells.map(([a, b]) => [p.r + a, p.c + b]);
-    const xs = cells.map(([, c]) => at(0, c));
-    const ys = cells.map(([r]) => atY(r));
-    const g = ctx.createLinearGradient(Math.min(...xs), Math.min(...ys), Math.max(...xs) + cell, Math.max(...ys) + cell);
-    g.addColorStop(0, '#ffdf7e');
-    g.addColorStop(1, '#d2952a');
+    const outline = pieceOutline(cells, (r, c) => same(r, c, me), at, atY, cell, gap);
+    const radius = Math.max(4, cell * 0.2);
+    const xs = outline.map(([px]) => px);
+    const ys = outline.map(([, py]) => py);
+    const x0 = Math.min(...xs);
+    const y0 = Math.min(...ys);
+    const x1 = Math.max(...xs);
+    const y1 = Math.max(...ys);
+
+    // Body: one rounded shape per module (outer and inner corners rounded).
+    ctx.save();
+    roundedPolygon(ctx, outline, radius);
+    const g = ctx.createLinearGradient(x0, y0, x1, y1);
+    g.addColorStop(0, '#ffe08a');
+    g.addColorStop(1, '#d0912a');
     ctx.fillStyle = g;
-    ctx.beginPath();
-    for (const [r, c] of cells) {
-      // Each cell, stretched over the gap toward neighbours of the same module.
-      const l = same(r, c - 1, me) ? gap : 0;
-      const t = same(r - 1, c, me) ? gap : 0;
-      ctx.rect(at(r, c) - l, atY(r) - t, cell + l, cell + t);
-    }
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 2;
     ctx.fill();
-    // Thin seams between the squares of one module, so its size can be counted
-    // (the thicker outline below still marks where each module ends).
-    ctx.strokeStyle = 'rgba(128, 82, 12, 0.55)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    for (const [r, c] of cells) {
-      if (same(r, c + 1, me)) {
-        const x = at(r, c) + cell + gap / 2;
-        ctx.moveTo(x, atY(r) + 4);
-        ctx.lineTo(x, atY(r) + cell - 4);
-      }
-      if (same(r + 1, c, me)) {
-        const y2 = atY(r) + cell + gap / 2;
-        ctx.moveTo(at(r, c) + 4, y2);
-        ctx.lineTo(at(r, c) + cell - 4, y2);
-      }
-    }
-    ctx.stroke();
-    // Soft sheen ring on each cell, like the game's tiles.
+    ctx.restore();
+
+    ctx.save();
+    roundedPolygon(ctx, outline, radius);
+    ctx.clip();
+    // Soft sheen ring on each square, like the game's tiles.
     ctx.strokeStyle = 'rgba(255, 246, 214, 0.32)';
     ctx.lineWidth = 1.2;
     for (const [r, c] of cells) {
@@ -260,20 +321,48 @@ function consoleGrid(ctx, x, y, cell, layout, pieces) {
       ctx.arc(at(r, c) + cell * 0.72, atY(r) + cell * 0.74, cell * 0.42, Math.PI, Math.PI * 1.5);
       ctx.stroke();
     }
-    ctx.strokeStyle = 'rgba(120, 76, 10, 0.9)';
-    ctx.lineWidth = 2;
-    for (const [r, c] of cells) {
-      const x0 = at(r, c) - (same(r, c - 1, me) ? gap : 0);
-      const y0 = atY(r) - (same(r - 1, c, me) ? gap : 0);
-      const x1 = at(r, c) + cell;
-      const y1 = atY(r) + cell;
+    // Engraved grooves between the squares of one module: a dark cut with a
+    // light lip beside it, running edge to edge so they notch the outline.
+    const groove = (ax, ay, bx, by, horizontal) => {
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(112, 68, 6, 0.85)';
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      if (!same(r - 1, c, me)) { ctx.moveTo(x0, y0 + 1); ctx.lineTo(x1, y0 + 1); }
-      if (!same(r + 1, c, me)) { ctx.moveTo(x0, y1 - 1); ctx.lineTo(x1, y1 - 1); }
-      if (!same(r, c - 1, me)) { ctx.moveTo(x0 + 1, y0); ctx.lineTo(x0 + 1, y1); }
-      if (!same(r, c + 1, me)) { ctx.moveTo(x1 - 1, y0); ctx.lineTo(x1 - 1, y1); }
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(bx, by);
       ctx.stroke();
+      ctx.strokeStyle = 'rgba(255, 244, 205, 0.6)';
+      ctx.lineWidth = 1.2;
+      const o = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(ax + (horizontal ? 0 : o), ay + (horizontal ? o : 0));
+      ctx.lineTo(bx + (horizontal ? 0 : o), by + (horizontal ? o : 0));
+      ctx.stroke();
+    };
+    for (const [r, c] of cells) {
+      if (same(r, c + 1, me)) {
+        const gx = at(r, c) + cell + gap / 2;
+        const top = same(r - 1, c, me) && same(r - 1, c + 1, me) ? atY(r) - gap / 2 : atY(r) - 2;
+        const bottom = same(r + 1, c, me) && same(r + 1, c + 1, me) ? atY(r) + cell + gap / 2 : atY(r) + cell + 2;
+        groove(gx, top, gx, bottom, false);
+      }
+      if (same(r + 1, c, me)) {
+        const gy = atY(r) + cell + gap / 2;
+        const left = same(r, c - 1, me) && same(r + 1, c - 1, me) ? at(r, c) - gap / 2 : at(r, c) - 2;
+        const right = same(r, c + 1, me) && same(r + 1, c + 1, me) ? at(r, c) + cell + gap / 2 : at(r, c) + cell + 2;
+        groove(left, gy, right, gy, true);
+      }
     }
+    // Bevel: light inner edge on top/left, dark on bottom/right.
+    roundedPolygon(ctx, outline, radius);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(255, 248, 220, 0.35)';
+    ctx.stroke();
+    ctx.restore();
+    roundedPolygon(ctx, outline, radius);
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = 'rgba(110, 68, 8, 0.95)';
+    ctx.stroke();
   });
   return CONSOLE_SIZE * cell + (CONSOLE_SIZE - 1) * gap;
 }
