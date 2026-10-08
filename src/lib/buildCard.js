@@ -13,7 +13,7 @@ import { MAX_STATS, MAX_STATS_LEVEL } from '../data/maxStats.js';
 import { encodeConsoleCode } from './consoleCode.js';
 import { loadoutOf } from './teamsReducer.js';
 import {
-  BODY, DISPLAY, EL, MONO, drawRank, ensureFonts, loadImage, roundRect, wrap,
+  BODY, DISPLAY, EL, MONO, clipCard, drawRank, drawSilverFrame, ensureFonts, loadImage, roundRect, wrap,
 } from './teamCard.js';
 
 export const BUILD_W = 1600;
@@ -301,6 +301,7 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
   canvas.width = BUILD_W;
   canvas.height = BUILD_H;
   const ctx = canvas.getContext('2d');
+  clipCard(ctx, BUILD_W, BUILD_H);
   drawBackdrop(ctx);
 
   const PAD = 32;
@@ -600,5 +601,7 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     ctx.fillText('CONSOLE CODE', BUILD_W - PAD - cw - 14, BUILD_H - 30);
     ctx.textAlign = 'left';
   }
+
+  drawSilverFrame(ctx, BUILD_W, BUILD_H);
   return canvas;
 }

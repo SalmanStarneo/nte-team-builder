@@ -119,6 +119,90 @@ export function pill(ctx, x, y, text, { bg, fg, font = `700 12px ${MONO}`, padX 
   return w;
 }
 
+// Silver frame: the site's top line (muted silver with smoke wisps) as a
+// rounded outline around the whole card. Call clipCard first so the corners
+// outside the frame stay transparent, and drawSilverFrame last.
+export const FRAME_RADIUS = 28;
+export const FRAME_WIDTH = 8;
+
+export function clipCard(ctx, w, h, radius = FRAME_RADIUS) {
+  roundRect(ctx, 0, 0, w, h, radius);
+  ctx.clip();
+}
+
+export function drawSilverFrame(ctx, w, h, { width = FRAME_WIDTH, radius = FRAME_RADIUS } = {}) {
+  const ring = () => {
+    ctx.beginPath();
+    roundRectPath(ctx, 0, 0, w, h, radius);
+    roundRectPath(ctx, width, width, w - width * 2, h - width * 2, radius - width);
+  };
+  ctx.save();
+  ring();
+  ctx.clip('evenodd');
+  const silver = ctx.createLinearGradient(0, 0, w, h);
+  [
+    [0, '#4a4f5c'], [0.18, '#727886'], [0.36, '#9ea4b1'], [0.5, '#c3c8d2'],
+    [0.64, '#979dab'], [0.82, '#6b7180'], [1, '#464b57'],
+  ].forEach(([at, col]) => silver.addColorStop(at, col));
+  ctx.fillStyle = silver;
+  ctx.fillRect(0, 0, w, h);
+
+  // Wisps drift along each edge, placed by a fixed pseudo-random sequence so
+  // every export looks the same.
+  let seed = 7;
+  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const perimeter = 2 * (w + h);
+  const count = Math.round(perimeter / 28);
+  for (let i = 0; i < count; i += 1) {
+    const dark = i % 3 === 2;
+    let t = rand() * perimeter;
+    const across = rand() * width;
+    let cx;
+    let cy;
+    let vertical = false;
+    if (t < w) { cx = t; cy = across; }
+    else if ((t -= w) < h) { cx = w - across; cy = t; vertical = true; }
+    else if ((t -= h) < w) { cx = w - t; cy = h - across; }
+    else { t -= w; cx = across; cy = h - t; vertical = true; }
+    const rx = 14 + rand() * 40;
+    const ry = 1.5 + rand() * 3.5;
+    const a = dark ? 0.18 + rand() * 0.2 : 0.14 + rand() * 0.26;
+    const tint = dark ? '22, 24, 32' : '245, 247, 252';
+    ctx.save();
+    ctx.translate(cx, cy);
+    if (vertical) ctx.rotate(Math.PI / 2);
+    ctx.scale(1, ry / rx);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+    g.addColorStop(0, `rgba(${tint}, ${a})`);
+    g.addColorStop(1, `rgba(${tint}, 0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, 0, rx, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
+
+  // A faint inner highlight so the frame reads as a raised edge.
+  ctx.save();
+  ctx.beginPath();
+  roundRectPath(ctx, width + 0.5, width + 0.5, w - width * 2 - 1, h - width * 2 - 1, radius - width);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Sub-path version of roundRect (no beginPath), so paths can be combined.
+function roundRectPath(ctx, x, y, w, h, r) {
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
 // Rank badge matching RankBadge.jsx: dark disc, heavy italic gradient letter,
 // white outline drawn under the fill.
 const RANK_FONT = '"Inter", "Arial Black", "Segoe UI Black", sans-serif';
@@ -239,6 +323,7 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   // Best resampling when portraits are scaled onto the card.
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
+  clipCard(ctx, CARD_W, CARD_H);
 
   // Background
   const g = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
@@ -248,44 +333,6 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   ctx.fillRect(0, 0, CARD_W, CARD_H);
 
   drawBands(ctx);
-
-  // Muted silver stripe across the top with soft smoke wisps.
-  const silver = ctx.createLinearGradient(0, 0, CARD_W, 0);
-  [
-    [0, '#4a4f5c'], [0.18, '#727886'], [0.36, '#9ea4b1'], [0.5, '#c3c8d2'],
-    [0.64, '#979dab'], [0.82, '#6b7180'], [1, '#464b57'],
-  ].forEach(([at, col]) => silver.addColorStop(at, col));
-  ctx.fillStyle = silver;
-  ctx.fillRect(0, 0, CARD_W, 8);
-  // Wisps: soft light ellipses, placed by a fixed pseudo-random sequence so
-  // every export looks the same.
-  let seed = 7;
-  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(0, 0, CARD_W, 8);
-  ctx.clip();
-  for (let i = 0; i < 70; i += 1) {
-    const dark = i % 3 === 2;
-    const cx = rand() * CARD_W;
-    const cy = 1 + rand() * 8;
-    const rx = 14 + rand() * 40;
-    const ry = 1.5 + rand() * 3.5;
-    const a = dark ? 0.18 + rand() * 0.2 : 0.14 + rand() * 0.26;
-    const tint = dark ? '22, 24, 32' : '245, 247, 252';
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(1, ry / rx);
-    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
-    g.addColorStop(0, `rgba(${tint}, ${a})`);
-    g.addColorStop(1, `rgba(${tint}, 0)`);
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(0, 0, rx, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-  ctx.restore();
 
   // Header
   const PAD = 48;
@@ -634,6 +681,8 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   }
   ctx.textAlign = 'left';
 
+
+  drawSilverFrame(ctx, CARD_W, CARD_H);
   return canvas;
 }
 
