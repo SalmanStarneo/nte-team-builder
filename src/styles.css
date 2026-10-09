@@ -3460,6 +3460,49 @@ th[aria-sort='descending'] .th-btn {
     font-size: 0.8rem;
   }
   .index-table .cell-other.is-empty {
-    display: none;
+    visibility: hidden; /* keeps every card the same height */
+  }
+  .index-table .cell-stat {
+    white-space: nowrap;
+  }
+}
+
+/* Equal tiles and rows for characters with two roles (e.g. Damage + Buff). */
+.char-grid > li {
+  display: flex;
+}
+.char-grid .char-tile {
+  flex: 1;
+  grid-template-rows: auto auto 1fr;
+  align-content: start;
+}
+.char-tile__roles .role-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: calc(2 * 1.35em + 2px); /* room for two roles on every tile */
+  line-height: 1.35;
+}
+.index-table .role-list {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  /* Phone cards: element and Arc type on one line, roles on their own line. */
+  .index-table .cell-meta-el {
+    grid-row: 2;
+    grid-column: 1;
+  }
+  .index-table .cell-meta-arc {
+    grid-row: 2;
+    grid-column: 2 / -1;
+  }
+  .index-table .cell-meta-roles {
+    grid-row: 3;
+    grid-column: 1 / -1;
+  }
+  .index-table .cell-meta-roles .role-list {
+    flex-wrap: nowrap;
   }
 }

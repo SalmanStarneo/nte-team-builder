@@ -272,7 +272,7 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                 <td className="cell-meta-arc">{c.arcType ? <span className="cell-el"><ArcTypeIcon type={c.arcType} size={16} />{c.arcType}</span> : '—'}</td>
                 {COLUMNS.filter((col) => col.endgame).map((col) => (
                   <td key={col.id} className="num cell-stat" data-label={col.label}>
-                    {ENDGAME[c.id]?.endgame[col.endgame] ?? '—'}
+                    {ENDGAME[c.id]?.endgame[col.endgame]?.replace(/%?\s*~\s*/, '–') ?? '—'}
                   </td>
                 ))}
                 <td className={`small cell-other${otherStats(c) ? '' : ' is-empty'}`}>{otherStats(c) || '—'}</td>
