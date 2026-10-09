@@ -3506,3 +3506,65 @@ th[aria-sort='descending'] .th-btn {
     flex-wrap: nowrap;
   }
 }
+
+/* Suggested Awakening unlock order on profiles */
+.awaken-order {
+  margin: 8px 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.awaken-order__title {
+  margin: 0 0 8px;
+  font: 600 0.72rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.awaken-order__title span {
+  color: var(--muted);
+}
+.awaken-order__steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.awaken-order__steps li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  font-size: 0.85rem;
+}
+.awaken-order__steps li:first-child {
+  background: color-mix(in srgb, var(--accent) 28%, var(--surface));
+}
+.awaken-order__n {
+  font: 600 0.68rem var(--font-mono);
+  color: var(--muted);
+}
+.awaken-order__why {
+  margin: 8px 0 0;
+  padding-left: 1.1em;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.awaken-order__why b {
+  color: var(--fg);
+  margin-right: 4px;
+}
+.awaken-rank {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  font: 600 0.62rem var(--font-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  vertical-align: 2px;
+}

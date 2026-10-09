@@ -14,6 +14,7 @@ import AscensionPlanner from './AscensionPlanner.jsx';
 import SkillsSection from './SkillsSection.jsx';
 import StatIcon from './StatIcon.jsx';
 import { AWAKENINGS, RESONANCES } from '../data/awakenings.js';
+import { AWAKENING_ORDER, ORDINAL } from '../data/awakeningOrder.js';
 import RoleList from './RoleList.jsx';
 import { useState } from 'react';
 import ExportDialog from './ExportDialog.jsx';
@@ -168,12 +169,36 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
         <h3 className="mini-title">Awakenings</h3>
         {AWAKENINGS[c.id] ? (
           <>
+            {AWAKENING_ORDER[c.id] && (
+              <div className="awaken-order">
+                <p className="awaken-order__title">Suggested unlock order <span>by duplicate</span></p>
+                <ol className="awaken-order__steps">
+                  {AWAKENING_ORDER[c.id].order.map((id, i) => (
+                    <li key={id} title={AWAKENING_ORDER[c.id].why[id] ?? ''}>
+                      <span className="awaken-order__n">{ORDINAL[i]}</span>
+                      <b>{id}</b>
+                    </li>
+                  ))}
+                </ol>
+                <ul className="awaken-order__why">
+                  {Object.entries(AWAKENING_ORDER[c.id].why).map(([id, text]) => (
+                    <li key={id}><b>{id}</b> {text}</li>
+                  ))}
+                </ul>
+                {AWAKENING_ORDER[c.id].alt && <p className="muted small">{AWAKENING_ORDER[c.id].alt}</p>}
+              </div>
+            )}
             <ol className="awaken-list">
               {AWAKENINGS[c.id].map((w) => (
                 <li key={w.id}>
                   <span className="awaken-id">{w.id}</span>
                   <span className="awaken-body">
-                    <b>{w.name}</b>
+                    <b>
+                      {w.name}
+                      {AWAKENING_ORDER[c.id]?.order.includes(w.id) && (
+                        <span className="awaken-rank">{ORDINAL[AWAKENING_ORDER[c.id].order.indexOf(w.id)]} pick</span>
+                      )}
+                    </b>
                     <span>{w.effect}</span>
                   </span>
                 </li>

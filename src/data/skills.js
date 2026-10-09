@@ -88,6 +88,8 @@ const U = 'Ultimate';
 const S = 'Support Skill';
 
 // Combat skills (max Lv 10) and life skills (max Lv 5) per character.
+// Pink Paws Heist life skills: Chiz (Nocturnal Animal, GameWith) and
+// Lacrimosa (Exclusive Bat-efit, Icy Veins), Oct 2026.
 export const SKILLS = {
   baicang: {
     combat: [
@@ -129,7 +131,10 @@ export const SKILLS = {
       s(U, 'Zero-Sum Game', 'Area damage, then a Grain Market state where her Redirect Skill cashes in Grain.'),
       s(S, 'Temporary Entry', 'Rides Brown Sugar Boba into enemies for one hit.'),
     ],
-    life: [s('Life', 'Lobby Manager', 'More shop customers, higher menu prices, less ingredient use.')],
+    life: [
+      s('Life', 'Lobby Manager', 'More shop customers, higher menu prices, less ingredient use.'),
+      s('Life', 'Nocturnal Animal', 'Highlights all collectibles in Pink Paws Heist in gold, even when Chiz isn’t on the team.'),
+    ],
   },
   daffodill: {
     combat: [
@@ -204,7 +209,10 @@ export const SKILLS = {
       s(U, 'Working Day Judgement', 'Truck or car attack, by mode, for heavy area damage and Nightmare.'),
       s(S, 'Microwake', 'Esper constructs hit once for area Chaos damage.'),
     ],
-    life: [s('Life', 'Chef Tomato', 'Higher prices for dessert dishes and less ingredient use.')],
+    life: [
+      s('Life', 'Chef Tomato', 'Higher prices for dessert dishes and less ingredient use.'),
+      s('Life', 'Exclusive Bat-efit', 'Fons and Paw-Paw Coins from Pink Paws Heist +15% (+20% at Lv 2) while she is on the team.'),
+    ],
   },
   linko: {
     combat: [
