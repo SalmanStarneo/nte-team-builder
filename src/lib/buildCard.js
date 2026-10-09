@@ -541,14 +541,16 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     stats = [...extra];
     const elDmg = `${el.name} DMG%`;
     const round = (n) => Math.round(n * 100) / 100;
+    // Base value unknown (estimated stats): show only what the build adds, or nothing.
+    const plus = (b, add) => (b == null ? (add ? round(add) : null) : round(b + add));
     stats = [
       { stat: 'HP', value: round(ms.hp + take('HP')) },
       { stat: 'ATK', value: round(ms.atk + take('ATK')) },
       { stat: 'DEF', value: round(ms.def + take('DEF')) },
-      { stat: 'CRIT Rate', value: round(ms.critRate + take('CRIT Rate')) },
-      { stat: 'CRIT DMG', value: round(ms.critDmg + take('CRIT DMG')) },
-      { stat: elDmg, value: round((ms.dmg?.[c.element] ?? 0) + take(elDmg)) },
-      { stat: 'Universal DMG%', value: round((ms.universal ?? 0) + take('Universal DMG%') + take('DMG%')) },
+      { stat: 'CRIT Rate', value: plus(ms.critRate, take('CRIT Rate')) },
+      { stat: 'CRIT DMG', value: plus(ms.critDmg, take('CRIT DMG')) },
+      { stat: elDmg, value: plus(ms.estimated ? null : ms.dmg?.[c.element] ?? 0, take(elDmg)) },
+      { stat: 'Universal DMG%', value: plus(ms.universal, take('Universal DMG%') + take('DMG%')) },
       ...stats,
     ];
     if (ms.cycle) stats.push({ stat: 'Cycle Intensity', value: round(ms.cycle + take('Cycle Intensity')) });
@@ -578,7 +580,7 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
   ctx.fillStyle = K.muted;
   ctx.font = `500 14px ${BODY}`;
   ctx.fillText(
-    `${ms ? `Lv ${MAX_STATS_LEVEL} base + build` : 'from this build'}${eg ? ' / endgame target' : ''}`,
+    `${ms ? `Lv ${MAX_STATS_LEVEL} base${ms.estimated ? ' (est.)' : ''} + build` : 'from this build'}${eg ? ' / endgame target' : ''}`,
     LCX + LCW - 18, top + 30,
   );
   ctx.textAlign = 'left';
@@ -606,8 +608,10 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
       ctx.textAlign = 'right';
       ctx.font = `600 15px ${MONO}`;
       const capped = st.stat === 'CRIT Rate' && Number(st.value) > 100;
+      // Estimated base (no in-game Level 80 values yet): mark HP/ATK/DEF as approximate.
+      const approx = ms?.estimated && ['HP', 'ATK', 'DEF'].includes(st.stat) && st.value != null;
       const v = st.value == null ? '—' : capped ? '100% (cap)' : isPercentStat(st.stat) ? statValue(st.stat, Number(st.value))
-        : Number(st.value).toLocaleString('en-US');
+        : `${approx ? '≈ ' : ''}${Number(st.value).toLocaleString('en-US')}`;
       ctx.fillText(v, valueX, base);
       const t = target(st.stat);
       if (t) {

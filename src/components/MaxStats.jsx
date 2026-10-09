@@ -11,6 +11,27 @@ const label = (type) => (type === 'mental' ? 'Mental' : ELEMENT_BY_ID[type].name
 // Level 80 stats as shown on the in-game character screen (no Arc or Console).
 export default function MaxStats({ stats }) {
   const [showAll, setShowAll] = useState(false);
+  if (stats.estimated) {
+    return (
+      <>
+        <h3 className="mini-title">Max stats <span>Lv {MAX_STATS_LEVEL} · estimated</span></h3>
+        <table>
+          <tbody>
+            {[['hp', 'HP', stats.hp], ['atk', 'ATK', stats.atk], ['def', 'DEF', stats.def]].map(([key, name, v]) => (
+              <tr key={key}>
+                <th scope="row"><span className="stat-label"><StatIcon stat={key} />{name}</span></th>
+                <td>≈ {num(v)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="muted small stats__estimate">
+          Estimated from Level 1 stats, may be adjusted later. Advanced attributes (CRIT, Cycle, Break, DMG
+          bonuses) will be added with in-game values.
+        </p>
+      </>
+    );
+  }
   const rows = [
     ['hp', 'HP', num(stats.hp)],
     ['atk', 'ATK', num(stats.atk)],

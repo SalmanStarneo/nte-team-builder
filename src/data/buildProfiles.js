@@ -105,7 +105,7 @@ export function recommendStats(characterOrId, cartridgeId = null) {
   // 3. Level 80 stats
   const ms = MAX_STATS[c.id];
   const usesCrit = (w.get('CRIT DMG') ?? 0) >= 6;
-  if (ms && usesCrit && profile.focus !== 'break') {
+  if (ms?.critRate != null && usesCrit && profile.focus !== 'break') {
     if (ms.critRate >= 70) {
       add('CRIT Rate', -4);
       add('CRIT DMG', 1);
@@ -115,7 +115,7 @@ export function recommendStats(characterOrId, cartridgeId = null) {
       reasons.push(`Base CRIT Rate is only ${ms.critRate}% at Lv ${MAX_STATS_LEVEL}, so CRIT Rate is worth more.`);
     }
   }
-  if (ms && ms.breakInt >= 100 && profile.focus !== 'break') {
+  if (ms?.breakInt != null && ms.breakInt >= 100 && profile.focus !== 'break') {
     add('Break Intensity', 3);
     tied.push(['Break Intensity', `High base Break Intensity (${ms.breakInt} at Lv ${MAX_STATS_LEVEL}) makes more of it useful.`]);
   }
