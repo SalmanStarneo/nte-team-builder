@@ -21,6 +21,7 @@ import ExportDialog from './ExportDialog.jsx';
 import { characterBuild, renderBuildCard } from '../lib/buildCard.js';
 import { CHARACTER_CONSOLE } from '../data/console.js';
 import { bestBuild } from '../data/bestBuild.js';
+import MyBuildEditor, { myBuildCurrent } from './MyBuildEditor.jsx';
 
 const fmt = (n) => n.toLocaleString('en-US');
 
@@ -229,6 +230,9 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
 
       <AscensionPlanner key={c.id} character={c} />
 
+      {CHARACTER_CONSOLE[c.id] && (
+        <MyBuildEditor character={c} activeTeam={activeTeam} onShare={(b) => setSharing({ mine: b })} />
+      )}
 
 
       <div className="detail__actions">
@@ -236,18 +240,22 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
           {inActiveTeam ? 'Already in current team' : teamFull ? 'Current team is full' : 'Add to current team'}
         </button>
         {CHARACTER_CONSOLE[c.id] && (
-          <button className="btn" onClick={() => setSharing(true)}>
-            Share build image
+          <button className="btn" onClick={() => setSharing({ recommended: true })}>
+            Share recommended build
           </button>
         )}
       </div>
       {sharing && (
         <ExportDialog
-          title="Build image"
+          title={sharing.mine ? 'My build image' : 'Recommended build image'}
           name={c.name}
-          suffix="nte-build"
+          suffix={sharing.mine ? 'my-nte-build' : 'nte-build'}
           onClose={() => setSharing(false)}
           render={(opts) => {
+            if (sharing.mine) {
+              const mine = myBuildCurrent(sharing.mine);
+              return renderBuildCard(characterBuild(c, { current: mine, source: 'My build', recStats: mine.cartStats }), opts);
+            }
             const best = bestBuild(c);
             return renderBuildCard(
               characterBuild(c, { current: best, source: 'Recommended build', recStats: best?.cartStats }),

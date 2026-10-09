@@ -77,7 +77,8 @@ export function characterBuild(character, { team = null, current = null, source 
     source: source ?? (current ? 'Console build' : inTeam ? `Team · ${team.name}` : 'Recommended build'),
     arc: arc ?? (recArcId ? ARC_BY_ID[recArcId] : null),
     arcState: arc ? 'Equipped' : 'Recommended',
-    arcDupes: lo?.arcDupes ?? null,
+    arcDupes: current?.arcDupes ?? lo?.arcDupes ?? null,
+    awakeningOrder: current?.awakeningOrder ?? null,
     cartridge: cartridge ?? rec?.cartridge ?? null,
     cartStats,
     pieces,
@@ -767,23 +768,26 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     && JSON.stringify(build.pieces.map(({ shape, r, c: col }) => [shape, r, col]))
       === JSON.stringify(build.recommended.pieces.map(({ shape, r, c: col }) => [shape, r, col]));
   const hasCurrent = build.pieces.length > 0 && !sameAsRec;
-  if (hasCurrent) {
+  // A player's own build shows only their modules; other cards compare with the recommendation.
+  const ownBuild = build.source === 'My build';
+  if (hasCurrent || (ownBuild && build.pieces.length)) {
     y += moduleRow(ctx, innerX, y, innerW, 'Current', build.cartridge, build.pieces, cartImg) + 14;
   }
-  if (build.recommended) {
+  if (build.recommended && !ownBuild) {
     y += moduleRow(ctx, innerX, y, innerW, 'Recommended', build.recommended.cartridge, build.recommended.pieces, recCartImg) + 14;
   }
 
   // Attribute priorities + grid template.
-  const gridPieces = hasCurrent ? build.pieces : build.recommended?.pieces ?? [];
+  const gridPieces = hasCurrent || ownBuild ? build.pieces : build.recommended?.pieces ?? [];
   // Leave room under the grid for the Awakening order orbs.
-  const avail = bottom - 18 - y - (AWAKENING_ORDER[c.id] ? 96 : 0);
+  const ao = build.awakeningOrder?.length ? { order: build.awakeningOrder } : AWAKENING_ORDER[c.id];
+  const avail = bottom - 18 - y - (ao ? 96 : 0);
   const cell = Math.max(22, Math.min(46, Math.floor((avail - 30 - 20) / 5)));
   const gridSize = cell * 5 + 20;
   const gx = RCX + RCW - 18 - gridSize;
   ctx.fillStyle = K.muted;
   ctx.font = `600 16px ${BODY}`;
-  ctx.fillText('Recommended attributes & template', innerX, y + 16);
+  ctx.fillText(ownBuild ? 'Attributes & template' : 'Recommended attributes & template', innerX, y + 16);
   if (info) consoleGrid(ctx, gx, y + 30, cell, info.layout, gridPieces);
   const recList = [build.recStats.main.stat, ...build.recStats.subs.map((s) => s.stat)];
   const lw = gx - innerX - 16;
@@ -812,7 +816,6 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
 
   // Awakening unlock order in the space under the attributes and grid:
   // element-coloured orbs, A6 → A4 → A1 …, one per duplicate.
-  const ao = AWAKENING_ORDER[c.id];
   const orbTop = Math.max(y + 30 + recList.length * lh + 8, y + 30 + gridSize) + 18;
   if (ao && bottom - 14 - orbTop >= 78) {
     ctx.fillStyle = K.muted;

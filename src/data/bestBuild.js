@@ -104,3 +104,19 @@ export function bestBuild(character) {
   }
   return { ...build, notes, critRate: critTotal(build) };
 }
+
+/** Pieces with the best S-rank module rolls for the character's recommended sub stats. */
+export function withBestModuleStats(character, pieces, cartridgeId) {
+  const st = recommendStats(character, cartridgeId);
+  return (pieces ?? []).map((p) => {
+    const type = SHAPES[p.shape].type;
+    return {
+      ...p,
+      stats: {
+        level: 20,
+        ...MODULE_MAIN_MAX[type],
+        subs: st.subs.map((stat) => ({ stat, value: MODULE_SUB_S[type][stat] ?? 0 })),
+      },
+    };
+  });
+}

@@ -3586,3 +3586,74 @@ th[aria-sort='descending'] .th-btn {
   vertical-align: 2px;
 }
 
+
+/* "Your build" editor on character profiles */
+.mybuild {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.mybuild__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.mybuild__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+.mybuild__field {
+  display: grid;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  min-width: 0;
+}
+.mybuild__field select {
+  width: 100%;
+  min-width: 0;
+}
+.mybuild__console {
+  margin-top: 10px;
+}
+.mybuild__sub {
+  margin-top: 16px;
+}
+.awaken-chain--edit {
+  gap: 10px 0;
+}
+.awaken-edit {
+  display: inline-grid;
+  justify-items: center;
+  gap: 3px;
+}
+.awaken-edit__moves {
+  display: inline-flex;
+  gap: 2px;
+}
+.awaken-edit__moves button {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--fg);
+  font: 700 0.9rem/1 var(--font-body, sans-serif);
+  cursor: pointer;
+}
+.awaken-edit__moves button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.mybuild__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
