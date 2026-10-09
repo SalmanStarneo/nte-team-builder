@@ -32,7 +32,7 @@ const COLUMNS = [
     ['hp', 'HP'], ['atk', 'ATK'], ['critRate', 'CRIT Rate'], ['critDmg', 'CRIT DMG'],
     ['universal', 'Univ. DMG'], ['element', 'Elem. DMG'],
   ].map(([key, label]) => ({
-    id: key, label, endgame: key, numeric: true, get: (c) => endgameNumber(ENDGAME[c.id]?.endgame[key]),
+    id: `eg-${key}`, label, endgame: key, numeric: true, get: (c) => endgameNumber(ENDGAME[c.id]?.endgame[key]),
   })),
   { id: 'other', label: 'Also', get: (c) => otherStats(c) || null },
 ];
@@ -158,8 +158,8 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
               {ARC_TYPES.map((a) => <option key={a} value={a}>{a}</option>)}
             </select>
           </label>
-          {view === 'grid' && (
-            <label className="select">
+          {(
+            <label className={`select${view === 'list' ? ' select--phone-only' : ''}`}>
               <span>Sort</span>
               <select
                 id="index-sort"
@@ -173,9 +173,12 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                 <option value="name:-1">Name Z–A</option>
                 <option value="element:1">Element</option>
                 <option value="rarity:-1">Rank</option>
-                <option value="hp:-1">HP</option>
-                <option value="atk:-1">ATK</option>
-                <option value="def:-1">DEF</option>
+                <option value="eg-hp:-1">HP</option>
+                <option value="eg-atk:-1">ATK</option>
+                <option value="eg-critRate:-1">CRIT Rate</option>
+                <option value="eg-critDmg:-1">CRIT DMG</option>
+                <option value="eg-universal:-1">Universal DMG</option>
+                <option value="eg-element:-1">Element DMG</option>
               </select>
             </label>
           )}
@@ -258,19 +261,21 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                     {c.upcoming && <span className="card__tag">Upcoming</span>}
                   </a>
                 </td>
-                <td>
+                <td className="cell-meta-el">
                   <span className="cell-el">
                     <ElementGlyph element={c.element} size={13} />
                     {ELEMENT_BY_ID[c.element].name}
                   </span>
                 </td>
-                <td><RankBadge rank={c.rarity} size={22} /></td>
-                <td><RoleList roles={c.roles} size={14} /></td>
-                <td>{c.arcType ? <span className="cell-el"><ArcTypeIcon type={c.arcType} size={16} />{c.arcType}</span> : '—'}</td>
+                <td className="cell-meta-rank"><RankBadge rank={c.rarity} size={22} /></td>
+                <td className="cell-meta-roles"><RoleList roles={c.roles} size={14} /></td>
+                <td className="cell-meta-arc">{c.arcType ? <span className="cell-el"><ArcTypeIcon type={c.arcType} size={16} />{c.arcType}</span> : '—'}</td>
                 {COLUMNS.filter((col) => col.endgame).map((col) => (
-                  <td key={col.id} className="num">{ENDGAME[c.id]?.endgame[col.endgame] ?? '—'}</td>
+                  <td key={col.id} className="num cell-stat" data-label={col.label}>
+                    {ENDGAME[c.id]?.endgame[col.endgame] ?? '—'}
+                  </td>
                 ))}
-                <td className="small cell-other">{otherStats(c) || '—'}</td>
+                <td className={`small cell-other${otherStats(c) ? '' : ' is-empty'}`}>{otherStats(c) || '—'}</td>
               </tr>
             ))}
           </tbody>
