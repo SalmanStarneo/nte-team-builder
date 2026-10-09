@@ -7,7 +7,7 @@ import { CARTRIDGE_BY_ID, bonusStats, cartridgesFor, isPercentStat } from '../da
 import { loadoutOf } from './teamsReducer.js';
 import { analyzeTeam } from './analyze.js';
 import { activeResonance } from '../data/awakenings.js';
-import { encodeCardCode } from './cardCode.js';
+import { encodeCardCode, splitCardCode } from './cardCode.js';
 import { consoleStats } from '../data/console.js';
 
 export const CARD_W = 1200;
@@ -654,10 +654,13 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   if (!sideBySide) {
     codeSize = Math.max(15, Math.min(20, Math.floor((20 * maxW) / fits(code, 20))));
     if (fits(code, codeSize) > maxW) {
-      // Two lines, split between groups.
+      // Two lines: the team part, then the team name's part.
+      const [teamPart, namePart] = splitCardCode(code);
       const groups = code.split('-');
       const half = Math.ceil(groups.length / 2);
-      codeLines = [groups.slice(0, half).join('-') + '-', groups.slice(half).join('-')];
+      codeLines = namePart
+        ? [`${teamPart}-`, namePart]
+        : [groups.slice(0, half).join('-') + '-', groups.slice(half).join('-')];
       codeSize = Math.max(13, Math.min(18, Math.floor((codeSize * maxW) / fits(codeLines[0], codeSize))));
     }
   }

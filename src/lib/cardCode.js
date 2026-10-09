@@ -367,18 +367,110 @@ function decodeV5(clean) {
 export const cleanCode = (input) =>
   (input ?? '').toUpperCase().replace(/[\s-]/g, '').replace(/[IL]/g, '1').replace(/O/g, '0');
 
-/** team + loadoutOf(team, id) → 'XXXXX-XXXXX-XXXXX-XXXXX' */
-export function encodeCardCode(team, loadoutOf) {
-  return encodeV5(team, loadoutOf);
+// ---- Team name, packed after the 4 team segments ----
+// One code character per letter or space (5 bits each). Capitals at the start
+// of words come back automatically (Title Case), so "Mono Blossom" costs
+// exactly its 12 letters and space, plus 1 header character.
+//   header: case mode (2 bits: 0 Title, 1 UPPER, 2 lower) + check (3 bits)
+//   symbols: 1–26 a–z · 27 space · 28 flip the case of the next letter ·
+//            30 next symbol is a digit or punctuation from NAME_EXTRA
+const NAME_EXTRA = '0123456789-\'&.!?+/:#(),_"*@%~=<>';
+const NAME_MAX = 40;
+const NAME_SALT = 5;
+const nameCheck = (syms) => (syms.reduce((a, v, i) => a + v * (i + 1), 0) + NAME_SALT) % 8;
+
+function nameSymbols(name, mode) {
+  const out = [];
+  let wordStart = true;
+  for (const ch of name) {
+    const lower = ch.toLowerCase();
+    const code = lower.charCodeAt(0) - 96;
+    if (code >= 1 && code <= 26 && lower !== ch.toUpperCase()) {
+      const expectUpper = mode === 1 || (mode === 0 && wordStart);
+      if ((ch !== lower) !== expectUpper) out.push(28);
+      out.push(code);
+      wordStart = false;
+    } else if (ch === ' ') {
+      out.push(27);
+      wordStart = true;
+    } else if (NAME_EXTRA.includes(ch)) {
+      out.push(30, NAME_EXTRA.indexOf(ch));
+      wordStart = false;
+    }
+  }
+  return out;
 }
 
-/** Returns { members, loadouts } or null. Accepts the current and all older formats. */
+function encodeName(name) {
+  const clean = (name ?? '').replace(/[‘’ʼ`]/g, "'").replace(/[“”]/g, '"').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().slice(0, NAME_MAX);
+  if (!clean) return '';
+  // Pick the case mode that needs the fewest flips.
+  const [mode, syms] = [0, 1, 2].map((m) => [m, nameSymbols(clean, m)]).sort((a, b) => a[1].length - b[1].length)[0];
+  if (!syms.length) return '';
+  return [((mode << 3) | nameCheck(syms)), ...syms].map((v) => ALPHABET[v]).join('');
+}
+
+/** Name part of a code → string, '' when there is none, null when it doesn't check out. */
+function decodeName(chars) {
+  if (!chars) return '';
+  const vals = [...chars].map((ch) => ALPHABET.indexOf(ch));
+  const [head, ...syms] = vals;
+  const mode = head >> 3;
+  if (mode > 2 || (head & 7) !== nameCheck(syms)) return null;
+  let out = '';
+  let wordStart = true;
+  let flip = false;
+  for (let i = 0; i < syms.length; i += 1) {
+    const v = syms[i];
+    if (v >= 1 && v <= 26) {
+      const upper = (mode === 1 || (mode === 0 && wordStart)) !== flip;
+      const ch = String.fromCharCode(96 + v);
+      out += upper ? ch.toUpperCase() : ch;
+      flip = false;
+      wordStart = false;
+    } else if (v === 27) {
+      out += ' ';
+      wordStart = true;
+    } else if (v === 28) {
+      flip = true;
+    } else if (v === 30 && i + 1 < syms.length && syms[i + 1] < NAME_EXTRA.length) {
+      out += NAME_EXTRA[syms[i + 1]];
+      i += 1;
+      wordStart = false;
+    } else {
+      return null;
+    }
+  }
+  return out;
+}
+
+/** team + loadoutOf(team, id) → 'XXXXX-XXXXX-XXXXX-XXXXX' plus the team name's segments. */
+export function encodeCardCode(team, loadoutOf) {
+  const teamPart = encodeV5(team, loadoutOf);
+  const namePart = encodeName(team.name);
+  return namePart ? `${teamPart}-${segment(namePart)}` : teamPart;
+}
+
+/** Splits a code into its team part and name part (for showing them on separate lines). */
+export function splitCardCode(code) {
+  const groups = code.split('-');
+  return [groups.slice(0, V5_CHARS / SEG).join('-'), groups.slice(V5_CHARS / SEG).join('-')];
+}
+
+/**
+ * Returns { members, loadouts, name? } or null. Accepts the current and all older
+ * formats. `name` is set when the code carries one; a mistyped name part still
+ * imports the team (without the name).
+ */
 export function decodeCardCode(input) {
   if (!input) return null;
   const clean = cleanCode(input);
   if ([...clean].some((ch) => !ALPHABET.includes(ch))) return null;
-  const v5 = decodeV5(clean);
-  if (v5) return v5;
+  const v5 = decodeV5(clean.slice(0, V5_CHARS));
+  if (v5) {
+    const name = decodeName(clean.slice(V5_CHARS));
+    return name ? { ...v5, name } : { ...v5, nameInvalid: name === null };
+  }
   // Older 4-character-group codes.
   if (clean.length < HEAD_CHARS) return null;
   const head = clean.slice(0, HEAD_CHARS);

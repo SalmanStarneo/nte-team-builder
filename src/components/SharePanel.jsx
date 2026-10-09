@@ -25,12 +25,12 @@ export default function SharePanel({ team, dispatch }) {
   function importCode(e) {
     e.preventDefault();
     const card = decodeCardCode(input);
-    const team = card ? { name: 'Imported team', ...card } : decodeTeam(input);
+    const team = card ? { ...card, name: card.name || 'Imported team' } : decodeTeam(input);
     if (!team) {
-      setError('That code isn’t valid. Use a card code (4 groups of 5) or a link code starting with nte1~. Console codes go in the Console tab.');
+      setError('That code isn’t valid. Use a card code (groups of 5) or a link code starting with nte1~. Console codes go in the Console tab.');
       return;
     }
-    setError('');
+    setError(card?.nameInvalid ? 'Imported the team, but the name part of the code had a typo, so it was named “Imported team”.' : '');
     setInput('');
     dispatch({ type: 'import', ...team });
   }
@@ -57,7 +57,7 @@ export default function SharePanel({ team, dispatch }) {
       </label>
 
       <div className="field">
-        <label htmlFor="card-code">Card code <span className="muted">· team, duplicates, Arcs and Cartridge sets</span></label>
+        <label htmlFor="card-code">Card code <span className="muted">· team name, duplicates, Arcs and Cartridge sets</span></label>
         <div className="code-row">
           <textarea
             id="card-code"
