@@ -378,6 +378,54 @@ function consoleGrid(ctx, x, y, cell, layout, pieces) {
   return CONSOLE_SIZE * cell + (CONSOLE_SIZE - 1) * gap;
 }
 
+// Relative brightness (0–1) of a #rrggbb colour.
+function luminance(hex) {
+  const v = parseInt(hex.slice(1), 16);
+  const [r, g, b] = [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+// A glossy sphere in `color`: bright highlight top-left, darker rim. `solid`
+// for the first pick; the rest are dimmer with a coloured ring.
+function drawOrb(ctx, cx, cy, r, color, solid) {
+  ctx.save();
+  ctx.shadowColor = solid ? `${color}88` : 'rgba(0, 0, 0, 0.4)';
+  ctx.shadowBlur = solid ? 14 : 6;
+  const g = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.4, r * 0.1, cx, cy, r);
+  if (solid) {
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(0.25, color);
+    g.addColorStop(1, shade(color, -0.45));
+  } else {
+    g.addColorStop(0, shade(color, -0.25));
+    g.addColorStop(0.6, shade(color, -0.62));
+    g.addColorStop(1, shade(color, -0.78));
+  }
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.lineWidth = solid ? 2 : 1.5;
+  ctx.strokeStyle = solid ? 'rgba(255, 255, 255, 0.75)' : color;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r - (solid ? 1 : 0.75), 0, Math.PI * 2);
+  ctx.stroke();
+  // Small gloss highlight.
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+  ctx.beginPath();
+  ctx.ellipse(cx - r * 0.3, cy - r * 0.45, r * 0.35, r * 0.18, -0.5, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Lighten (amt > 0) or darken (amt < 0) a #rrggbb colour.
+function shade(hex, amt) {
+  const v = parseInt(hex.slice(1), 16);
+  const f = (c) => Math.round(amt < 0 ? c * (1 + amt) : c + (255 - c) * amt);
+  const [r, g, b] = [f((v >> 16) & 255), f((v >> 8) & 255), f(v & 255)];
+  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
+}
+
 function drawBackdrop(ctx) {
   ctx.fillStyle = K.bg;
   ctx.fillRect(0, 0, BUILD_W, BUILD_H);
@@ -491,45 +539,6 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
       ctx.fillText(line, px, ly + 4);
       ly += 22;
     }
-  }
-
-  // ---- Awakening unlock order: A6 → A4 → A1 … (one per duplicate) ----
-  const ao = AWAKENING_ORDER[c.id];
-  if (ao) {
-    const footerTop = BUILD_H - 62;
-    const chipH = 34;
-    const top0 = Math.max(ly + 22, footerTop - 30 - chipH);
-    ctx.fillStyle = K.muted;
-    ctx.font = `600 13px ${MONO}`;
-    ctx.fillText('AWAKENING ORDER', px, top0 + 14);
-    const tw = ctx.measureText('AWAKENING ORDER ').width;
-    ctx.font = `500 13px ${BODY}`;
-    ctx.fillText('· one per duplicate', px + tw, top0 + 14);
-    const n = ao.order.length;
-    const arrowW = 14;
-    const chipW = Math.min(56, (LW - (n - 1) * arrowW) / n);
-    const y = top0 + 26;
-    ao.order.forEach((id, i) => {
-      const x = px + i * (chipW + arrowW);
-      ctx.fillStyle = i === 0 ? 'rgba(232, 72, 140, 0.28)' : K.inset;
-      roundRect(ctx, x, y, chipW, chipH, 8);
-      ctx.fill();
-      if (i === 0) {
-        ctx.strokeStyle = 'rgba(232, 72, 140, 0.8)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      }
-      ctx.textAlign = 'center';
-      ctx.font = `700 16px ${MONO}`;
-      ctx.fillStyle = K.fg;
-      ctx.fillText(id, x + chipW / 2, y + chipH / 2 + 6);
-      if (i < n - 1) {
-        ctx.font = `600 14px ${BODY}`;
-        ctx.fillStyle = K.muted;
-        ctx.fillText('→', x + chipW + arrowW / 2, y + chipH / 2 + 5);
-      }
-      ctx.textAlign = 'left';
-    });
   }
 
   // ---- Header strip ----
@@ -761,8 +770,9 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
 
   // Attribute priorities + grid template.
   const gridPieces = hasCurrent ? build.pieces : build.recommended?.pieces ?? [];
-  const avail = bottom - 18 - y;
-  const cell = Math.max(24, Math.min(46, Math.floor((avail - 30 - 20) / 5)));
+  // Leave room under the grid for the Awakening order orbs.
+  const avail = bottom - 18 - y - (AWAKENING_ORDER[c.id] ? 96 : 0);
+  const cell = Math.max(22, Math.min(46, Math.floor((avail - 30 - 20) / 5)));
   const gridSize = cell * 5 + 20;
   const gx = RCX + RCW - 18 - gridSize;
   ctx.fillStyle = K.muted;
@@ -793,6 +803,39 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     ctx.fillStyle = K.fg;
     ctx.fillText(wrap(ctx, statLabel(stat), lw - 70, 1)[0], innerX + 62, ry + (lh - 6) / 2 + 5);
   });
+
+  // Awakening unlock order in the space under the attributes and grid:
+  // element-coloured orbs, A6 → A4 → A1 …, one per duplicate.
+  const ao = AWAKENING_ORDER[c.id];
+  const orbTop = Math.max(y + 30 + recList.length * lh + 8, y + 30 + gridSize) + 18;
+  if (ao && bottom - 14 - orbTop >= 78) {
+    ctx.fillStyle = K.muted;
+    ctx.font = `600 16px ${BODY}`;
+    ctx.fillText('Awakening order', innerX, orbTop + 14);
+    const tw = ctx.measureText('Awakening order  ').width;
+    ctx.font = `500 13px ${BODY}`;
+    ctx.fillText('one per duplicate', innerX + tw, orbTop + 14);
+    const n = ao.order.length;
+    const space = bottom - 14 - (orbTop + 28);
+    const d = Math.min(50, space - 4);
+    const gap = Math.min(40, (innerW - n * d) / Math.max(1, n - 1));
+    const cy = orbTop + 28 + d / 2;
+    const darkText = luminance(elColor) > 0.55;
+    ao.order.forEach((id, i) => {
+      const cx = innerX + d / 2 + i * (d + gap);
+      drawOrb(ctx, cx, cy, d / 2, elColor, i === 0);
+      ctx.textAlign = 'center';
+      ctx.font = `800 ${Math.round(d * 0.34)}px ${MONO}`;
+      ctx.fillStyle = i === 0 ? (darkText ? '#1a1410' : '#ffffff') : K.fg;
+      ctx.fillText(id, cx, cy + d * 0.12);
+      if (i < n - 1) {
+        ctx.font = `600 ${Math.round(d * 0.36)}px ${BODY}`;
+        ctx.fillStyle = K.muted;
+        ctx.fillText('→', cx + d / 2 + gap / 2, cy + d * 0.12);
+      }
+      ctx.textAlign = 'left';
+    });
+  }
 
   // ---- Footer: console code + legal line ----
   const code = info && (build.pieces.length || build.cartridge)

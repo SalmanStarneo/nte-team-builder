@@ -3542,14 +3542,27 @@ th[aria-sort='descending'] .th-btn {
   color: var(--muted);
 }
 .awaken-chain__id {
-  padding: 4px 10px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
-  font: 700 0.9rem var(--font-mono);
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--el);
+  background: radial-gradient(circle at 32% 28%,
+    color-mix(in srgb, var(--el) 45%, var(--surface)) 0%,
+    color-mix(in srgb, var(--el) 22%, var(--surface)) 55%,
+    color-mix(in srgb, var(--el) 30%, var(--surface-2)) 100%);
+  font: 800 0.8rem var(--font-mono);
+  color: var(--fg);
+  box-shadow: inset 0 -3px 6px rgb(0 0 0 / 0.12);
 }
 .awaken-chain__id.is-first {
-  background: color-mix(in srgb, var(--accent) 30%, var(--surface));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent);
+  border-color: rgb(255 255 255 / 0.8);
+  background: radial-gradient(circle at 32% 28%, #fff 0%, var(--el) 30%,
+    color-mix(in srgb, var(--el) 60%, #000) 100%);
+  color: #fff;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--el) 60%, transparent), inset 0 -3px 6px rgb(0 0 0 / 0.2);
 }
 .awaken-rank {
   margin-left: 8px;
@@ -3560,4 +3573,16 @@ th[aria-sort='descending'] .th-btn {
   color: var(--muted);
   text-transform: uppercase;
   vertical-align: 2px;
+}
+
+/* Light element colours in dark mode (Cosmos, Lakshana): dark text on the first orb. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .awaken-order:is([data-el='cosmos'], [data-el='lakshana']) .awaken-chain__id.is-first {
+    color: #15171f;
+    text-shadow: 0 1px 1px rgb(255 255 255 / 0.5);
+  }
+}
+:root[data-theme='dark'] .awaken-order:is([data-el='cosmos'], [data-el='lakshana']) .awaken-chain__id.is-first {
+  color: #15171f;
+  text-shadow: 0 1px 1px rgb(255 255 255 / 0.5);
 }

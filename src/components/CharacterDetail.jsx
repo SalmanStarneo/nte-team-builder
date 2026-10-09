@@ -170,7 +170,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
         {AWAKENINGS[c.id] ? (
           <>
             {AWAKENING_ORDER[c.id] && (
-              <div className="awaken-order">
+              <div className="awaken-order" data-el={c.element}>
                 <p className="awaken-order__title">Suggested unlock order <span>one per duplicate</span></p>
                 <ol className="awaken-chain" aria-label="Unlock order">
                   {AWAKENING_ORDER[c.id].order.map((id, i) => (
