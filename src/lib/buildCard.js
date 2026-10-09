@@ -11,8 +11,7 @@ import {
 import { suggestedBuild, suggestedCartStats } from '../data/consoleBuilds.js';
 import { MAX_STATS, MAX_STATS_LEVEL } from '../data/maxStats.js';
 import { ENDGAME } from '../data/endgame.js';
-import { AWAKENING_ORDER, ORDINAL } from '../data/awakeningOrder.js';
-import { AWAKENINGS } from '../data/awakenings.js';
+import { AWAKENING_ORDER } from '../data/awakeningOrder.js';
 import { encodeConsoleCode } from './consoleCode.js';
 import { loadoutOf } from './teamsReducer.js';
 import {
@@ -494,34 +493,42 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     }
   }
 
-  // ---- Awakening unlock order (which to take with each duplicate) ----
+  // ---- Awakening unlock order: A6 → A4 → A1 … (one per duplicate) ----
   const ao = AWAKENING_ORDER[c.id];
   if (ao) {
     const footerTop = BUILD_H - 62;
-    const top0 = Math.max(ly + 22, footerTop - 34 - ao.order.length * 27);
-    const rowH = Math.min(27, Math.floor((footerTop - top0 - 34) / ao.order.length));
+    const chipH = 34;
+    const top0 = Math.max(ly + 22, footerTop - 30 - chipH);
     ctx.fillStyle = K.muted;
     ctx.font = `600 13px ${MONO}`;
     ctx.fillText('AWAKENING ORDER', px, top0 + 14);
     const tw = ctx.measureText('AWAKENING ORDER ').width;
     ctx.font = `500 13px ${BODY}`;
-    ctx.fillText('· by duplicate', px + tw, top0 + 14);
-    const names = Object.fromEntries((AWAKENINGS[c.id] ?? []).map((w) => [w.id, w.name]));
+    ctx.fillText('· one per duplicate', px + tw, top0 + 14);
+    const n = ao.order.length;
+    const arrowW = 14;
+    const chipW = Math.min(56, (LW - (n - 1) * arrowW) / n);
+    const y = top0 + 26;
     ao.order.forEach((id, i) => {
-      const y = top0 + 28 + i * rowH;
-      ctx.fillStyle = i === 0 ? 'rgba(232, 72, 140, 0.22)' : K.inset;
-      roundRect(ctx, px, y, LW, rowH - 4, 6);
+      const x = px + i * (chipW + arrowW);
+      ctx.fillStyle = i === 0 ? 'rgba(232, 72, 140, 0.28)' : K.inset;
+      roundRect(ctx, x, y, chipW, chipH, 8);
       ctx.fill();
-      const base = y + (rowH - 4) / 2 + 5;
-      ctx.font = `600 12px ${MONO}`;
-      ctx.fillStyle = i === 0 ? K.pink : K.muted;
-      ctx.fillText(ORDINAL[i].toUpperCase(), px + 10, base);
-      ctx.font = `700 15px ${MONO}`;
+      if (i === 0) {
+        ctx.strokeStyle = 'rgba(232, 72, 140, 0.8)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+      ctx.textAlign = 'center';
+      ctx.font = `700 16px ${MONO}`;
       ctx.fillStyle = K.fg;
-      ctx.fillText(id, px + 56, base);
-      ctx.font = `500 14px ${BODY}`;
-      ctx.fillStyle = K.fg;
-      if (names[id]) ctx.fillText(wrap(ctx, names[id], LW - 106, 1)[0], px + 92, base);
+      ctx.fillText(id, x + chipW / 2, y + chipH / 2 + 6);
+      if (i < n - 1) {
+        ctx.font = `600 14px ${BODY}`;
+        ctx.fillStyle = K.muted;
+        ctx.fillText('→', x + chipW + arrowW / 2, y + chipH / 2 + 5);
+      }
+      ctx.textAlign = 'left';
     });
   }
 

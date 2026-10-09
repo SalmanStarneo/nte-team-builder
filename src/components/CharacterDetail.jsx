@@ -171,20 +171,15 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
           <>
             {AWAKENING_ORDER[c.id] && (
               <div className="awaken-order">
-                <p className="awaken-order__title">Suggested unlock order <span>by duplicate</span></p>
-                <ol className="awaken-order__steps">
+                <p className="awaken-order__title">Suggested unlock order <span>one per duplicate</span></p>
+                <ol className="awaken-chain" aria-label="Unlock order">
                   {AWAKENING_ORDER[c.id].order.map((id, i) => (
-                    <li key={id} title={AWAKENING_ORDER[c.id].why[id] ?? ''}>
-                      <span className="awaken-order__n">{ORDINAL[i]}</span>
-                      <b>{id}</b>
+                    <li key={id} title={`${ORDINAL[i]} duplicate`}>
+                      {i > 0 && <span className="awaken-chain__arrow" aria-hidden="true">→</span>}
+                      <span className={`awaken-chain__id${i === 0 ? ' is-first' : ''}`}>{id}</span>
                     </li>
                   ))}
                 </ol>
-                <ul className="awaken-order__why">
-                  {Object.entries(AWAKENING_ORDER[c.id].why).map(([id, text]) => (
-                    <li key={id}><b>{id}</b> {text}</li>
-                  ))}
-                </ul>
                 {AWAKENING_ORDER[c.id].alt && <p className="muted small">{AWAKENING_ORDER[c.id].alt}</p>}
               </div>
             )}

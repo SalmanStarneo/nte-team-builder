@@ -3524,39 +3524,32 @@ th[aria-sort='descending'] .th-btn {
 .awaken-order__title span {
   color: var(--muted);
 }
-.awaken-order__steps {
+.awaken-chain {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  gap: 6px 0;
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.awaken-order__steps li {
+.awaken-chain li {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 9px;
-  border-radius: 999px;
+}
+.awaken-chain__arrow {
+  margin: 0 7px;
+  color: var(--muted);
+}
+.awaken-chain__id {
+  padding: 4px 10px;
+  border-radius: 8px;
   background: color-mix(in srgb, var(--accent) 12%, var(--surface));
-  font-size: 0.85rem;
+  font: 700 0.9rem var(--font-mono);
 }
-.awaken-order__steps li:first-child {
-  background: color-mix(in srgb, var(--accent) 28%, var(--surface));
-}
-.awaken-order__n {
-  font: 600 0.68rem var(--font-mono);
-  color: var(--muted);
-}
-.awaken-order__why {
-  margin: 8px 0 0;
-  padding-left: 1.1em;
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-.awaken-order__why b {
-  color: var(--fg);
-  margin-right: 4px;
+.awaken-chain__id.is-first {
+  background: color-mix(in srgb, var(--accent) 30%, var(--surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 .awaken-rank {
   margin-left: 8px;
