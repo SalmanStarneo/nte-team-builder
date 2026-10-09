@@ -378,44 +378,50 @@ function consoleGrid(ctx, x, y, cell, layout, pieces) {
   return CONSOLE_SIZE * cell + (CONSOLE_SIZE - 1) * gap;
 }
 
-// Relative brightness (0–1) of a #rrggbb colour.
-function luminance(hex) {
-  const v = parseInt(hex.slice(1), 16);
-  const [r, g, b] = [(v >> 16) & 255, (v >> 8) & 255, v & 255];
-  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-}
-
-// A glossy sphere in `color`: bright highlight top-left, darker rim. `solid`
-// for the first pick; the rest are dimmer with a coloured ring.
-function drawOrb(ctx, cx, cy, r, color, solid) {
+// A flat Awakening badge, like the game's Awakening screen: dark disc, thick
+// glowing ring in the element colour. `first` adds a stronger glow and a check badge.
+function drawOrb(ctx, cx, cy, r, color, first) {
+  const ring = Math.max(3, r * 0.17);
   ctx.save();
-  ctx.shadowColor = solid ? `${color}88` : 'rgba(0, 0, 0, 0.4)';
-  ctx.shadowBlur = solid ? 14 : 6;
-  const g = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.4, r * 0.1, cx, cy, r);
-  if (solid) {
-    g.addColorStop(0, '#ffffff');
-    g.addColorStop(0.25, color);
-    g.addColorStop(1, shade(color, -0.45));
-  } else {
-    g.addColorStop(0, shade(color, -0.25));
-    g.addColorStop(0.6, shade(color, -0.62));
-    g.addColorStop(1, shade(color, -0.78));
-  }
-  ctx.fillStyle = g;
+  // Outer glow
+  ctx.shadowColor = color;
+  ctx.shadowBlur = first ? r * 0.9 : r * 0.45;
+  ctx.fillStyle = '#16131b';
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
-  ctx.lineWidth = solid ? 2 : 1.5;
-  ctx.strokeStyle = solid ? 'rgba(255, 255, 255, 0.75)' : color;
+  // Ring
+  ctx.lineWidth = ring;
+  ctx.strokeStyle = first ? shade(color, 0.15) : color;
   ctx.beginPath();
-  ctx.arc(cx, cy, r - (solid ? 1 : 0.75), 0, Math.PI * 2);
+  ctx.arc(cx, cy, r - ring / 2, 0, Math.PI * 2);
   ctx.stroke();
-  // Small gloss highlight.
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+  // Faint inner glow just inside the ring
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = `${color}55`;
   ctx.beginPath();
-  ctx.ellipse(cx - r * 0.3, cy - r * 0.45, r * 0.35, r * 0.18, -0.5, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.arc(cx, cy, r - ring - 1.5, 0, Math.PI * 2);
+  ctx.stroke();
+  if (first) {
+    // Check badge, top-left
+    const br = r * 0.3;
+    const bx = cx - r * 0.72;
+    const by = cy - r * 0.72;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(bx, by, br, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = shade(color, -0.35);
+    ctx.lineWidth = Math.max(2, br * 0.32);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(bx - br * 0.45, by + br * 0.02);
+    ctx.lineTo(bx - br * 0.1, by + br * 0.38);
+    ctx.lineTo(bx + br * 0.5, by - br * 0.35);
+    ctx.stroke();
+  }
 }
 
 // Lighten (amt > 0) or darken (amt < 0) a #rrggbb colour.
@@ -820,13 +826,12 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     const d = Math.min(50, space - 4);
     const gap = Math.min(40, (innerW - n * d) / Math.max(1, n - 1));
     const cy = orbTop + 28 + d / 2;
-    const darkText = luminance(elColor) > 0.55;
     ao.order.forEach((id, i) => {
       const cx = innerX + d / 2 + i * (d + gap);
       drawOrb(ctx, cx, cy, d / 2, elColor, i === 0);
       ctx.textAlign = 'center';
       ctx.font = `800 ${Math.round(d * 0.34)}px ${MONO}`;
-      ctx.fillStyle = i === 0 ? (darkText ? '#1a1410' : '#ffffff') : K.fg;
+      ctx.fillStyle = '#ffffff';
       ctx.fillText(id, cx, cy + d * 0.12);
       if (i < n - 1) {
         ctx.font = `600 ${Math.round(d * 0.36)}px ${BODY}`;
