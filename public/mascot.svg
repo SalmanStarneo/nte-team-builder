@@ -33,6 +33,12 @@
   <path d="M49 38 Q55 40 55.5 45" stroke="#2B1D16" stroke-width="4.6" fill="none" stroke-linecap="round"/>
   <path d="M49 38 Q55 40 55.5 45" stroke="#9C7255" stroke-width="2.6" fill="none" stroke-linecap="round"/>
 
+  <!-- Stitched rings on the arms -->
+  <path d="M12.02 40.93 L10.45 38.98" stroke="#5A3E2E" stroke-width="0.55" stroke-dasharray="0.6 0.45" stroke-linecap="round"/>
+  <path d="M10.55 42.59 L8.40 41.31" stroke="#5A3E2E" stroke-width="0.55" stroke-dasharray="0.6 0.45" stroke-linecap="round"/>
+  <path d="M53.55 38.98 L51.98 40.93" stroke="#5A3E2E" stroke-width="0.55" stroke-dasharray="0.6 0.45" stroke-linecap="round"/>
+  <path d="M55.60 41.31 L53.45 42.59" stroke="#5A3E2E" stroke-width="0.55" stroke-dasharray="0.6 0.45" stroke-linecap="round"/>
+
   <!-- Mitts -->
   <circle cx="8.5" cy="47.5" r="3.4" fill="#EBDAC2" stroke="#2B1D16" stroke-width="1.2"/>
   <circle cx="55.5" cy="47.5" r="3.4" fill="#EBDAC2" stroke="#2B1D16" stroke-width="1.2"/>
