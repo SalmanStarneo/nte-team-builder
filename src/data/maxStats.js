@@ -2,6 +2,15 @@
 // Source: in-game character screens, provided by the project owner (Oct 2026).
 // Percentages are stored as numbers (83 = 83%). Element DMG bonuses and
 // resistances not listed are 0%.
+//
+// TO REVISIT (Oct 2026) — adjust when new screenshots or corrections come in:
+// - Daffodil, Nanally, Hathor, Chiz, Jiuyuan: rows below Break Intensity
+//   (Universal DMG, Healing, element DMG/RES) not captured yet; 0 assumed.
+// - The eight older entries (Lacrimosa … Blackbird) look like they were taken
+//   with an Arc equipped (ATK ~400–550 high, CRIT/Cycle above bare values).
+//   Build cards add the Arc on top, so those cards overcount. Retake bare.
+// - ATK_GROWTH (7.95x) comes from the five bare screens; recheck once more
+//   characters are measured bare.
 
 import { CHARACTERS } from './characters.js';
 
@@ -25,16 +34,24 @@ const MEASURED = {
   chaos: s(15756, 1132, 921, { critRate: 50.6, critDmg: 158, charge: 100, cycle: 18, breakInt: 72, universal: 15 }),
   sakiri: s(16483, 1034, 909, { critRate: 18, critDmg: 68, charge: 100, cycle: 18, breakInt: 30, universal: 21 }, { incantation: 91.5 }),
   blackbird: s(15514, 1238, 884, { critRate: 74, critDmg: 96, charge: 100, cycle: 18, breakInt: 18, universal: 14 }, { psyche: 37.5 }),
+  // Bare Level 80 (nothing equipped), Oct 2026. Rows below Break Intensity
+  // (Universal DMG, Healing, DMG bonuses) not captured yet; 0 assumed.
+  daffodill: s(16180, 644, 873, { critRate: 5, critDmg: 50, charge: 100, cycle: 0, breakInt: 0, universal: 0 }),
+  nanally: s(15998, 636, 909, { critRate: 5, critDmg: 50, charge: 100, cycle: 0, breakInt: 0, universal: 0 }),
+  hathor: s(15998, 644, 884, { critRate: 5, critDmg: 50, charge: 100, cycle: 0, breakInt: 0, universal: 0 }),
+  chiz: s(15514, 660, 909, { critRate: 5, critDmg: 50, charge: 100, cycle: 0, breakInt: 0, universal: 0 }),
+  jiuyuan: s(15635, 652, 909, { critRate: 5, critDmg: 50, charge: 100, cycle: 0, breakInt: 0, universal: 0 }),
 };
 
 // Estimated Level 80 HP, ATK and DEF for characters without in-game values yet,
-// from their Level 1 stats. In the measured data, Level 80 HP and DEF are
-// exactly 12.12x Level 1 (Zero, Lacrimosa, Sakiri); ATK grows 13.2x–14.9x, so
-// 13.2x is used. Advanced stats (CRIT, Cycle, Break, DMG bonuses) can't be
-// estimated and stay null. Marked `estimated` so the UI can flag them; replace
-// with in-game values when available.
+// from their Level 1 stats. Bare Level 80 screens (Daffodil, Nanally, Hathor,
+// Chiz, Jiuyuan) show HP and DEF at 12.12x Level 1 and ATK at 7.95x. (An
+// earlier 13.2x ATK figure came from screens with an Arc equipped.) Advanced
+// stats (CRIT, Cycle, Break, DMG bonuses) can't be estimated and stay null.
+// Marked `estimated` so the UI can flag them; replace with in-game values
+// when available.
 export const HP_DEF_GROWTH = 12.12;
-export const ATK_GROWTH = 13.2;
+export const ATK_GROWTH = 7.95;
 const ESTIMATED = Object.fromEntries(
   CHARACTERS.filter((c) => c.stats && !MEASURED[c.id]).map((c) => [c.id, {
     hp: Math.round(c.stats.hp * HP_DEF_GROWTH),
