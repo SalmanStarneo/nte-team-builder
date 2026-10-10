@@ -2462,6 +2462,19 @@ th[aria-sort='descending'] .th-btn {
   flex-wrap: wrap;
   row-gap: 2px;
 }
+/* Character profile: element, rank and version stay on one line; roles wrap as a unit. */
+.detail__title .eyebrow {
+  column-gap: 12px;
+}
+.eyebrow__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.eyebrow__ver {
+  text-transform: none;
+}
 
 /* Skills on the character page */
 .skill-list {
