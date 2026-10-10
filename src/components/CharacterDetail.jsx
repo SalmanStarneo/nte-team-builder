@@ -43,6 +43,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
         <div className="detail__title">
           <p className="eyebrow">
             <ElementGlyph element={c.element} size={16} /> {element.name} · {c.rarity}-rank ·{' '}
+            {c.version && <>Ver. {c.version} ·{' '}</>}
             <RoleList roles={c.roles} size={14} />
           </p>
           <h2 id="detail-name" className="detail__name">{c.name}</h2>

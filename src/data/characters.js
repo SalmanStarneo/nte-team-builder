@@ -7,6 +7,8 @@
 // guides use the character for (e.g. Hotori is a Buffer who also burst-damages).
 // "unit" is a squad inside the faction (e.g. ETD-6 in the Bureau of Anomaly Control).
 // "formerFaction" is shown with a "Former" tag.
+// "version": the game version the character was released in (launch is 1.0;
+// 1.1+ from the banner history; upcoming ones are leaked and may change; null = unknown).
 // "upcoming: true" hides a character unless the "Show upcoming" filter is on.
 export const DATA_VERSION = '1.4';
 
@@ -17,134 +19,134 @@ const stats = (hp, atk, def) => ({ hp, atk, def, critRate: 5, critDmg: 50 });
 export const CHARACTERS = [
   // S-rank
   {
-    id: 'baicang', name: 'Baicang', rarity: 'S', element: 'incantation', roles: ['Damage'],
+    id: 'baicang', name: 'Baicang', rarity: 'S', version: '1.0', element: 'incantation', roles: ['Damage'],
     arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'ETD-4', ability: 'Verdict and Autumn',
     tags: ['Main DPS', 'DoT'], stats: stats(1370, 81, 66),
   },
   {
-    id: 'blackbird', name: 'Blackbird', rarity: 'S', element: 'psyche', roles: ['Damage', 'Buff'],
+    id: 'blackbird', name: 'Blackbird', rarity: 'S', version: '1.4', element: 'psyche', roles: ['Damage', 'Buff'],
     arcType: 'Gas', faction: 'Yggash Court', ability: 'Naenia Merula',
     tags: ['Instant Cycle', 'Main DPS', 'DMG Boost'], stats: null,
   },
   {
-    id: 'chaos', name: 'Chaos', rarity: 'S', element: 'lakshana', roles: ['Damage'],
+    id: 'chaos', name: 'Chaos', rarity: 'S', version: '1.1', element: 'lakshana', roles: ['Damage'],
     arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: 'In the beginning, none could tell heaven from earth.',
     tags: ['Main DPS'], stats: null,
   },
   {
-    id: 'chiz', name: 'Chiz', rarity: 'S', element: 'cosmos', roles: ['Damage'],
+    id: 'chiz', name: 'Chiz', rarity: 'S', version: '1.0', element: 'cosmos', roles: ['Damage'],
     arcType: 'Gas', faction: 'Dvořák Family', ability: 'A World of Dew',
     tags: ['Main DPS'], stats: stats(1280, 83, 75),
   },
   {
-    id: 'daffodill', name: 'Daffodill', rarity: 'S', element: 'chaos', roles: ['Damage'],
+    id: 'daffodill', name: 'Daffodill', rarity: 'S', version: '1.0', element: 'chaos', roles: ['Damage'],
     arcType: 'Liquid', faction: 'Eibon Antique Shop', ability: 'Thousand Blades, Thousand Eyes',
     tags: ['Burst DPS', 'Break Boost'], stats: stats(1335, 81, 72),
   },
   {
-    id: 'zero', name: 'Esper Zero', rarity: 'S', element: 'cosmos', roles: ['Damage'],
+    id: 'zero', name: 'Esper Zero', rarity: 'S', version: '1.0', element: 'cosmos', roles: ['Damage'],
     arcType: 'Solid', faction: 'Eibon Antique Shop', ability: 'Zeroth Sense',
     tags: ['Burst DPS', 'Instant Cycle'], stats: stats(1250, 85, 75),
   },
   {
-    id: 'fadia', name: 'Fadia', rarity: 'S', element: 'psyche', roles: ['Survival', 'Damage'],
+    id: 'fadia', name: 'Fadia', rarity: 'S', version: '1.0', element: 'psyche', roles: ['Survival', 'Damage'],
     arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'ETD-4', ability: 'Lilith',
-    tags: ['Survival'], stats: stats(1410, 75, 75),
+    tags: ['DMG Redirection'], stats: stats(1410, 75, 75),
   },
   {
-    id: 'hathor', name: 'Hathor', rarity: 'S', element: 'lakshana', roles: ['Damage', 'Buff'],
+    id: 'hathor', name: 'Hathor', rarity: 'S', version: '1.0', element: 'lakshana', roles: ['Damage', 'Buff'],
     arcType: 'Plasma', faction: 'Sterry Express', ability: "Wanderer's Pact",
     tags: ['Burst DPS'], stats: stats(1320, 81, 73),
   },
   {
-    id: 'hotori', name: 'Hotori', rarity: 'S', element: 'cosmos', roles: ['Buff', 'Damage'],
+    id: 'hotori', name: 'Hotori', rarity: 'S', version: '1.0', element: 'cosmos', roles: ['Buff', 'Damage'],
     arcType: 'Solid', faction: 'Eibon Antique Shop', ability: 'Duino Elegies',
     tags: ['Burst DPS', 'DMG Boost'], stats: stats(1330, 82, 70),
   },
   {
-    id: 'iroi', name: 'Iroi', rarity: 'S', element: 'anima', roles: ['Survival', 'Buff'],
+    id: 'iroi', name: 'Iroi', rarity: 'S', version: '1.2', element: 'anima', roles: ['Survival', 'Buff'],
     arcType: 'Liquid', faction: 'Bureau of Anomaly Control', unit: 'CSU-2', ability: 'Infant Dream',
     tags: ['Healing', 'DMG Boost'], stats: null,
   },
   {
-    id: 'jiuyuan', name: 'Jiuyuan', rarity: 'S', element: 'anima', roles: ['Damage', 'Survival'],
+    id: 'jiuyuan', name: 'Jiuyuan', rarity: 'S', version: '1.0', element: 'anima', roles: ['Damage', 'Survival'],
     arcType: 'Solid', faction: 'Sterry Express', ability: 'Ordinance of Cycles',
     tags: ['Burst DPS', 'Control'], stats: stats(1290, 82, 75),
   },
   {
-    id: 'lacrimosa', name: 'Lacrimosa', rarity: 'S', element: 'chaos', roles: ['Damage'],
+    id: 'lacrimosa', name: 'Lacrimosa', rarity: 'S', version: '1.1', element: 'chaos', roles: ['Damage'],
     arcType: 'Liquid', faction: 'Bureau of Anomaly Control', unit: 'ETD-4', ability: 'Requiem',
     tags: ['Main DPS', 'DoT'], stats: stats(1320, 80, 75),
   },
   {
-    id: 'linko', name: 'Linko', rarity: 'S', element: 'anima', roles: ['Damage', 'Buff'],
+    id: 'linko', name: 'Linko', rarity: 'S', version: '1.3', element: 'anima', roles: ['Damage', 'Buff'],
     arcType: 'Plasma', faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: 'Telepathy',
     tags: ['Sub-DPS', 'RES Shred'], stats: null,
   },
   {
-    id: 'nanally', name: 'Nanally', rarity: 'S', element: 'anima', roles: ['Damage'],
+    id: 'nanally', name: 'Nanally', rarity: 'S', version: '1.0', element: 'anima', roles: ['Damage'],
     arcType: 'Plasma', faction: 'Eibon Antique Shop', ability: 'Genius Ichi-daime: Earth Flip',
     tags: ['Main DPS', 'Follow-up Attack'], stats: stats(1320, 80, 75),
   },
   {
-    id: 'sakiri', name: 'Sakiri', rarity: 'S', element: 'incantation', roles: ['Buff'],
+    id: 'sakiri', name: 'Sakiri', rarity: 'S', version: '1.0', element: 'incantation', roles: ['Buff'],
     arcType: 'Gas', faction: 'Eibon Antique Shop', ability: 'Ghosteater',
     tags: ['Control', 'DMG Boost'], stats: stats(1360, 78, 75),
   },
   {
-    id: 'shinku', name: 'Shinku', rarity: 'S', element: 'cosmos', roles: ['Damage'],
+    id: 'shinku', name: 'Shinku', rarity: 'S', version: '1.2', element: 'cosmos', roles: ['Damage'],
     arcType: 'Condensate', faction: 'Bureau of Anomaly Control', unit: 'CSU-2', ability: 'Moonlit Crimson Dragon',
     tags: ['Main DPS'], stats: null,
   },
   {
-    id: 'zankou', name: 'Zankou', rarity: 'S', element: 'incantation', roles: ['Damage'],
+    id: 'zankou', name: 'Zankou', rarity: 'S', version: '1.3', element: 'incantation', roles: ['Damage'],
     arcType: 'Gas', faction: null, formerFaction: 'The Scarlet Letter', ability: 'Eye of Delusion',
     tags: ['Main DPS', 'DoT'], stats: null,
   },
   {
-    id: 'akane', name: 'Akane Rin', rarity: 'S', element: 'lakshana', roles: ['Damage'],
+    id: 'akane', name: 'Akane Rin', rarity: 'S', version: '1.4', element: 'lakshana', roles: ['Damage'],
     arcType: 'Liquid', faction: 'Tamamochi Street Resident Association', ability: null,
     tags: ['Main DPS'], stats: null, upcoming: true,
   },
   // Version 1.5 drip-marketing reveals. Arc type and kit not published yet.
   {
-    id: 'elyms', name: 'Elyms', rarity: 'S', element: 'cosmos', roles: ['Damage'],
+    id: 'elyms', name: 'Elyms', rarity: 'S', version: null, element: 'cosmos', roles: ['Damage'],
     arcType: null, faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: null,
     tags: ['Melee'], stats: null, upcoming: true,
   },
   {
-    id: 'exe', name: 'Exe', rarity: 'S', element: 'chaos', roles: ['Damage'],
+    id: 'exe', name: 'Exe', rarity: 'S', version: null, element: 'chaos', roles: ['Damage'],
     arcType: null, faction: 'Bureau of Anomaly Control', unit: 'ETD-6', ability: null,
     tags: [], stats: null, upcoming: true,
   },
   // A-rank
   {
-    id: 'adler', name: 'Adler', rarity: 'A', element: 'incantation', roles: ['Survival'],
+    id: 'adler', name: 'Adler', rarity: 'A', version: '1.0', element: 'incantation', roles: ['Survival'],
     arcType: 'Condensate', faction: 'Eibon Antique Shop', ability: 'Ayatana',
-    tags: ['Survival', 'DoT'], stats: stats(1180, 55, 82),
+    tags: ['Shield', 'DoT'], stats: stats(1180, 55, 82),
   },
   {
-    id: 'aurelia', name: 'Aurelia', rarity: 'A', element: 'psyche', roles: ['Damage'],
+    id: 'aurelia', name: 'Aurelia', rarity: 'A', version: '1.0', element: 'psyche', roles: ['Damage'],
     arcType: 'Plasma', faction: 'Tamamochi Street Resident Association', ability: 'Nostalgia for Youth',
     tags: ['Main DPS'], stats: stats(980, 76, 60),
   },
   {
-    id: 'edgar', name: 'Edgar', rarity: 'A', element: 'cosmos', roles: ['Survival'],
+    id: 'edgar', name: 'Edgar', rarity: 'A', version: '1.0', element: 'cosmos', roles: ['Survival'],
     arcType: 'Liquid', faction: 'Eibon Antique Shop', ability: "Finnegan's Vigil",
-    tags: ['Survival'], stats: stats(1350, 53, 68),
+    tags: ['Healing'], stats: stats(1350, 53, 68),
   },
   {
-    id: 'haniel', name: 'Haniel', rarity: 'A', element: 'psyche', roles: ['Buff', 'Damage'],
+    id: 'haniel', name: 'Haniel', rarity: 'A', version: '1.0', element: 'psyche', roles: ['Buff', 'Damage'],
     arcType: 'Solid', faction: 'Sterry Express', ability: 'Amazing Grace',
     tags: ['DMG Boost'], stats: stats(1130, 62, 70),
   },
   {
-    id: 'mint', name: 'Mint', rarity: 'A', element: 'anima', roles: ['Damage'],
+    id: 'mint', name: 'Mint', rarity: 'A', version: '1.0', element: 'anima', roles: ['Damage'],
     arcType: 'Liquid', faction: 'Bureau of Anomaly Control', unit: 'CSU-2', ability: 'Nya-choo!',
     tags: ['Main DPS'], stats: stats(1000, 75, 60),
   },
   {
-    id: 'skia', name: 'Skia', rarity: 'A', element: 'lakshana', roles: ['Damage'],
+    id: 'skia', name: 'Skia', rarity: 'A', version: '1.0', element: 'lakshana', roles: ['Damage'],
     arcType: 'Gas', faction: 'Bureau of Anomaly Control', unit: 'ETD-4', ability: 'Faust',
     tags: ['Main DPS'], stats: stats(1100, 70, 55),
   },
