@@ -1,7 +1,7 @@
 // Character roster. Update this file when a new patch adds characters.
 // Sources (Oct 2026): neverness.gg and Icy Veins character lists (rank, element,
 // role, arc type; some sources call Condensate "Synthesis"); Dexerto wiki profiles (faction, Esper ability, role tags,
-// Level 1 base stats, kept for reference; the app shows Level 80 stats from maxStats.js). Fields set to null are not yet published by those sources.
+// Level 1 base stats, kept for reference; role tags checked against in-game character screens, Oct 2026; the app shows Level 80 stats from maxStats.js). Fields set to null are not yet published by those sources.
 //
 // roles: the in-game role comes first; extra roles reflect what community
 // guides use the character for (e.g. Hotori is a Buffer who also burst-damages).
@@ -24,7 +24,7 @@ export const CHARACTERS = [
   {
     id: 'blackbird', name: 'Blackbird', rarity: 'S', element: 'psyche', roles: ['Damage', 'Buff'],
     arcType: 'Gas', faction: 'Yggash Court', ability: 'Naenia Merula',
-    tags: ['Main DPS', 'Team ATK Buff'], stats: null,
+    tags: ['Instant Cycle', 'Main DPS', 'DMG Boost'], stats: null,
   },
   {
     id: 'chaos', name: 'Chaos', rarity: 'S', element: 'lakshana', roles: ['Damage'],
@@ -39,7 +39,7 @@ export const CHARACTERS = [
   {
     id: 'daffodill', name: 'Daffodill', rarity: 'S', element: 'chaos', roles: ['Damage'],
     arcType: 'Liquid', faction: 'Eibon Antique Shop', ability: 'Thousand Blades, Thousand Eyes',
-    tags: ['Burst DPS', 'Break'], stats: stats(1335, 81, 72),
+    tags: ['Burst DPS', 'Break Boost'], stats: stats(1335, 81, 72),
   },
   {
     id: 'zero', name: 'Esper Zero', rarity: 'S', element: 'cosmos', roles: ['Damage'],
@@ -64,12 +64,12 @@ export const CHARACTERS = [
   {
     id: 'iroi', name: 'Iroi', rarity: 'S', element: 'anima', roles: ['Survival', 'Buff'],
     arcType: 'Liquid', faction: 'Bureau of Anomaly Control', unit: 'CSU-2', ability: 'Infant Dream',
-    tags: ['Survival', 'Team ATK Buff'], stats: null,
+    tags: ['Healing', 'DMG Boost'], stats: null,
   },
   {
     id: 'jiuyuan', name: 'Jiuyuan', rarity: 'S', element: 'anima', roles: ['Damage', 'Survival'],
     arcType: 'Solid', faction: 'Sterry Express', ability: 'Ordinance of Cycles',
-    tags: ['Burst DPS', 'Grouping'], stats: stats(1290, 82, 75),
+    tags: ['Burst DPS', 'Control'], stats: stats(1290, 82, 75),
   },
   {
     id: 'lacrimosa', name: 'Lacrimosa', rarity: 'S', element: 'chaos', roles: ['Damage'],
