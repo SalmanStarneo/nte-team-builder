@@ -66,7 +66,8 @@ export default function App() {
           <div className="brand-wrap">
             <img
               src={`${import.meta.env.BASE_URL}mascot.svg`}
-              alt=""
+              alt="Cortado, the site mascot"
+              title="Cortado"
               className="brand__mascot"
               width="200"
               height="200"
