@@ -101,7 +101,7 @@ export const CHARACTERS = [
   {
     id: 'zankou', name: 'Zankou', rarity: 'S', version: '1.3', element: 'incantation', roles: ['Damage'],
     arcType: 'Gas', faction: null, formerFaction: 'The Scarlet Letter', ability: 'Eye of Delusion',
-    tags: ['Main DPS', 'DoT'], stats: null,
+    tags: ['Main DPS', 'DoT', 'Follow-up Attack'], stats: null,
   },
   {
     id: 'akane', name: 'Akane Rin', rarity: 'S', version: '1.4', element: 'lakshana', roles: ['Damage'],
