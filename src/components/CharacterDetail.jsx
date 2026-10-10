@@ -44,11 +44,9 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
           <p className="eyebrow">
             <span className="eyebrow__meta">
               <ElementGlyph element={c.element} size={16} />
-              <span>
-                {element.name} · {c.rarity}-rank
-                {c.version && <> · <span className="eyebrow__ver">Ver: {c.version}</span></>}
-              </span>
+              <span>{element.name} · {c.rarity}-rank</span>
             </span>
+            {c.version && <span className="eyebrow__ver">Ver {c.version}</span>}
             <RoleList roles={c.roles} size={14} />
           </p>
           <h2 id="detail-name" className="detail__name">{c.name}</h2>

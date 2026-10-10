@@ -2472,8 +2472,19 @@ th[aria-sort='descending'] .th-btn {
   gap: 6px;
   white-space: nowrap;
 }
+/* Version as its own small tag, so it wraps to the next line instead of
+   running past the card or under the close button. */
 .eyebrow__ver {
+  flex: none;
+  padding: 1px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  white-space: nowrap;
   text-transform: none;
+  letter-spacing: 0.04em;
+}
+.detail__title {
+  padding-right: 4px;
 }
 
 /* Skills on the character page */
@@ -3669,4 +3680,33 @@ th[aria-sort='descending'] .th-btn {
   display: flex;
   justify-content: flex-end;
   margin-top: 14px;
+}
+
+/* Very narrow phones: smaller portrait, and element · rank may wrap. */
+@media (max-width: 400px) {
+  .detail__head {
+    gap: 10px;
+  }
+  .detail__head .portrait--xl {
+    width: 64px;
+    height: 64px;
+    font-size: 1.6rem;
+  }
+  .eyebrow__meta {
+    white-space: normal;
+  }
+}
+@media (max-width: 340px) {
+  .detail__head .portrait--xl {
+    width: 52px;
+    height: 52px;
+    font-size: 1.3rem;
+  }
+  .detail__head .eyebrow {
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+  }
+  .detail__close {
+    padding: 4px 8px;
+  }
 }
