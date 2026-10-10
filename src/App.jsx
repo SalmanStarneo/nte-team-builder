@@ -65,11 +65,11 @@ export default function App() {
         <div className="masthead__row">
           <div className="brand-wrap">
             <img
-              src={`${import.meta.env.BASE_URL}mascot.webp`}
+              src={`${import.meta.env.BASE_URL}mascot.svg`}
               alt=""
               className="brand__mascot"
               width="200"
-              height="253"
+              height="200"
             />
             <h1 className="brand">
               <span className="brand__small">Neverness to Everness</span>
