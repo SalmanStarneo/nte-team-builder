@@ -7,7 +7,9 @@ import { useEffect, useRef, useState } from 'react';
 // fluffy, ringed brown-and-cream tail (a little like a red panda's) stays out
 // of sight from the front: at rest it wraps a small grip rung on the back,
 // taking the shape of a mug handle to carry it by. It only shows from the
-// front when wagging or in a fight.
+// front when wagging or in a fight. A grey unibrow sits on its face screen,
+// and its hi-vis belt is an inflatable layer of its own that puffs up into a
+// float ring by itself in water.
 //
 // Clicking Cortado plays the next emote. One of them swaps its headwear.
 export const MASCOT_HATS = [
@@ -24,6 +26,7 @@ const EMOTES = [
   { id: 'hop', label: 'hops', ms: 900 },
   { id: 'hat', label: 'swaps its headwear', ms: 800 },
   { id: 'dash', label: 'dashes on its wheels', ms: 1100 },
+  { id: 'swim', label: 'inflates its float belt', ms: 1600 },
   { id: 'sparkle', label: 'sparkles after a refill', ms: 1200 },
 ];
 const HAT_SWAP_AT = 300;
@@ -49,12 +52,20 @@ function Tail({ d }) {
   );
 }
 
-// A face-screen patch drawn over the mascot's own eyes (same 64×64 grid as mascot.svg).
+// The unibrow for each face, on the face screen above the eyes.
+const BROWS = {
+  happy: 'M24.2 28.3 Q28 27 32 27.9 Q36 27 39.8 28.3',
+  sparkle: 'M24.2 28.3 Q28 27 32 27.9 Q36 27 39.8 28.3',
+  focused: 'M24 28.2 Q28 28.6 32 30.2 Q36 28.6 40 28.2',
+};
+
+// A face-screen patch drawn over the mascot's own eyes and unibrow (same 64×64 grid as mascot.svg).
 function Face({ kind }) {
   const glow = { filter: 'drop-shadow(0 0 0.8px #FFE2B0)' };
   return (
     <g>
       <rect x="20.2" y="27.2" width="23.6" height="13.1" rx="6.5" fill="#2E1F17" />
+      <path d={BROWS[kind]} stroke="#9A8F88" strokeWidth="1.1" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       <ellipse cx="22.6" cy="38" rx="1.6" ry="0.9" fill="#F4A7A0" />
       <ellipse cx="41.4" cy="38" rx="1.6" ry="0.9" fill="#F4A7A0" />
       {kind === 'happy' && (
@@ -122,7 +133,7 @@ export default function Mascot() {
   }
 
   const id = emote?.id;
-  const face = { wag: 'happy', hop: 'happy', dash: 'focused', sparkle: 'sparkle' }[id];
+  const face = { wag: 'happy', hop: 'happy', dash: 'focused', swim: 'happy', sparkle: 'sparkle' }[id];
 
   return (
     <button
@@ -167,9 +178,26 @@ export default function Mascot() {
             height="200"
           />
           {/* In front: new face and sparkles */}
-          {(face || id === 'sparkle') && (
+          {(face || id === 'sparkle' || id === 'swim') && (
             <svg className="mascot__layer mascot__layer--front" viewBox="0 0 64 64" aria-hidden="true">
               {face && <Face kind={face} />}
+              {id === 'swim' && (
+                <>
+                  {/* The float belt inflates into a ring, then the water rises around it */}
+                  <g className="mascot__ring">
+                    <path d="M10.6 44.4 Q32 55 53.4 44.4 Q57.6 48.6 53.4 52.8 Q32 63 10.6 52.8 Q6.4 48.6 10.6 44.4 Z" fill="#E8833A" stroke="#2B1D16" strokeWidth="1.1" />
+                    <path d="M18 47.4 Q17 51.6 18 55.7 M25 49.1 Q24.2 53.2 25 57.3 M39 49.1 Q39.8 53.2 39 57.3 M46 47.4 Q47 51.6 46 55.7" stroke="#B4561C" strokeWidth="0.6" fill="none" strokeLinecap="round" />
+                    <path d="M12.6 46.2 Q32 55.8 51.4 46.2" stroke="#F7B07A" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+                    <path d="M8.6 49.4 Q32 60.6 55.4 49.4" stroke="#2B1D16" strokeWidth="2" fill="none" />
+                    <path d="M8.6 49.4 Q32 60.6 55.4 49.4" stroke="#E6EBF0" strokeWidth="1.2" fill="none" />
+                    <circle cx="32" cy="55" r="1.7" fill="#D5DBE3" stroke="#2B1D16" strokeWidth="0.6" />
+                  </g>
+                  <g className="mascot__water">
+                    <path d="M-10 57 Q-4 55 2 57 T14 57 T26 57 T38 57 T50 57 T62 57 T74 57 L74 66 L-10 66 Z" fill="#7FC4E2" opacity="0.6" />
+                    <path d="M-10 57 Q-4 55 2 57 T14 57 T26 57 T38 57 T50 57 T62 57 T74 57" stroke="#3F8FB5" strokeWidth="0.8" fill="none" />
+                  </g>
+                </>
+              )}
               {id === 'sparkle' && (
                 <>
                   <Star x={8} y={14} s={1.1} className="mascot__star" />
