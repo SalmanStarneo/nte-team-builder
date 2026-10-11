@@ -22,30 +22,10 @@
       <feGaussianBlur stdDeviation="0.9" result="b"/>
       <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#F1D6A6"/>
-      <stop offset="100%" stop-color="#D2A86C"/>
-    </linearGradient>
-    <linearGradient id="tire" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#4A3428"/>
-      <stop offset="100%" stop-color="#1E1410"/>
-    </linearGradient>
   </defs>
 
   <!-- Ground shadow -->
   <ellipse cx="32" cy="60" rx="12" ry="2.6" fill="#000" opacity="0.18"/>
-
-  <!-- Retractable wheels (half tucked under the body) -->
-  <circle cx="24" cy="54.2" r="3.6" fill="url(#tire)" stroke="#2B1D16" stroke-width="1"/>
-  <circle cx="24" cy="54.2" r="1.5" fill="url(#silver)" stroke="#2B1D16" stroke-width="0.5"/>
-  <circle cx="40" cy="54.2" r="3.6" fill="url(#tire)" stroke="#2B1D16" stroke-width="1"/>
-  <circle cx="40" cy="54.2" r="1.5" fill="url(#silver)" stroke="#2B1D16" stroke-width="0.5"/>
-  <path d="M19.6 52.4 Q32 56.6 44.4 52.4" stroke="#2B1D16" stroke-width="0.7" fill="none" opacity="0.55"/>
-
-  <!-- Tail, shaped like a mug handle so Cortado can be carried -->
-  <path d="M47.5 29.5 C59.5 28.5 60.5 45.5 48.5 46" stroke="#2B1D16" stroke-width="5.2" fill="none" stroke-linecap="round"/>
-  <path d="M47.5 29.5 C59.5 28.5 60.5 45.5 48.5 46" stroke="#B8926E" stroke-width="3.2" fill="none" stroke-linecap="round"/>
-  <path d="M50.5 31 C56.6 31.6 57.6 38 56.4 41" stroke="#EBDAC2" stroke-width="0.9" fill="none" stroke-linecap="round" opacity="0.9"/>
 
   <!-- Arms -->
   <path d="M15 38 Q9 40 8.5 45" stroke="#2B1D16" stroke-width="4.6" fill="none" stroke-linecap="round"/>
@@ -82,9 +62,8 @@
   <path d="M15.6 46 Q32 52 48.4 46 L46.6 49.8 Q32 55.2 17.4 49.8 Z" fill="#E8833A" stroke="#2B1D16" stroke-width="1"/>
   <path d="M16.6 47.8 Q32 53.4 47.4 47.8" stroke="#FCE7C3" stroke-width="1" fill="none"/>
   <!-- Little bolt badges -->
-  <!-- Coffee bean badge: Cortado runs on coffee -->
-  <ellipse cx="16.9" cy="35" rx="1.45" ry="1.9" transform="rotate(-20 16.9 35)" fill="#6B3F24" stroke="#2B1D16" stroke-width="0.7"/>
-  <path d="M16.4 33.5 Q17.6 35 16.9 36.6" stroke="#E9C9A0" stroke-width="0.5" fill="none" stroke-linecap="round"/>
+  <circle cx="16.8" cy="35" r="1.4" fill="#CFC2B4" stroke="#2B1D16" stroke-width="0.7"/>
+  <path d="M16 35 L17.6 35" stroke="#2B1D16" stroke-width="0.6"/>
   <circle cx="47.2" cy="35" r="1.4" fill="#CFC2B4" stroke="#2B1D16" stroke-width="0.7"/>
   <path d="M47.2 34.2 L47.2 35.8" stroke="#2B1D16" stroke-width="0.6"/>
 
@@ -119,12 +98,8 @@
   <polygon points="38.60,11.10 39.45,13.23 41.74,13.38 39.98,14.85 40.54,17.07 38.60,15.85 36.66,17.07 37.22,14.85 35.46,13.38 37.75,13.23" fill="url(#silver)" stroke="#2B1D16" stroke-width="0.7" stroke-linejoin="round"/>
   <path d="M37.9 13.6 L38.6 12.2" stroke="#fff" stroke-width="0.5" stroke-linecap="round" opacity="0.9"/>
 
-
-  <!-- Coffee stirring stick (Cortado's "antenna") -->
-  <g transform="translate(40.2 10.2) rotate(-51.8)">
-    <rect x="-0.4" y="-1.05" width="7.92" height="2.1" rx="1.05" fill="url(#wood)" stroke="#2B1D16" stroke-width="0.7"/>
-    <rect x="4.12" y="-1.05" width="3.4" height="2.1" rx="1.05" fill="#7A4A2A" stroke="#2B1D16" stroke-width="0.7"/>
-    <path d="M1 -0.25 L3.52 -0.25" stroke="#FFF3DA" stroke-width="0.45" stroke-linecap="round" opacity="0.8"/>
-  </g>
-  <path d="M46.3 5.2 q1.3 -1 0.3 -2 q-1 -1 0.4 -2" stroke="#B9A797" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.85"/>
+  <!-- Antenna -->
+  <line x1="40.5" y1="9.5" x2="44.5" y2="3.8" stroke="#2B1D16" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="40.5" y1="9.5" x2="44.5" y2="3.8" stroke="#9C7255" stroke-width="0.8" stroke-linecap="round"/>
+  <circle cx="44.5" cy="3.8" r="1.6" fill="#FFE2B0" stroke="#2B1D16" stroke-width="0.7"/>
 </svg>

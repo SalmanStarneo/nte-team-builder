@@ -19,8 +19,13 @@ import SharePanel from './components/SharePanel.jsx';
 import TeamSlots from './components/TeamSlots.jsx';
 import TeamTabs from './components/TeamTabs.jsx';
 
-// Cortado, the mascot: a coffee-powered anomaly with a stirring-stick antenna,
-// a handle-shaped tail and retractable wheels. Clicking swaps its headwear.
+// Cortado, the mascot: an anomaly that runs on coffee. Its headwear doubles as
+// the lid over a hatch where coffee (or beans/powder and hot water) is poured
+// in, and every hat carries its silver star. It usually floats; retractable
+// wheels come out only when it's tired of floating or needs to dash. Its
+// cream-and-brown striped tail stays out of sight from the front: the tip wraps
+// into a handle at the back, used to carry it (or swing it in a fight).
+// Clicking the mascot swaps its headwear.
 const MASCOT_HATS = [
   { file: 'mascot.svg', label: 'Hard hat' },
   { file: 'mascot-beanie.svg', label: 'Knit beanie' },
