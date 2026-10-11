@@ -241,7 +241,9 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
             (b) => b.layout === layout && (!loadout.cartridge || b.cartridge === loadout.cartridge),
           );
           const builds = [...saved, suggested].filter(Boolean);
-          const samePieces = (b) => JSON.stringify(b.pieces) === JSON.stringify(loadout.console);
+          // Same layout = same shapes in the same places (module stats may differ).
+          const layoutKey = (ps) => JSON.stringify((ps ?? []).map(({ shape, r, c: col }) => [shape, r, col]));
+          const samePieces = (b) => layoutKey(b.pieces) === layoutKey(loadout.console);
           // Saved builds win over the suggested one when both match.
           const current = builds.find(samePieces);
           const sb = specBonus(c.id, loadout.console);

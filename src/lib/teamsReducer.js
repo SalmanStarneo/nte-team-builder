@@ -3,6 +3,7 @@ import { CHARACTER_BY_ID } from '../data/characters.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import { CARTRIDGE_SUB_SLOTS, LEGACY_MODULE_STATS, MODULE_SLOTS, MODULE_STATS } from '../data/gear.js';
 import { MAX_ARC_DUPES, MAX_DUPES } from '../data/awakenings.js';
+import { presetLoadouts } from '../data/presets.js';
 
 // All team changes go through this reducer, so the rules live in one place.
 // State shape: { teams: [{ id, name, members: [id|null x4], loadouts }], activeId, notice }
@@ -60,8 +61,8 @@ export function loadoutOf(team, charId) {
 export function initialState(saved) {
   if (saved) return { ...saved, notice: null };
   const teams = [
-    makeTeam('Mono Blossom', ['nanally', 'jiuyuan', 'zero', 'hotori']),
-    makeTeam('Lacrimosa Scorch', ['lacrimosa', 'sakiri', 'adler', 'fadia']),
+    makeTeam('Mono Blossom', ['nanally', 'jiuyuan', 'zero', 'hotori'], presetLoadouts(['nanally', 'jiuyuan', 'zero', 'hotori'])),
+    makeTeam('Lacrimosa Scorch', ['lacrimosa', 'sakiri', 'adler', 'fadia'], presetLoadouts(['lacrimosa', 'sakiri', 'adler', 'fadia'])),
   ];
   return { teams, activeId: teams[0].id, notice: null, isExample: true };
 }
@@ -159,8 +160,14 @@ export function teamsReducer(state, action) {
 
     case 'loadPreset':
       return {
-        ...updateActive(state, (t) => ({ ...t, name: action.name, members: [...action.members] })),
-        notice: `Loaded ${action.name} into this team.`,
+        ...updateActive(state, (t) => ({
+          ...t,
+          name: action.name,
+          members: [...action.members],
+          // Recommended kit for every member, replacing what this team had.
+          loadouts: structuredClone(presetLoadouts(action.members)),
+        })),
+        notice: `Loaded ${action.name} into this team, with each member’s recommended kit.`,
       };
 
     case 'setLoadout':
