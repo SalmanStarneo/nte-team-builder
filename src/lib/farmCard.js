@@ -3,13 +3,16 @@
 // material is farmed. Same look as the build card (charcoal panels, silver frame).
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import { farmList } from '../data/farmList.js';
+import { bestBuild } from '../data/bestBuild.js';
+import { CARTRIDGE_BY_ID } from '../data/gear.js';
+import { SET_SHAPES, SHAPES } from '../data/console.js';
 import { materialIconUrl } from './icons.js';
 import {
   BODY, DISPLAY, EL, MONO, clipCard, drawRank, drawSilverFrame, ensureFonts, loadImage, roundRect, wrap,
 } from './teamCard.js';
 
 export const FARM_W = 1600;
-export const FARM_H = 880;
+export const FARM_H = 920;
 
 const K = {
   bg: '#121318',
@@ -101,6 +104,14 @@ function tile(ctx, x, y, size, item, img) {
     ctx.drawImage(img, x + (size - s) / 2, y + (size - s) / 2 - 4, s, s);
   }
   // Amount badge
+  if (item.badge === false) {
+    ctx.fillStyle = K.fg;
+    ctx.font = `600 14px ${BODY}`;
+    ctx.textAlign = 'center';
+    wrap(ctx, item.name, size + 22, 2).forEach((l, i) => ctx.fillText(l, x + size / 2, y + size + 22 + i * 18));
+    ctx.textAlign = 'left';
+    return;
+  }
   const label = item.qty == null ? 'as needed' : `×${short(item.qty)}`;
   ctx.font = `800 ${item.qty == null ? 12 : 16}px ${MONO}`;
   const bw = ctx.measureText(label).width + 14;
@@ -125,7 +136,100 @@ function group(ctx, x, y, w, h, g, imgs, size = 104) {
   const shift = panel(ctx, x, y, w, h, g.title, g.where);
   const n = g.items.length;
   const gap = Math.min(44, (w - 36 - n * size) / Math.max(1, n - 1));
-  g.items.forEach((item, i) => tile(ctx, x + 18 + i * (size + gap), y + 52 + shift, size, item, imgs.get(item.name)));
+  const startX = x + (w - (n * size + (n - 1) * gap)) / 2;
+  // Tile plus a two-line name, centred in the space under the title.
+  const top = y + 46 + shift;
+  const startY = top + Math.max(6, (y + h - 12 - top - (size + 44)) / 2);
+  g.items.forEach((item, i) => tile(ctx, startX + i * (size + gap), startY, size, item, imgs.get(item.name)));
+}
+
+const ROMAN = { 2: 'II', 3: 'III', 4: 'IV' };
+
+function goldCells(ctx, x, y, cells, size, gap) {
+  for (const [r, c] of cells) {
+    const cx = x + c * (size + gap);
+    const cy = y + r * (size + gap);
+    const g = ctx.createLinearGradient(cx, cy, cx + size, cy + size);
+    g.addColorStop(0, '#f8c27a');
+    g.addColorStop(1, '#c46a2c');
+    ctx.fillStyle = g;
+    roundRect(ctx, cx, cy, size, size, Math.max(2, size * 0.18));
+    ctx.fill();
+  }
+}
+
+// The recommended Cartridge set and the modules to farm for it.
+function consolePanel(ctx, x, y, w, h, build, cartImg) {
+  const cart = CARTRIDGE_BY_ID[build.cartridge];
+  panel(ctx, x, y, w, h, 'Console gear', 'Rabbit Hole');
+  const size = 104;
+  // Cartridge tile
+  const cx = x + 24;
+  const ty = y + 52;
+  tile(ctx, cx, ty, size, { name: cart.name, qty: null, kind: 'boss', badge: false }, cartImg);
+  const main = build.cartStats?.main?.stat;
+  if (main) {
+    ctx.fillStyle = K.muted;
+    ctx.font = `500 13px ${BODY}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(`Main: ${main}`, cx + size / 2, ty + size + 58);
+    ctx.textAlign = 'left';
+  }
+
+  // Modules: one chip per shape with its count
+  const counts = new Map();
+  for (const p of build.pieces) counts.set(p.shape, (counts.get(p.shape) ?? 0) + 1);
+  const setShapes = new Set(SET_SHAPES[build.cartridge] ?? []);
+  const mx = cx + size + 34;
+  const mw = x + w - 24 - mx;
+  ctx.fillStyle = K.fg;
+  ctx.font = `700 15px ${BODY}`;
+  ctx.fillText(`${build.pieces.length} modules`, mx, ty + 14);
+  ctx.fillStyle = K.muted;
+  ctx.font = `500 13px ${BODY}`;
+  ctx.fillText(`gold = counts for ${cart.name}`, mx + ctx.measureText(`${build.pieces.length} modules`).width + 40, ty + 14);
+  const chipW = 64;
+  const chipH = 62;
+  const perRow = Math.max(1, Math.floor((mw + 10) / (chipW + 10)));
+  [...counts].forEach(([shape, n], i) => {
+    const sx = mx + (i % perRow) * (chipW + 10);
+    const sy = ty + 28 + Math.floor(i / perRow) * (chipH + 8);
+    const inSet = setShapes.has(shape);
+    ctx.fillStyle = K.inset;
+    roundRect(ctx, sx, sy, chipW, chipH, 10);
+    ctx.fill();
+    ctx.strokeStyle = inSet ? '#f2c14e' : K.line;
+    ctx.lineWidth = inSet ? 2 : 1.5;
+    ctx.stroke();
+    const cells = SHAPES[shape].cells;
+    const rows = Math.max(...cells.map((c) => c[0])) + 1;
+    const cols = Math.max(...cells.map((c) => c[1])) + 1;
+    const cs = Math.min(9, 30 / Math.max(rows, cols));
+    const gw = cols * cs + (cols - 1) * 2;
+    const gh = rows * cs + (rows - 1) * 2;
+    goldCells(ctx, sx + 6 + (28 - gw) / 2, sy + 6 + (36 - gh) / 2, cells, cs, 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `800 15px ${MONO}`;
+    ctx.fillText(`×${n}`, sx + 36, sy + 29);
+    ctx.fillStyle = K.muted;
+    ctx.font = `600 10px ${MONO}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(`TYPE ${ROMAN[SHAPES[shape].type]}`, sx + chipW / 2, sy + chipH - 8);
+    ctx.textAlign = 'left';
+  });
+  const chipRows = Math.ceil(counts.size / perRow);
+
+  // Sub stats to look for
+  const subs = [...new Set((build.pieces[0]?.stats?.subs ?? []).map((sub) => sub.stat))];
+  if (subs.length) {
+    ctx.fillStyle = K.muted;
+    ctx.font = `600 13px ${BODY}`;
+    const ly = ty + 28 + chipRows * (chipH + 8) + 16;
+    ctx.fillText('Module sub stats to look for', mx, ly);
+    ctx.fillStyle = K.fg;
+    ctx.font = `600 14px ${BODY}`;
+    wrap(ctx, subs.join(' · '), mw, 2).forEach((l, i) => ctx.fillText(l, mx, ly + 22 + i * 19));
+  }
 }
 
 /** Renders the farm card and returns the canvas (null without material data). */
@@ -144,6 +248,8 @@ export async function renderFarmCard(character, { base = '/' } = {}) {
     ...names.map((n) => (materialIconUrl(n) ? loadImage(materialIconUrl(n)) : null)),
   ]);
   const imgs = new Map(names.map((n, i) => [n, icons[i]]));
+  const build = bestBuild(c);
+  const cartImg = build?.cartridge ? await loadImage(`${base}icons/cartridges/${build.cartridge}.webp`) : null;
 
   const canvas = document.createElement('canvas');
   canvas.width = FARM_W;
@@ -255,24 +361,14 @@ export async function renderFarmCard(character, { base = '/' } = {}) {
   const half = (RW - GAP) / 2;
   group(ctx, RX, TOP + ROW + GAP, half, ROW, by.family, imgs);
   group(ctx, RX + half + GAP, TOP + ROW + GAP, half, ROW, by.books, imgs);
-  // Row 3: currency
-  group(ctx, RX, TOP + 2 * (ROW + GAP), RW, ROW, by.money, imgs);
-
-  // Exact coin total next to the currency tiles
-  const coins = by.money.items.find((i) => i.name === 'Beetle Coin');
-  if (coins) {
-    const ry = TOP + 2 * (ROW + GAP);
-    ctx.textAlign = 'right';
-    ctx.fillStyle = K.muted;
-    ctx.font = `600 14px ${MONO}`;
-    ctx.fillText('BEETLE COIN TOTAL', RX + RW - 24, ry + 96);
-    ctx.fillStyle = K.fg;
-    ctx.font = `italic 800 44px ${DISPLAY}`;
-    ctx.fillText(fmt(coins.qty), RX + RW - 24, ry + 142);
-    ctx.fillStyle = K.muted;
-    ctx.font = `500 13px ${BODY}`;
-    ctx.fillText('Character EXP costs extra coin as you level', RX + RW - 24, ry + 168);
-    ctx.textAlign = 'left';
+  // Row 3: currency + console gear
+  const r3 = TOP + 2 * (ROW + GAP);
+  const ROW3 = 250;
+  if (build?.cartridge) {
+    group(ctx, RX, r3, half, ROW3, by.money, imgs);
+    consolePanel(ctx, RX + half + GAP, r3, half, ROW3, build, cartImg);
+  } else {
+    group(ctx, RX, r3, RW, ROW3, by.money, imgs);
   }
 
   // ---- Footer ----

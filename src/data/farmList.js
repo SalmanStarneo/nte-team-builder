@@ -72,7 +72,7 @@ export function farmList(characterId) {
       {
         id: 'money',
         title: 'Currency and life skill',
-        where: 'Beetle Coin from the EXP & Beetle Coins zone',
+        where: 'Coin: EXP & Beetle Coins zone',
         items: pick(['Beetle Coin', 'Fons', 'Dreamless Seed']),
       },
     ].filter(Boolean),
