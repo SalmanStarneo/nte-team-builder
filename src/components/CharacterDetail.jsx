@@ -22,6 +22,8 @@ import { characterBuild, renderBuildCard } from '../lib/buildCard.js';
 import { CHARACTER_CONSOLE } from '../data/console.js';
 import { bestBuild } from '../data/bestBuild.js';
 import MyBuildEditor, { myBuildCurrent } from './MyBuildEditor.jsx';
+import { farmList } from '../data/farmList.js';
+import { renderFarmCard } from '../lib/farmCard.js';
 
 const fmt = (n) => n.toLocaleString('en-US');
 
@@ -234,6 +236,20 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
 
       <AscensionPlanner key={c.id} character={c} />
 
+      {farmList(c.id) && (
+        <section className="farm-cta" aria-labelledby="farm-cta-title">
+          <div className="farm-cta__text">
+            <h3 id="farm-cta-title" className="mini-title">Farming list</h3>
+            <p className="muted small">
+              Every material to ascend {c.name} to Lv 80 and max all skills, grouped by where to farm it.
+            </p>
+          </div>
+          <button type="button" className="btn" onClick={() => setSharing({ farm: true })}>
+            Share farming list
+          </button>
+        </section>
+      )}
+
       {CHARACTER_CONSOLE[c.id] && (
         <MyBuildEditor character={c} activeTeam={activeTeam} onShare={(b) => setSharing({ mine: b })} />
       )}
@@ -251,11 +267,12 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
       </div>
       {sharing && (
         <ExportDialog
-          title={sharing.mine ? 'My build image' : 'Recommended build image'}
+          title={sharing.farm ? 'Farming list image' : sharing.mine ? 'My build image' : 'Recommended build image'}
           name={c.name}
-          suffix={sharing.mine ? 'my-nte-build' : 'nte-build'}
+          suffix={sharing.farm ? 'nte-farming-list' : sharing.mine ? 'my-nte-build' : 'nte-build'}
           onClose={() => setSharing(false)}
           render={(opts) => {
+            if (sharing.farm) return renderFarmCard(c, opts);
             if (sharing.mine) {
               const mine = myBuildCurrent(sharing.mine);
               return renderBuildCard(characterBuild(c, { current: mine, source: 'My build', recStats: mine.cartStats }), opts);
