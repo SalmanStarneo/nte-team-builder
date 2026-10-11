@@ -1,0 +1,186 @@
+import { useEffect, useRef, useState } from 'react';
+
+// Cortado, the mascot: an anomaly that runs on coffee. Its headwear doubles as
+// the lid over a hatch where coffee (or beans/powder and hot water) is poured
+// in, and every hat carries its silver star. It usually floats; retractable
+// wheels come out only when it's tired of floating or needs to dash. Its
+// fluffy, ringed brown-and-cream tail (a little like a red panda's) stays out
+// of sight from the front: at rest it wraps a small grip rung on the back,
+// taking the shape of a mug handle to carry it by. It only shows from the
+// front when wagging or in a fight.
+//
+// Clicking Cortado plays the next emote. One of them swaps its headwear.
+export const MASCOT_HATS = [
+  { file: 'mascot.svg', label: 'Hard hat' },
+  { file: 'mascot-beanie.svg', label: 'Knit beanie' },
+  { file: 'mascot-beret.svg', label: 'Barista beret' },
+  { file: 'mascot-lid.svg', label: 'Coffee cup lid' },
+];
+const HAT_KEY = 'nte-team-builder:mascotHat';
+
+// Played in this order, one per click. `ms` matches the CSS animation length.
+const EMOTES = [
+  { id: 'wag', label: 'wags its tail', ms: 1200 },
+  { id: 'hop', label: 'hops', ms: 900 },
+  { id: 'hat', label: 'swaps its headwear', ms: 800 },
+  { id: 'dash', label: 'dashes on its wheels', ms: 1100 },
+  { id: 'sparkle', label: 'sparkles after a refill', ms: 1200 },
+];
+const HAT_SWAP_AT = 300;
+
+const loadHat = () => {
+  try {
+    const n = Number(localStorage.getItem(HAT_KEY));
+    return Number.isInteger(n) && n >= 0 && n < MASCOT_HATS.length ? n : 0;
+  } catch {
+    return 0;
+  }
+};
+
+// The fluffy ringed tail, drawn in four layers like the concept sheet.
+function Tail({ d }) {
+  return (
+    <>
+      <path d={d} stroke="#2B1D16" strokeWidth="7.8" fill="none" strokeLinecap="round" strokeDasharray="0.01 2.6" />
+      <path d={d} stroke="#2B1D16" strokeWidth="6.8" fill="none" strokeLinecap="round" />
+      <path d={d} stroke="#7A5238" strokeWidth="5.2" fill="none" strokeLinecap="round" />
+      <path d={d} stroke="#F3E3C8" strokeWidth="5.2" fill="none" strokeDasharray="2.6 2.6" />
+    </>
+  );
+}
+
+// A face-screen patch drawn over the mascot's own eyes (same 64×64 grid as mascot.svg).
+function Face({ kind }) {
+  const glow = { filter: 'drop-shadow(0 0 0.8px #FFE2B0)' };
+  return (
+    <g>
+      <rect x="20.2" y="27.2" width="23.6" height="13.1" rx="6.5" fill="#2E1F17" />
+      <ellipse cx="22.6" cy="38" rx="1.6" ry="0.9" fill="#F4A7A0" />
+      <ellipse cx="41.4" cy="38" rx="1.6" ry="0.9" fill="#F4A7A0" />
+      {kind === 'happy' && (
+        <g stroke="#FFE2B0" strokeWidth="2" fill="none" strokeLinecap="round" style={glow}>
+          <path d="M24.4 35 Q27 30.6 29.6 35" />
+          <path d="M34.4 35 Q37 30.6 39.6 35" />
+        </g>
+      )}
+      {kind === 'focused' && (
+        <g fill="#FFE2B0" stroke="#FFE2B0" strokeWidth="0.8" strokeLinejoin="round" style={glow}>
+          <path d="M24.3 31.4 L29.7 33.2 L29.7 36.6 L24.3 36.6 Z" />
+          <path d="M39.7 31.4 L34.3 33.2 L34.3 36.6 L39.7 36.6 Z" />
+        </g>
+      )}
+      {kind === 'sparkle' && (
+        <g fill="#FFE2B0" style={glow}>
+          <path d="M27 29.8 Q27.6 33 30.8 33.6 Q27.6 34.2 27 37.4 Q26.4 34.2 23.2 33.6 Q26.4 33 27 29.8 Z" />
+          <path d="M37 29.8 Q37.6 33 40.8 33.6 Q37.6 34.2 37 37.4 Q36.4 34.2 33.2 33.6 Q36.4 33 37 29.8 Z" />
+        </g>
+      )}
+    </g>
+  );
+}
+
+// The CSS animation scales the wrapper; the inner path keeps its own transform.
+const Star = ({ x, y, s = 1, className }) => (
+  <g className={className}>
+    <path
+      transform={`translate(${x} ${y}) scale(${s})`}
+      d="M0 -3 Q0.5 -0.5 3 0 Q0.5 0.5 0 3 Q-0.5 0.5 -3 0 Q-0.5 -0.5 0 -3 Z"
+      fill="#FFE2B0"
+      stroke="#2B1D16"
+      strokeWidth="0.5"
+    />
+  </g>
+);
+
+export default function Mascot() {
+  const [hat, setHat] = useState(loadHat);
+  const [emote, setEmote] = useState(null); // { id, n }
+  const next = useRef(0);
+  const timers = useRef([]);
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+
+  function swapHat() {
+    setHat((h) => {
+      const n = (h + 1) % MASCOT_HATS.length;
+      try {
+        localStorage.setItem(HAT_KEY, String(n));
+      } catch {
+        /* storage unavailable */
+      }
+      return n;
+    });
+  }
+
+  function play() {
+    timers.current.forEach(clearTimeout);
+    const e = EMOTES[next.current];
+    next.current = (next.current + 1) % EMOTES.length;
+    // A new key restarts the CSS animation even when the same emote repeats.
+    setEmote({ id: e.id, n: Date.now() });
+    if (e.id === 'hat') timers.current.push(setTimeout(swapHat, HAT_SWAP_AT));
+    timers.current.push(setTimeout(() => setEmote(null), e.ms));
+  }
+
+  const id = emote?.id;
+  const face = { wag: 'happy', hop: 'happy', dash: 'focused', sparkle: 'sparkle' }[id];
+
+  return (
+    <button
+      type="button"
+      className="brand__mascot-btn"
+      onClick={play}
+      title={`Cortado · ${MASCOT_HATS[hat].label} (click for an emote)`}
+      aria-label={`Cortado, the site mascot, wearing a ${MASCOT_HATS[hat].label.toLowerCase()}. Play an emote`}
+    >
+      <span key={emote?.n ?? 'idle'} className={`mascot${id ? ` mascot--${id}` : ''}`}>
+        <span className="mascot__rig">
+          {/* Behind the body: tail, wheels, speed lines */}
+          <svg className="mascot__layer mascot__layer--back" viewBox="0 0 64 64" aria-hidden="true">
+            {id === 'wag' && (
+              <g className="mascot__tail">
+                <Tail d="M42 50 Q54 52 57 42 Q59.4 34 56 27.6" />
+              </g>
+            )}
+            {id === 'dash' && (
+              <>
+                <g className="mascot__speed" stroke="#B8A898" strokeWidth="1.2" strokeLinecap="round">
+                  <path d="M-6 30 L5 30" />
+                  <path d="M-9 38 L3 38" />
+                  <path d="M-5 46 L5 46" />
+                </g>
+                <g className="mascot__wheels">
+                  <rect x="22.6" y="52" width="2.2" height="4.6" rx="0.6" fill="#C9D0D9" stroke="#2B1D16" strokeWidth="0.6" />
+                  <rect x="39.2" y="52" width="2.2" height="4.6" rx="0.6" fill="#C9D0D9" stroke="#2B1D16" strokeWidth="0.6" />
+                  <circle cx="23.7" cy="57.6" r="3" fill="#3A271D" stroke="#2B1D16" strokeWidth="1" />
+                  <circle cx="23.7" cy="57.6" r="1.1" fill="#C9D0D9" />
+                  <circle cx="40.3" cy="57.6" r="3" fill="#3A271D" stroke="#2B1D16" strokeWidth="1" />
+                  <circle cx="40.3" cy="57.6" r="1.1" fill="#C9D0D9" />
+                </g>
+              </>
+            )}
+          </svg>
+          <img
+            src={`${import.meta.env.BASE_URL}${MASCOT_HATS[hat].file}`}
+            alt=""
+            className="brand__mascot"
+            width="200"
+            height="200"
+          />
+          {/* In front: new face and sparkles */}
+          {(face || id === 'sparkle') && (
+            <svg className="mascot__layer mascot__layer--front" viewBox="0 0 64 64" aria-hidden="true">
+              {face && <Face kind={face} />}
+              {id === 'sparkle' && (
+                <>
+                  <Star x={8} y={14} s={1.1} className="mascot__star" />
+                  <Star x={57} y={18} s={0.9} className="mascot__star mascot__star--2" />
+                  <Star x={52} y={4} s={0.7} className="mascot__star mascot__star--3" />
+                </>
+              )}
+            </svg>
+          )}
+        </span>
+      </span>
+    </button>
+  );
+}
