@@ -214,7 +214,30 @@ button {
   min-width: 0;
 }
 
+.brand__mascot-btn {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 16px;
+  transition: transform 0.15s ease;
+}
+.brand__mascot-btn:hover {
+  transform: rotate(-4deg) translateY(-2px);
+}
+.brand__mascot-btn:active {
+  transform: scale(0.96);
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand__mascot-btn,
+  .brand__mascot-btn:hover {
+    transition: none;
+    transform: none;
+  }
+}
 .brand__mascot {
+  display: block;
   flex: none;
   width: auto;
   height: clamp(64px, 11vw, 92px);

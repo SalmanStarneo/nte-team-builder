@@ -19,7 +19,35 @@ import SharePanel from './components/SharePanel.jsx';
 import TeamSlots from './components/TeamSlots.jsx';
 import TeamTabs from './components/TeamTabs.jsx';
 
+// Cortado, the mascot: a coffee-powered anomaly with a stirring-stick antenna,
+// a handle-shaped tail and retractable wheels. Clicking swaps its headwear.
+const MASCOT_HATS = [
+  { file: 'mascot.svg', label: 'Hard hat' },
+  { file: 'mascot-beanie.svg', label: 'Knit beanie' },
+  { file: 'mascot-beret.svg', label: 'Barista beret' },
+  { file: 'mascot-lid.svg', label: 'Coffee cup lid' },
+];
+const HAT_KEY = 'nte-team-builder:mascotHat';
+const loadHat = () => {
+  try {
+    const n = Number(localStorage.getItem(HAT_KEY));
+    return Number.isInteger(n) && n >= 0 && n < MASCOT_HATS.length ? n : 0;
+  } catch {
+    return 0;
+  }
+};
+
 export default function App() {
+  const [hat, setHat] = useState(loadHat);
+  const nextHat = () => {
+    const n = (hat + 1) % MASCOT_HATS.length;
+    setHat(n);
+    try {
+      localStorage.setItem(HAT_KEY, String(n));
+    } catch {
+      /* storage unavailable */
+    }
+  };
   const [state, dispatch] = useReducer(teamsReducer, null, () => initialState(loadState()));
   const route = useHashRoute();
   const display = useDisplayScale();
@@ -64,14 +92,21 @@ export default function App() {
         <div className="masthead__line" aria-hidden="true" />
         <div className="masthead__row">
           <div className="brand-wrap">
-            <img
-              src={`${import.meta.env.BASE_URL}mascot.svg`}
-              alt="Cortado, the site mascot"
-              title="Cortado"
-              className="brand__mascot"
-              width="200"
-              height="200"
-            />
+            <button
+              type="button"
+              className="brand__mascot-btn"
+              onClick={nextHat}
+              title={`Cortado · ${MASCOT_HATS[hat].label} (click to swap headwear)`}
+              aria-label={`Cortado, the site mascot, wearing a ${MASCOT_HATS[hat].label.toLowerCase()}. Swap headwear`}
+            >
+              <img
+                src={`${import.meta.env.BASE_URL}${MASCOT_HATS[hat].file}`}
+                alt=""
+                className="brand__mascot"
+                width="200"
+                height="200"
+              />
+            </button>
             <h1 className="brand">
               <span className="brand__small">Neverness to Everness</span>
               Team Builder
