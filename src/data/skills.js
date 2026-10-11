@@ -52,6 +52,9 @@ export const PASSIVE_COSTS = [
 
 // Life skill 1 → 5, total.
 export const LIFE_COST = { seeds: 56, fons: 22000 };
+// Dreamless Seeds come from the Mall (the in-game shop) and daily tasks
+// (project owner, Oct 2026).
+export const DREAMLESS_SOURCE = 'Mall and daily tasks';
 
 // [skill book family, weekly item] per character.
 const SKILL_MATS = {
@@ -370,7 +373,7 @@ export function skillCost(characterId, { from = 1, to = SKILL_MAX, skills = 4, p
     { name: 'Beetle Coin', qty: t.coins, kind: 'coins' },
   ];
   if (life) {
-    out.push({ name: 'Dreamless Seed', qty: LIFE_COST.seeds, kind: 'life', source: 'Life skill' });
+    out.push({ name: 'Dreamless Seed', qty: LIFE_COST.seeds, kind: 'life', source: DREAMLESS_SOURCE });
     out.push({ name: 'Fons', qty: LIFE_COST.fons, kind: 'life', source: 'Life skill' });
   }
   return out.filter((m) => m.qty > 0);

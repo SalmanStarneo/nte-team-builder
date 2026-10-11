@@ -436,5 +436,12 @@ export const GLOSSARY = [
     term: 'Life skill',
     category: 'City & currency',
     text: 'A character’s non-combat skill that helps with city activities, such as better shop prices or extra heist rewards.',
+    related: ['Dreamless Seed'],
+  },
+  {
+    term: 'Dreamless Seed',
+    category: 'City & currency',
+    text: 'The item used, with Fons, to level up life skills. Bought from the Mall (the in-game shop) and earned from daily tasks.',
+    related: ['Life skill', 'Fons'],
   },
 ];
