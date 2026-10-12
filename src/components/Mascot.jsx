@@ -29,7 +29,33 @@ const EMOTES = [
   { id: 'swim', label: 'inflates its float belt', ms: 1600 },
   { id: 'sparkle', label: 'sparkles after a refill', ms: 1200 },
   { id: 'charge', label: 'goes into charging mode', ms: 2600 },
+  { id: 'dice', label: 'rolls dice eyes', ms: 2000 },
 ];
+// Dice eyes: faces flicker while they tumble, then land on the rolled values.
+const DICE_ROLL_MS = 1000;
+const DICE_TICK_MS = 85;
+const d6 = () => 1 + Math.floor(Math.random() * 6);
+// Pip positions for each face, as [col, row] in a 3×3 grid (-1..1).
+const PIPS = {
+  1: [[0, 0]],
+  2: [[-1, -1], [1, 1]],
+  3: [[-1, -1], [0, 0], [1, 1]],
+  4: [[-1, -1], [1, -1], [-1, 1], [1, 1]],
+  5: [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]],
+  6: [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]],
+};
+function Die({ cx, cy, value, fill, className }) {
+  const s = 7.6;
+  return (
+    <g className={className}>
+      <rect x={cx - s / 2} y={cy - s / 2} width={s} height={s} rx="1.6" fill={fill} stroke="#2B1D16" strokeWidth="0.7" />
+      <path d={`M${cx - s / 2 + 1.2} ${cy - s / 2 + 1} h${s - 3}`} stroke="#ffffff" strokeOpacity="0.45" strokeWidth="0.7" strokeLinecap="round" />
+      {PIPS[value].map(([c, r], i) => (
+        <circle key={i} cx={cx + c * 2.1} cy={cy + r * 2.1} r="0.78" fill="#FFF9F0" />
+      ))}
+    </g>
+  );
+}
 const HAT_SWAP_AT = 300;
 
 const loadHat = () => {
@@ -58,11 +84,12 @@ const BROWS = {
   happy: 'M24.2 28.3 Q28 27 32 27.9 Q36 27 39.8 28.3',
   sparkle: 'M24.2 28.3 Q28 27 32 27.9 Q36 27 39.8 28.3',
   focused: 'M24 28.2 Q28 28.6 32 30.2 Q36 28.6 40 28.2',
+  dice: 'M23.8 28.2 Q27.6 26.6 32 27.6 Q36.4 26.6 40.2 28.2',
   battery: 'M24.2 28.6 Q28 29.2 32 28.8 Q36 29.2 39.8 28.6',
 };
 
 // A face-screen patch drawn over the mascot's own eyes and unibrow (same 64×64 grid as mascot.svg).
-function Face({ kind }) {
+function Face({ kind, dice }) {
   const glow = { filter: 'drop-shadow(0 0 0.8px #FFE2B0)' };
   return (
     <g>
@@ -113,6 +140,12 @@ function Face({ kind }) {
           </g>
         </g>
       )}
+      {kind === 'dice' && dice && (
+        <g>
+          <Die cx={27} cy={33.8} value={dice[0]} fill="#D9434E" className="mascot__die" />
+          <Die cx={37} cy={33.8} value={dice[1]} fill="#3F7FD8" className="mascot__die mascot__die--2" />
+        </g>
+      )}
       {kind === 'sparkle' && (
         <g fill="#FFE2B0" style={glow}>
           <path d="M27 29.8 Q27.6 33 30.8 33.6 Q27.6 34.2 27 37.4 Q26.4 34.2 23.2 33.6 Q26.4 33 27 29.8 Z" />
@@ -139,9 +172,10 @@ const Star = ({ x, y, s = 1, className }) => (
 export default function Mascot() {
   const [hat, setHat] = useState(loadHat);
   const [emote, setEmote] = useState(null); // { id, n }
+  const [dice, setDice] = useState([1, 1]);
   const next = useRef(0);
   const timers = useRef([]);
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  useEffect(() => () => timers.current.forEach((t) => { clearTimeout(t); clearInterval(t); }), []);
 
   function swapHat() {
     setHat((h) => {
@@ -156,17 +190,23 @@ export default function Mascot() {
   }
 
   function play() {
-    timers.current.forEach(clearTimeout);
+    timers.current.forEach((t) => { clearTimeout(t); clearInterval(t); });
     const e = EMOTES[next.current];
     next.current = (next.current + 1) % EMOTES.length;
     // A new key restarts the CSS animation even when the same emote repeats.
     setEmote({ id: e.id, n: Date.now() });
+    if (e.id === 'dice') {
+      const final = [d6(), d6()];
+      const tick = setInterval(() => setDice([d6(), d6()]), DICE_TICK_MS);
+      timers.current.push(tick);
+      timers.current.push(setTimeout(() => { clearInterval(tick); setDice(final); }, DICE_ROLL_MS));
+    }
     if (e.id === 'hat') timers.current.push(setTimeout(swapHat, HAT_SWAP_AT));
     timers.current.push(setTimeout(() => setEmote(null), e.ms));
   }
 
   const id = emote?.id;
-  const face = { wag: 'happy', hop: 'happy', dash: 'focused', swim: 'happy', sparkle: 'sparkle', charge: 'battery' }[id];
+  const face = { wag: 'happy', hop: 'happy', dash: 'focused', swim: 'happy', sparkle: 'sparkle', charge: 'battery', dice: 'dice' }[id];
 
   return (
     <button
@@ -213,7 +253,7 @@ export default function Mascot() {
           {/* In front: new face and sparkles */}
           {(face || id === 'sparkle' || id === 'swim') && (
             <svg className="mascot__layer mascot__layer--front" viewBox="0 0 64 64" aria-hidden="true">
-              {face && <Face kind={face} />}
+              {face && <Face kind={face} dice={dice} />}
               {id === 'charge' && (
                 <g className="mascot__bolt" fill="#FFE2B0" stroke="#2B1D16" strokeWidth="0.5" strokeLinejoin="round">
                   <path d="M53.4 9.6 L50.2 15 L52.6 15 L51 19.8 L55 13.6 L52.4 13.6 Z" />
