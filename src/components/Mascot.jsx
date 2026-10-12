@@ -28,6 +28,7 @@ const EMOTES = [
   { id: 'dash', label: 'dashes on its wheels', ms: 1100 },
   { id: 'swim', label: 'inflates its float belt', ms: 1600 },
   { id: 'sparkle', label: 'sparkles after a refill', ms: 1200 },
+  { id: 'charge', label: 'goes into charging mode', ms: 2600 },
 ];
 const HAT_SWAP_AT = 300;
 
@@ -57,6 +58,7 @@ const BROWS = {
   happy: 'M24.2 28.3 Q28 27 32 27.9 Q36 27 39.8 28.3',
   sparkle: 'M24.2 28.3 Q28 27 32 27.9 Q36 27 39.8 28.3',
   focused: 'M24 28.2 Q28 28.6 32 30.2 Q36 28.6 40 28.2',
+  battery: 'M24.2 28.6 Q28 29.2 32 28.8 Q36 29.2 39.8 28.6',
 };
 
 // A face-screen patch drawn over the mascot's own eyes and unibrow (same 64×64 grid as mascot.svg).
@@ -78,6 +80,37 @@ function Face({ kind }) {
         <g fill="#FFE2B0" stroke="#FFE2B0" strokeWidth="0.8" strokeLinejoin="round" style={glow}>
           <path d="M24.3 31.4 L29.7 33.2 L29.7 36.6 L24.3 36.6 Z" />
           <path d="M39.7 31.4 L34.3 33.2 L34.3 36.6 L39.7 36.6 Z" />
+        </g>
+      )}
+      {kind === 'battery' && (
+        <g>
+          {/* Both eyes merge into one battery; coffee fills it from the base toward the tip */}
+          <clipPath id="cortado-batt-clip">
+            <rect x="25.3" y="30.9" width="12.4" height="6.2" rx="0.9" />
+          </clipPath>
+          <linearGradient id="cortado-coffee" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#6B4329" />
+            <stop offset="70%" stopColor="#B07646" />
+            <stop offset="100%" stopColor="#E7B27A" />
+          </linearGradient>
+          <g style={glow} className="mascot__batt">
+            <rect x="24.2" y="29.8" width="14.6" height="8.4" rx="1.8" fill="none" stroke="#FFE2B0" strokeWidth="1.1" />
+            <rect x="39.2" y="32.3" width="1.7" height="3.4" rx="0.6" fill="#FFE2B0" />
+          </g>
+          <g clipPath="url(#cortado-batt-clip)">
+            <g className="mascot__coffee">
+              <path
+                d="M12 30 H37.8 Q38.8 31.2 37.8 32.4 T37.8 34.8 T37.8 37.2 Q38.2 37.8 37.8 38.4 H12 Z"
+                fill="url(#cortado-coffee)"
+              />
+              <path
+                d="M37.8 30 Q38.8 31.2 37.8 32.4 T37.8 34.8 T37.8 37.2 Q38.2 37.8 37.8 38.4"
+                stroke="#FFE2B0"
+                strokeWidth="0.5"
+                fill="none"
+              />
+            </g>
+          </g>
         </g>
       )}
       {kind === 'sparkle' && (
@@ -133,7 +166,7 @@ export default function Mascot() {
   }
 
   const id = emote?.id;
-  const face = { wag: 'happy', hop: 'happy', dash: 'focused', swim: 'happy', sparkle: 'sparkle' }[id];
+  const face = { wag: 'happy', hop: 'happy', dash: 'focused', swim: 'happy', sparkle: 'sparkle', charge: 'battery' }[id];
 
   return (
     <button
@@ -181,6 +214,11 @@ export default function Mascot() {
           {(face || id === 'sparkle' || id === 'swim') && (
             <svg className="mascot__layer mascot__layer--front" viewBox="0 0 64 64" aria-hidden="true">
               {face && <Face kind={face} />}
+              {id === 'charge' && (
+                <g className="mascot__bolt" fill="#FFE2B0" stroke="#2B1D16" strokeWidth="0.5" strokeLinejoin="round">
+                  <path d="M53.4 9.6 L50.2 15 L52.6 15 L51 19.8 L55 13.6 L52.4 13.6 Z" />
+                </g>
+              )}
               {id === 'swim' && (
                 <>
                   {/* The float belt inflates into a ring, then the water rises around it */}

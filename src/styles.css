@@ -289,6 +289,17 @@ button {
   animation: cortado-water 1.6s ease-in-out both;
 }
 .mascot--sparkle .mascot__rig { animation: cortado-glow 1.2s ease-in-out; }
+.mascot--charge .mascot__rig { animation: cortado-settle 2.6s ease-in-out; }
+.mascot--charge .mascot__coffee {
+  transform-box: view-box;
+  animation: cortado-fill 2.6s ease-in-out both;
+}
+.mascot--charge .mascot__batt { animation: cortado-blink 2.6s ease-in-out; }
+.mascot--charge .mascot__bolt {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cortado-bolt 2.6s ease-in-out both;
+}
 .mascot--sparkle .mascot__star { animation: cortado-star 1.2s ease-out both; }
 .mascot--sparkle .mascot__star--2 { animation-delay: 0.12s; }
 .mascot--sparkle .mascot__star--3 { animation-delay: 0.24s; }
@@ -358,6 +369,26 @@ button {
   20%, 80% { opacity: 1; transform: none; }
   50% { transform: translateX(-3px); }
   100% { opacity: 0; transform: translateY(10px); }
+}
+@keyframes cortado-settle {
+  0%, 100% { transform: none; }
+  15%, 85% { transform: translateY(5%) scale(1.02, 0.97); }
+}
+@keyframes cortado-fill {
+  0%, 10% { transform: translateX(-12.4px); }
+  80%, 100% { transform: translateX(0); }
+}
+@keyframes cortado-blink {
+  0%, 100% { opacity: 1; }
+  88% { opacity: 1; }
+  92% { opacity: 0.4; }
+  96% { opacity: 1; }
+}
+@keyframes cortado-bolt {
+  0% { opacity: 0; transform: scale(0.4); }
+  15%, 80% { opacity: 1; transform: none; }
+  45% { transform: scale(1.15); }
+  100% { opacity: 0; transform: scale(0.6); }
 }
 @keyframes cortado-glow {
   0%, 100% { transform: none; filter: none; }
