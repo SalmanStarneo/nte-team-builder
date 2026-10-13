@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
-import { ARCS, RECOMMENDED } from '../data/arcs.js';
+import { ARCS, ARC_BY_ID, FIELD_EFFECTS, RECOMMENDED } from '../data/arcs.js';
+import { navigate } from '../lib/route.js';
+import ArcDetail from './ArcDetail.jsx';
 import { ARC_TYPES, CHARACTERS, CHARACTER_BY_ID } from '../data/characters.js';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
@@ -14,7 +16,8 @@ for (const [cid, ids] of Object.entries(RECOMMENDED)) {
   for (const id of ids) (RECOMMENDED_FOR[id] ||= []).push(cid);
 }
 
-export default function ArcsPage({ arcType }) {
+export default function ArcsPage({ arcType, arcId }) {
+  const selected = arcId ? ARC_BY_ID[arcId] : null;
   const type = ARC_TYPES.map((t) => t.toLowerCase()).includes(arcType)
     ? ARC_TYPES.find((t) => t.toLowerCase() === arcType)
     : 'all';
@@ -43,9 +46,11 @@ export default function ArcsPage({ arcType }) {
       <header className="page__head">
         <h2 className="page__title">Arcs</h2>
         <p className="muted">
-          {ARCS.length} Arcs. A character can equip any Arc of their Arc type.
+          {ARCS.length} Arcs. A character can equip any Arc of their Arc type. Select an Arc for its materials and who it suits.
         </p>
       </header>
+
+      {selected && <ArcDetail key={selected.id} arc={selected} onClose={() => navigate('arcs')} />}
 
       <div className="type-tabs" role="tablist" aria-label="Arc type">
         <a className="type-tab" role="tab" aria-selected={type === 'all'} href="#arcs">
@@ -109,10 +114,18 @@ export default function ArcsPage({ arcType }) {
             const sig = a.signature && CHARACTER_BY_ID[a.signature];
             const recs = (RECOMMENDED_FOR[a.id] || []).filter((id) => id !== a.signature).map((id) => CHARACTER_BY_ID[id]);
             return (
-              <li key={a.id} className="arc-card" data-arc-type={a.type.toLowerCase()}>
+              <li
+                key={a.id}
+                className="arc-card arc-card--link"
+                data-arc-type={a.type.toLowerCase()}
+                aria-current={selected?.id === a.id ? 'true' : undefined}
+                onClick={(e) => {
+                  if (!e.target.closest('a, button')) navigate(`arc-${a.id}`);
+                }}
+              >
                 <div className="arc-card__top">
                   <RankBadge rank={a.rarity} size={22} />
-                  <h3 className="arc-card__name">{a.name}</h3>
+                  <h3 className="arc-card__name"><a href={`#arc-${a.id}`}>{a.name}</a></h3>
                   {type === 'all' && <span className="arc-card__type"><ArcTypeIcon type={a.type} size={16} />{a.type}</span>}
                 </div>
                 <dl className="gear-stats">
@@ -120,6 +133,7 @@ export default function ArcsPage({ arcType }) {
                   <div><dt>Secondary</dt><dd>{a.sub}</dd></div>
                 </dl>
                 <p className="arc-card__passive">{a.passive}</p>
+                {FIELD_EFFECTS[a.id] && <p className="arc-card__field">Outside combat: {FIELD_EFFECTS[a.id].name}</p>}
                 {(sig || recs.length > 0) && (
                   <div className="arc-card__users">
                     {sig && (

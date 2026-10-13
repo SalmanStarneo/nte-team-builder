@@ -4,10 +4,29 @@ const BASE = import.meta.env.BASE_URL;
 export const elementIconUrl = (elementId) => `${BASE}icons/elements/${elementId}.webp`;
 export const roleIconUrl = (role) => `${BASE}icons/roles/${role.toLowerCase()}.webp`;
 export const cartridgeIconUrl = (id) => `${BASE}icons/cartridges/${id}.webp`;
+export const arcImageUrl = (id) => `${BASE}arcs/${id}.webp`;
 export const arcTypeIconUrl = (type) => `${BASE}icons/arc-types/${type.toLowerCase()}.webp`;
 
 // Material icons we have files for (public/icons/materials/<slug>.webp).
 const MATERIAL_ICONS = new Set([
+  'beaty',
+  'versey',
+  'harmony',
+  'iron-appleseed',
+  'silver-appleseed',
+  'golden-appleseed',
+  'beginner-drama-core',
+  'master-drama-core',
+  'collectors-drama-core',
+  'flavorless-cold-dessert',
+  'plain-cold-dessert',
+  'special-cold-dessert',
+  'liquid-dream-trial-kit',
+  'liquid-dream-travel-kit',
+  'liquid-dream-can',
+  'light-dye',
+  'colorless-dye',
+  'chaotic-dye',
   'colorful-ticket-stub',
   'eternal-memory',
   'fons',

@@ -109,7 +109,7 @@ export default function App() {
         <CharactersPage characterId={route.characterId} activeTeam={active} onAdd={addFromIndex} />
       )}
 
-      {route.view === 'arcs' && <ArcsPage arcType={route.arcType} />}
+      {route.view === 'arcs' && <ArcsPage arcType={route.arcType} arcId={route.arcId} />}
 
       {route.view === 'console' && (
         <ConsolePage

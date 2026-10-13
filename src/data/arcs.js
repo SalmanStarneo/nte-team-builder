@@ -73,6 +73,21 @@ export const ARCS = [
   arc('Us', 'B', 'Plasma', 380, 'ATK 20%', 'Basic Attack DMG up.'),
 ];
 
+// Effects outside combat, such as exploration tools.
+// Source (Oct 2026): Icy Veins Time Bandit page and heist article.
+export const FIELD_EFFECTS = {
+  'time-bandit': {
+    name: 'Arc - Picky',
+    text: 'Summons Picky to pry open all lockable objects nearby, so every safe in a heist room opens at once. Doesn’t reach other floors. 50s cooldown.',
+  },
+};
+
+// Arcs that don't come from the Arc banner.
+export const ARC_SOURCES = {
+  'day-off': 'Free from the Eclipse side quest.',
+  'time-bandit': 'Arc Shop → Arc Exchange, 100 U-00NE.',
+};
+
 export const ARC_BY_ID = Object.fromEntries(ARCS.map((a) => [a.id, a]));
 
 // Recommended Arcs per character, best first. A character's signature Arc is

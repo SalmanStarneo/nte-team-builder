@@ -3960,3 +3960,63 @@ th[aria-sort='descending'] .th-btn {
 .farm-cta .btn {
   flex: none;
 }
+
+/* ---------- Arc detail ---------- */
+.arc-card--link { cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.arc-card--link:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); box-shadow: 0 4px 14px rgba(0, 0, 0, .08); }
+.arc-card--link[aria-current='true'] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.arc-card__name a { color: inherit; text-decoration: none; }
+.arc-card__name a:hover { text-decoration: underline; }
+.arc-card__field {
+  margin: 0;
+  justify-self: start;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--good) 14%, var(--surface));
+  color: var(--good);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.arc-detail { --el: var(--arc-c, var(--accent)); margin-bottom: 18px; }
+.arc-detail[data-arc-type='solid'] { --arc-c: #8a7cf0; }
+.arc-detail[data-arc-type='liquid'] { --arc-c: #18b3d8; }
+.arc-detail[data-arc-type='gas'] { --arc-c: #8fa6d6; }
+.arc-detail[data-arc-type='plasma'] { --arc-c: #3d63f0; }
+.arc-detail[data-arc-type='condensate'] { --arc-c: #e0405e; }
+.arc-detail__art {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 128px;
+  height: 128px;
+  border-radius: 16px;
+  background:
+    radial-gradient(70% 70% at 50% 40%, color-mix(in srgb, var(--arc-c) 30%, transparent), transparent 72%),
+    color-mix(in srgb, var(--arc-c) 10%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--arc-c) 30%, var(--line));
+}
+.arc-detail__art img { width: 116px; height: 116px; object-fit: contain; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .25)); }
+.arc-detail .eyebrow__meta { display: inline-flex; align-items: center; gap: 6px; }
+.arc-field {
+  display: grid;
+  gap: 2px;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--good) 35%, var(--line));
+  background: color-mix(in srgb, var(--good) 9%, var(--surface));
+}
+.arc-field__label { font: 600 0.7rem var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--good); }
+.arc-field p { margin: 2px 0 0; font-size: 0.9rem; }
+.arc-users-detail { display: grid; gap: 10px; margin-top: 16px; }
+.arc-users-detail__row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.arc-users-detail__row--others a { display: inline-flex; }
+.arc-level { display: grid; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.arc-dyes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.arc-dyes li { display: inline-flex; align-items: center; gap: 6px; font-size: 0.84rem; font-weight: 600; }
+.arc-dyes .mat__src { display: block; font-weight: 400; }
+@media (max-width: 520px) {
+  .arc-detail__art { width: 84px; height: 84px; border-radius: 12px; }
+  .arc-detail__art img { width: 76px; height: 76px; }
+}
