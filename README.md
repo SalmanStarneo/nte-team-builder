@@ -41,7 +41,7 @@ The six elements form a ring: Cosmos, Anima, Incantation, Chaos, Psyche and Laks
 | Lakshana + Cosmos + Anima | Charge | Trio |
 | Incantation + Chaos + Psyche | Discord | Trio |
 
-The model is validated against published community team compositions. Game data is compiled from public community sources and may lag behind new patches; corrections are welcome via [issues](https://github.com/SalmanStarneo/nte-team-builder/issues).
+The model is validated against published community team compositions. Game data is compiled from public community sources and may lag behind new patches; corrections are welcome via [issues](https://github.com/SilverneoStar/nte-team-builder/issues).
 
 ## Running locally
 
@@ -98,7 +98,7 @@ The app has no backend, accounts, analytics or tracking. Teams are stored only i
 
 **No monetisation.** The project carries no advertising, paid features or donations and will not be monetised.
 
-**Removal requests.** Rights holders who would like any content changed or removed can [open an issue](https://github.com/SalmanStarneo/nte-team-builder/issues). Requests will be handled promptly.
+**Removal requests.** Rights holders who would like any content changed or removed can [open an issue](https://github.com/SilverneoStar/nte-team-builder/issues). Requests will be handled promptly.
 
 See [NOTICE.md](NOTICE.md) for full attribution.
 

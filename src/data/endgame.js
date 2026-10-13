@@ -9,8 +9,6 @@
 // main / subs: priority strings as written; parsePriority() turns them into stat names.
 // builds: characters with more than one build on Prydwen; the first is the default.
 
-const PRYDWEN = 'https://www.prydwen.gg/neverness-to-everness/characters/';
-
 export const ENDGAME = {
   adler: {
     slug: 'adler',
@@ -206,8 +204,6 @@ export const ENDGAME = {
     cartridges: ['Speedy Hedgehog', 'Lost Radiance', 'Fireflies and the Forest', 'Shadow Creed'],
   },
 };
-
-export const endgameUrl = (id) => (ENDGAME[id] ? `${PRYDWEN}${ENDGAME[id].slug}` : null);
 
 // Display order and labels for endgame stats.
 export const ENDGAME_STATS = [

@@ -1,5 +1,5 @@
 # Builds the app and publishes it to GitHub Pages on every push to main.
-# Live at https://salmanstarneo.github.io/nte-team-builder/
+# Live at https://silverneostar.github.io/nte-team-builder/
 name: Deploy to GitHub Pages
 
 on:

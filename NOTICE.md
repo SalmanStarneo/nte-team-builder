@@ -8,7 +8,7 @@ NTE Team Builder is an unofficial, non-commercial fan project. It is not affilia
 
 ## Game data
 
-Character names, elements, roles, ranks and reaction rules are factual information compiled from publicly available community resources and in-game observation. No game files have been extracted, decompiled or redistributed. Console grid layouts, module shapes, Cartridge set shape requirements and character module bonuses are factual game information as published by the [Icy Veins NTE Console Tool](https://www.icy-veins.com/neverness-to-everness/console-tool); the planner itself is this project's own code. Recommended endgame stats, Cartridge stat priorities and recommended Cartridge sets are factual build guidance as published on [Prydwen](https://www.prydwen.gg/neverness-to-everness/characters) character guides (October 2026); each character profile links its source page.
+Character names, elements, roles, ranks and reaction rules are factual information compiled from publicly available community resources and in-game observation. No game files have been extracted, decompiled or redistributed. Console grid layouts, module shapes, Cartridge set shape requirements and character module bonuses are factual game information as published by the [Icy Veins NTE Console Tool](https://www.icy-veins.com/neverness-to-everness/console-tool); the planner itself is this project's own code. Recommended endgame stats, Cartridge stat priorities and recommended Cartridge sets are factual build guidance as published on [Prydwen](https://www.prydwen.gg/neverness-to-everness/characters) character guides (October 2026).
 
 ## Artwork
 
@@ -29,4 +29,4 @@ Any official artwork included in this repository is used only where the publishe
 
 ## Contact
 
-Rights holders may request changes or removal of any content by [opening an issue](https://github.com/SalmanStarneo/nte-team-builder/issues).
+Rights holders may request changes or removal of any content by [opening an issue](https://github.com/SilverneoStar/nte-team-builder/issues).
