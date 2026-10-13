@@ -8,7 +8,7 @@ import { CARTRIDGE_BY_ID } from '../data/gear.js';
 import { SET_SHAPES, SHAPES } from '../data/console.js';
 import { materialIconUrl } from './icons.js';
 import { ARC_DYES, ARC_MATERIAL_SOURCE, arcAscensionCost } from '../data/arcMaterials.js';
-import { RECOMMENDED } from '../data/arcs.js';
+import { ARC_SOURCES, RECOMMENDED } from '../data/arcs.js';
 import { CHARACTER_BY_ID } from '../data/characters.js';
 import {
   BODY, DISPLAY, EL, MONO, clipCard, drawRank, drawSilverFrame, ensureFonts, loadImage, roundRect, wrap,
@@ -515,6 +515,35 @@ export async function renderArcFarmCard(arc, { base = '/' } = {}) {
     ctx.font = `600 15px ${BODY}`;
     const label = users.map((c) => c.name).join(', ');
     wrap(ctx, label, LW, 1).forEach((l) => ctx.fillText(l, PAD, ly + 90));
+    ly += 90;
+  }
+
+  // How to get the Arc itself, as far as the left column has room.
+  const sources = ARC_SOURCES[arc.id] ?? [];
+  if (sources.length) {
+    ly += 40;
+    ctx.fillStyle = K.pink;
+    ctx.font = `700 13px ${MONO}`;
+    ctx.fillText('HOW TO GET', PAD, ly);
+    ctx.font = `500 15px ${BODY}`;
+    const LINE = 20;
+    const bottom = ARC_FARM_H - 56;
+    let y = ly + 24;
+    let shown = 0;
+    for (const src of sources) {
+      const lines = wrap(ctx, src, LW - 16, 3);
+      if (y + (lines.length - 1) * LINE > bottom) break;
+      ctx.fillStyle = color;
+      ctx.fillRect(PAD + 1, y - 9, 6, 6);
+      ctx.fillStyle = K.fg;
+      lines.forEach((l, i) => ctx.fillText(l, PAD + 16, y + i * LINE));
+      y += lines.length * LINE + 6;
+      shown += 1;
+    }
+    if (shown < sources.length && y <= bottom + LINE) {
+      ctx.fillStyle = K.muted;
+      ctx.fillText(`+${sources.length - shown} more on the site`, PAD + 16, Math.min(y, bottom + LINE));
+    }
   }
 
   // ---- Header strip ----

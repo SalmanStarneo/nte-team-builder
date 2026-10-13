@@ -82,10 +82,78 @@ export const FIELD_EFFECTS = {
   },
 };
 
-// Arcs that don't come from the Arc banner.
+// How to get each Arc, most useful route first.
+// Sources (Oct 2026): GameWith "How to Get S-Rank Arcs for Free" and per-Arc
+// "How to Obtain" sections; Gfinity (Marching Beyond Time banner); playnews
+// (Crime and Punishment banner); AllThings.how (Elite Hunter Supplies).
+// "Character banners" are the Scarborough Fair boards (GameWith: "Gacha"),
+// "Arc banners" the Arc Research Program, and the Arc Shop is the Arc
+// Exchange paid in U-00NE from anomaly bosses.
+// Far Side of the Moon, Ravenous Blade, The Wrong Gate and Voice of the
+// Voyager follow the signature-Arc pattern (limited Arc banner alongside their
+// character); no guide lists their source yet. The Great Thief has no source
+// listed anywhere yet, so it shows none.
+const LIMITED = 'Limited Arc banner (Arc Research Program, Tri-Keys), alongside its character’s banner';
+const CHAR_BANNERS = 'Character banners (Scarborough Fair)';
+const ARC_BANNERS = 'Arc banners (Arc Research Program)';
+const ARC_SHOP = 'Arc Shop (Arc Exchange, paid in U-00NE from anomaly bosses)';
+const PASS = 'Elite Hunter Supplies (paid Circle Bounty pass): pick any S-rank Arc at Bounty Rank 30';
+const commission = (name, where) => `Anomaly Commission “${name}”${where ? ` (${where})` : ''}`;
+
 export const ARC_SOURCES = {
-  'day-off': 'Free from the Eclipse side quest.',
-  'time-bandit': 'Arc Shop → Arc Exchange, 100 U-00NE.',
+  // S-rank
+  'blow-up-the-crowd': [commission('Rhythm Master', 'Illusion Town')],
+  'blushing-mirage': [LIMITED],
+  'camellia-society': ['First clear of the Serenetti Anomaly Hunt', ARC_BANNERS],
+  'contemplative-cat': ['City Tycoon reward at Tycoon Level 21'],
+  'crime-and-punishment': [LIMITED],
+  'day-off': ['Eclipse side quest at the Bureau of Anomaly Control'],
+  'eternal-waltz': ['Anomaly Pilgrimage: first clear against The Never-ending Arachne'],
+  'far-side-of-the-moon': [LIMITED],
+  'fluff-of-fearlessness': [PASS],
+  'fluff-of-ferocity': [PASS],
+  'fluff-of-finesse': [PASS],
+  'fluff-of-fleetness': [PASS],
+  'fluff-of-fortitude': [PASS],
+  'good-boys-grand-adventure': ['Anomaly Pilgrimage: first clear against Morphix', ARC_BANNERS],
+  'hethereaus-keeper': ['Max out your Wanted Level, defeat the Justice Executioner, then visit the Security Office'],
+  'marching-beyond-time': [LIMITED],
+  'raging-flames': [commission('Ride Assault', 'Bridge Crossings'), ARC_BANNERS],
+  'ravenous-blade': [LIMITED],
+  'ready-ready': [LIMITED],
+  'reality-refuge': [commission('Let’s Go See a Movie', 'New Herland District'), ARC_BANNERS],
+  'song-of-the-whale': [commission('Deep Blue Sorrow', 'New Herland District')],
+  'stellar-veil': ['Login bonus event'],
+  'tears-beneath-the-mask': [commission('Call of the Lost', 'New Herland District')],
+  'the-last-rose': [LIMITED],
+  'the-rain-that-shook-the-world': ['Limited Press Arc Pack in the Mall (paid)', 'Arc Shop, after buying the pack'],
+  'the-wrong-gate': [LIMITED],
+  'voice-of-the-voyager': [LIMITED],
+  'whats-desired': [LIMITED],
+  'your-happiness-is-priceless': ['Mall, for Nacupeda Coins: “Make a Sincere Wish” once a day at Nacupeda’s Pool, southwest Illusion Town'],
+  'youthful-fantasy': [commission('The Book of Post-Adolescence', 'New Herland District'), ARC_BANNERS],
+  // A-rank
+  'a-time-will-come': [commission('Dragon Gate Substitute'), commission('Heaven’s Forsaken'), ARC_SHOP],
+  'call-of-the-twisted-city': [commission('Kindness Hard to Refuse'), ARC_SHOP],
+  'clear-skies': [CHAR_BANNERS, ARC_SHOP],
+  'cosmos-daze-wild-reverie': [commission('Lightspeed Tagger')],
+  'drawn-blade': [commission('Where Is Home'), CHAR_BANNERS, ARC_BANNERS, ARC_SHOP],
+  'failing-you-heavy-in-my-heart': [commission('Video Cemetery'), ARC_SHOP],
+  'mind-royale': [commission('Reclaim Inspiration'), commission('Plot Hole Repair Project'), ARC_SHOP],
+  oraora: ['Anomaly Commissions “Backstreet Boxer”, “Rooftop Boxer”, “Court Boxer” and “Party Boxer”', ARC_SHOP],
+  'shiny-days': [ARC_SHOP],
+  'the-fools-spring': [ARC_SHOP],
+  'the-forgotten': ['Pre-release reward', CHAR_BANNERS, ARC_SHOP],
+  'the-good-the-bad-the-bitter': [ARC_SHOP],
+  'time-bandit': ['Arc Shop (Arc Exchange): 100 U-00NE'],
+  umbrella: [commission('Prepare for Rain'), CHAR_BANNERS, ARC_BANNERS, ARC_SHOP],
+  'watch-your-heads': [CHAR_BANNERS, ARC_BANNERS, ARC_SHOP],
+  // B-rank
+  'be-happy': [CHAR_BANNERS, ARC_BANNERS],
+  'dangerous-game': [CHAR_BANNERS, ARC_BANNERS],
+  'first-step-to-success': [CHAR_BANNERS, ARC_BANNERS],
+  'real-music': [CHAR_BANNERS, ARC_BANNERS],
+  us: [CHAR_BANNERS, ARC_BANNERS],
 };
 
 export const ARC_BY_ID = Object.fromEntries(ARCS.map((a) => [a.id, a]));

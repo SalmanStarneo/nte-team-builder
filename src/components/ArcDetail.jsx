@@ -36,7 +36,7 @@ export default function ArcDetail({ arc: a, onClose }) {
   const named = new Set([a.signature, ...recs.map((c) => c.id)]);
   const others = CHARACTERS.filter((c) => c.arcType === a.type && !named.has(c.id));
   const field = FIELD_EFFECTS[a.id];
-  const source = ARC_SOURCES[a.id];
+  const sources = ARC_SOURCES[a.id] ?? [];
   const cost = arcAscensionCost(a, from, to);
   const table = arcAscensionTable(a);
 
@@ -75,7 +75,6 @@ export default function ArcDetail({ arc: a, onClose }) {
             <div><dt>Base ATK</dt><dd>{a.atk} <span className="muted">at Lv {ARC_MAX_LEVEL}</span></dd></div>
             <div><dt>Secondary</dt><dd>{a.sub}</dd></div>
             <div><dt>Passive</dt><dd>{a.passive}</dd></div>
-            {source && <div><dt>How to get</dt><dd>{source}</dd></div>}
           </dl>
 
           {field && (
@@ -85,6 +84,17 @@ export default function ArcDetail({ arc: a, onClose }) {
               <p>{field.text}</p>
             </aside>
           )}
+
+          <section className="arc-obtain" aria-labelledby="arc-obtain-title">
+            <h3 id="arc-obtain-title" className="mini-title">How to get</h3>
+            {sources.length > 0 ? (
+              <ul className="arc-obtain__list">
+                {sources.map((s) => <li key={s}>{s}</li>)}
+              </ul>
+            ) : (
+              <p className="muted small">No source is listed for this Arc yet.</p>
+            )}
+          </section>
 
           <section className="arc-users-detail">
             <h3 className="mini-title">Who it’s for</h3>
@@ -223,7 +233,7 @@ export default function ArcDetail({ arc: a, onClose }) {
           <div className="farm-cta__text">
             <h3 id="arc-farm-title" className="mini-title">Farming list</h3>
             <p className="muted small">
-              Every material to take {a.name} from Lv 20 to {ARC_MAX_LEVEL}, grouped by where to farm it.
+              How to get {a.name}, plus every material to take it from Lv 20 to {ARC_MAX_LEVEL}, grouped by where to farm it.
             </p>
           </div>
           <button type="button" className="btn" onClick={() => setSharing(true)}>

@@ -1581,6 +1581,35 @@ button {
   margin: 0;
   font-weight: 500;
 }
+
+/* Where an Arc comes from */
+.arc-obtain {
+  margin-top: 18px;
+}
+.arc-obtain__list {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+.arc-obtain__list li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.arc-obtain__list li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.5em;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: rotate(45deg);
+}
 .stats table {
   width: 100%;
   border-collapse: collapse;
