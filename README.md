@@ -22,6 +22,7 @@ Plan squads, browse every character, see which elemental reactions they trigger 
 - **Character index.** A sortable, filterable table of every Esper with rank, element, role, Arc type and base stats. Each character has a detail view with faction, Esper ability, reactions and featured teams.
 - **Arcs.** All Arcs with tabs for each Arc type (Solid, Liquid, Gas, Plasma, Condensate), rank filter, search, and the characters each Arc is the signature of or recommended for.
 - **Ascension planner.** Each character page lists the materials to raise their level cap, with a from/to range and a per-ascension breakdown.
+- **Achievements tracker.** All 388 in-game achievements across 8 categories, filterable by tier (Bronze, Silver, Gold, Hidden) and progress, sortable, and searchable. Tick them off as you go; progress is saved in your browser. Hidden achievements keep their requirement covered until you choose to reveal it.
 - **Glossary.** Searchable definitions of game terms, from the Esper Cycle and reactions to Arcs, the Console and endgame modes.
 - **Display size.** Scales automatically on large screens, with a manual size picker (90% to 140%) saved per browser.
 - **Light and dark themes**, following your system setting. Element colours match the in-game Esper Cycle.

@@ -7,6 +7,7 @@ import { decodeTeam } from './lib/share.js';
 import { loadState, saveState } from './lib/storage.js';
 import { initialState, loadoutOf, teamsReducer } from './lib/teamsReducer.js';
 import Analysis from './components/Analysis.jsx';
+import AchievementsPage from './components/AchievementsPage.jsx';
 import ArcsPage from './components/ArcsPage.jsx';
 import CharactersPage from './components/CharactersPage.jsx';
 import ExportDialog from './components/ExportDialog.jsx';
@@ -111,6 +112,8 @@ export default function App() {
       )}
 
       {route.view === 'arcs' && <ArcsPage arcType={route.arcType} arcId={route.arcId} />}
+
+      {route.view === 'achievements' && <AchievementsPage category={route.category} />}
 
       {route.view === 'console' && (
         <ConsolePage

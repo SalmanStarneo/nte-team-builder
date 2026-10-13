@@ -4153,3 +4153,219 @@ th[aria-sort='descending'] .th-btn {
   .arc-detail__art { width: 84px; height: 84px; border-radius: 12px; }
   .arc-detail__art img { width: 76px; height: 76px; }
 }
+
+/* ---------- Achievements ---------- */
+.medal {
+  flex: none;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18), inset 0 2px 0 rgba(255, 255, 255, 0.35);
+}
+.medal--b { background: linear-gradient(135deg, #e3a06b, #a8612f); }
+.medal--s { background: linear-gradient(135deg, #f2f4f8, #9aa3b2); }
+.medal--g { background: linear-gradient(135deg, #ffe08a, #c9921c); }
+.medal--h {
+  background: var(--surface-2);
+  border: 1.5px dashed var(--muted);
+  box-shadow: none;
+}
+
+.ach-summary {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.ach-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ach-progress__bar {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.ach-progress__bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+.ach-progress__num {
+  flex: none;
+  font: 600 0.85rem var(--font-mono);
+}
+.ach-tiers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 0.85rem;
+}
+.ach-tiers li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ach-tiers strong {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+.ach-cat {
+  display: grid;
+  gap: 8px;
+}
+.ach-cat p {
+  margin: 0;
+}
+.ach-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.ach-select select {
+  min-height: 32px;
+  padding: 3px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 0.8rem;
+}
+.ach-filters .search {
+  flex: 1 1 220px;
+  min-width: 200px;
+  max-width: 320px;
+}
+.ach-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.ach-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ach-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ach-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.ach {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 4px 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transition: border-color 0.15s, opacity 0.15s;
+}
+.ach:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+.ach__check {
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  accent-color: var(--good);
+  cursor: pointer;
+}
+.ach .medal {
+  margin-top: 3px;
+}
+.ach__body {
+  min-width: 0;
+}
+.ach__name {
+  display: block;
+  font-weight: 600;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.ach__text {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.ach__reveal {
+  margin-top: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 0.82rem;
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+.ach__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.ach__cat,
+.ach__tier {
+  font: 500 0.68rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.ach--done {
+  border-color: color-mix(in srgb, var(--good) 45%, var(--line));
+  background: color-mix(in srgb, var(--good) 7%, var(--surface));
+}
+.ach--done .ach__name {
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--fg) 40%, transparent);
+}
+.ach-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ach-foot p {
+  margin: 0;
+  max-width: 70ch;
+}
+@media (max-width: 560px) {
+  .ach {
+    grid-template-columns: auto auto minmax(0, 1fr);
+  }
+  .ach__meta {
+    grid-column: 3;
+    justify-content: flex-start;
+  }
+}
