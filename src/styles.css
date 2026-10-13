@@ -1277,10 +1277,11 @@ button {
   border-top: 1px solid var(--line);
   font-size: 0.8rem;
   color: var(--muted);
+  text-align: center;
 }
 
 .foot__notes {
-  margin: 14px 0 0;
+  margin: 14px auto 0;
   max-width: 70ch;
 }
 
@@ -1300,7 +1301,8 @@ button {
   margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  justify-content: center;
   gap: 10px;
 }
 
@@ -1347,6 +1349,8 @@ button {
   display: flex;
   flex-direction: column;
   line-height: 1.2;
+  text-align: left;
+  white-space: nowrap;
 }
 
 .social__name {
@@ -1359,8 +1363,22 @@ button {
   color: var(--muted);
 }
 
+/* Keep all three buttons on one line on narrow phones: drop the handles. */
+@media (max-width: 520px) {
+  .social__list {
+    gap: 6px;
+  }
+  .social__link {
+    gap: 8px;
+    padding: 6px 12px 6px 6px;
+  }
+  .social__handle {
+    display: none;
+  }
+}
+
 .social__note {
-  margin: 10px 0 0;
+  margin: 10px auto 0;
   max-width: 70ch;
   font-size: 0.75rem;
   font-style: italic;
