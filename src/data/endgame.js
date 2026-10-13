@@ -1,13 +1,13 @@
 // Recommended endgame stats and Cartridge stat priorities per character.
-// Source: Prydwen character pages (https://www.prydwen.gg/neverness-to-everness/characters/<slug>),
-// "Recommended endgame stats", "Best Stats" and "Best Cartridges", collected Oct 2026.
-// Values are written as on Prydwen ("20,000+", "50% ~ 80%+"). Prydwen tunes them
+// Source: published community build guides (recommended endgame stats, best
+// stats and best Cartridges per character), collected Oct 2026.
+// Values are written as the guides give them ("20,000+", "50% ~ 80%+"), tuned
 // for the character's signature Arc.
 //
 // endgame keys: hp, atk, def, critRate, critDmg, universal, element (the
 // character's own element DMG), cycle, break.
 // main / subs: priority strings as written; parsePriority() turns them into stat names.
-// builds: characters with more than one build on Prydwen; the first is the default.
+// builds: characters with more than one recommended build; the first is the default.
 
 export const ENDGAME = {
   adler: {
@@ -217,7 +217,7 @@ export const endgameNumber = (v) => {
   return m ? Number(m[0].replace(/,/g, '')) : null;
 };
 
-// Prydwen's stat names → the app's stat names.
+// The guides' stat names → the app's stat names.
 const NAME_MAP = {
   'crit rate': 'CRIT Rate',
   'crit dmg': 'CRIT DMG',

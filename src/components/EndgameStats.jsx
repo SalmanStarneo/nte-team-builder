@@ -29,7 +29,7 @@ function Priority({ title, text }) {
   );
 }
 
-// Prydwen's recommended endgame stats and Cartridge stat priorities.
+// Community-guide recommended endgame stats and Cartridge stat priorities.
 export default function EndgameStats({ character: c }) {
   const e = ENDGAME[c.id];
   if (!e) {

@@ -612,7 +612,7 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     if (ms.cycle) stats.push({ stat: 'Cycle Intensity', value: round(ms.cycle + take('Cycle Intensity')) });
     if (ms.breakInt) stats.push({ stat: 'Break Intensity', value: round(ms.breakInt + take('Break Intensity')) });
   }
-  // Prydwen's endgame targets, shown beside each value.
+  // Recommended endgame targets, shown beside each value.
   const eg = ENDGAME[c.id]?.endgame;
   const targetKey = {
     HP: 'hp', ATK: 'atk', DEF: 'def', 'CRIT Rate': 'critRate', 'CRIT DMG': 'critDmg',

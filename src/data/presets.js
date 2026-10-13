@@ -1,5 +1,5 @@
 // Community team archetypes (Mobalytics team guide, Sep 2026; Blackbird,
-// Aurelia, Mint and Skia teams from Prydwen, Kaiden, Icy Veins and GameWith,
+// Aurelia, Mint and Skia teams from Kaiden, Icy Veins, GameWith and other community guides,
 // Oct 2026). Loading one copies it into the team you're editing, with each
 // member's recommended kit (see presetLoadouts).
 import { CHARACTER_BY_ID } from './characters.js';

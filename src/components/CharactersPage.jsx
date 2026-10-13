@@ -27,7 +27,7 @@ const COLUMNS = [
   { id: 'rarity', label: 'Rank', get: (c) => c.rarity },
   { id: 'role', label: 'Roles', get: (c) => c.roles.join(', ') },
   { id: 'arcType', label: 'Arc type', get: (c) => c.arcType },
-  // Prydwen's recommended endgame stats; sorted by their first number.
+  // Recommended endgame stats from community build guides; sorted by their first number.
   ...[
     ['hp', 'HP'], ['atk', 'ATK'], ['critRate', 'CRIT Rate'], ['critDmg', 'CRIT DMG'],
     ['universal', 'Univ. DMG'], ['element', 'Elem. DMG'],

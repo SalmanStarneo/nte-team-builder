@@ -46,7 +46,7 @@ const SURVIVAL_SET = {
 const SURVIVAL_STYLE = { adler: 'shield', edgar: 'heal', iroi: 'heal', fadia: 'hp' };
 
 export function cartridgesFor(character) {
-  // Prydwen's ranking when it has one, by set name.
+  // The build guides' ranking when they have one, by set name.
   const named = ENDGAME[character.id]?.cartridges
     ?.map((n) => CARTRIDGES.find((x) => x.name === n)?.id)
     .filter(Boolean);

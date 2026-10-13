@@ -1,5 +1,5 @@
 // Character skills and the materials to level them.
-// Sources (Oct 2026): GameWith, Prydwen, Icy Veins and neverness.gg character
+// Sources (Oct 2026): GameWith, Icy Veins and neverness.gg character
 // pages (skill names, life skills); Icy Veins "profile-skills" pages and item
 // "used by" lists (skill-book family and weekly item per character); Oslink max-level
 // material guides (per-level table, cross-checked against Icy Veins totals).

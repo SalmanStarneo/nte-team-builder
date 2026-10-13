@@ -3,8 +3,8 @@
 // Cartridge set and Console layout, and the recommended stats at their best
 // S-rank values (+20).
 // Values (Oct 2026): S-rank Cartridge main stats at +20 and fixed S-rank sub
-// stats; S-rank module main and sub stats per module Type, from the Prydwen
-// "Modules – Stats" guide.
+// stats; S-rank module main and sub stats per module Type, from published
+// community module stat guides.
 import { ARCS, ARC_BY_ID, RECOMMENDED } from './arcs.js';
 import { bonusStats, cartridgesFor } from './gear.js';
 import { SHAPES, consoleStats } from './console.js';

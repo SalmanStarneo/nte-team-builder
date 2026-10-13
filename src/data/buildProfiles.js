@@ -9,9 +9,9 @@
 // The highest-weight main stat and the top 4 sub stats are suggested, with the
 // reasons shown next to them.
 //
-// When Prydwen has a "Best Stats" priority for the character (data/endgame.js)
+// When the build guides give a "Best Stats" priority for the character (data/endgame.js)
 // it is used first; the weights only fill gaps. Profiles marked `override`
-// keep the project owner's reading of the kit instead, and show Prydwen's
+// keep the project owner's reading of the kit instead, and show the guide's
 // priority as an alternative.
 //
 // Profiles: from the project owner's notes (Oct 2026).
@@ -145,7 +145,7 @@ export function recommendStats(characterOrId, cartridgeId = null) {
 
   const ranked = (pool) => [...w].filter(([s, n]) => pool.has(s) && n > 0).sort((a, b) => b[1] - a[1]).map(([s]) => s);
 
-  // Prydwen's "Best Stats" priority, minus Cycle Intensity for instant-Cycle kits.
+  // The guide's "Best Stats" priority, minus Cycle Intensity for instant-Cycle kits.
   const guide = ENDGAME[c.id];
   const fromGuide = (text, pool) => parsePriority(text).flat()
     .filter((s) => pool.has(s) && !(profile.instantCycle && s === 'Cycle Intensity'));

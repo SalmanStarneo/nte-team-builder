@@ -1,5 +1,5 @@
 // Glossary of NTE terms. Reactions are added automatically from elements.js.
-// Modes and city terms (Oct 2026): Icy Veins, GameWith, Prydwen, Kaiden and
+// Modes and city terms (Oct 2026): Icy Veins, GameWith, Kaiden and
 // AllThings.how guides.
 // Each entry: { term, also?, category, text, related? }
 export const GLOSSARY_CATEGORIES = [
