@@ -1277,7 +1277,93 @@ button {
   border-top: 1px solid var(--line);
   font-size: 0.8rem;
   color: var(--muted);
+}
+
+.foot__notes {
+  margin: 14px 0 0;
   max-width: 70ch;
+}
+
+/* Fan-run social links in the footer */
+.social__title {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.social__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.social__link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 14px 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--fg);
+  text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.social__link:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.social__link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.social__icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  flex-shrink: 0;
+}
+
+.social__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.social__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.social__name {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.social__handle {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.social__note {
+  margin: 10px 0 0;
+  max-width: 70ch;
+  font-size: 0.75rem;
+  font-style: italic;
 }
 
 @media (prefers-reduced-motion: reduce) {

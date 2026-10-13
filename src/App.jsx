@@ -14,6 +14,7 @@ import LoadoutPanel from './components/LoadoutPanel.jsx';
 import GlossaryPage from './components/GlossaryPage.jsx';
 import ConsolePage from './components/ConsolePage.jsx';
 import Portrait from './components/Portrait.jsx';
+import SocialLinks from './components/SocialLinks.jsx';
 import Roster from './components/Roster.jsx';
 import SharePanel from './components/SharePanel.jsx';
 import TeamSlots from './components/TeamSlots.jsx';
@@ -189,10 +190,13 @@ export default function App() {
       {exporting && <ExportDialog team={active} onClose={() => setExporting(false)} />}
 
       <footer className="foot">
+        <SocialLinks />
+        <p className="foot__notes">
         Your teams are saved only in this browser on this device. Nobody else can see or change them.
         Element reactions follow the Esper Cycle: each element reacts with its two neighbours.
         Game data is compiled from community sources and may lag behind patches.
         Neverness to Everness and all related content belong to Hotta Studio and Perfect World Games.
+        </p>
       </footer>
     </div>
   );
