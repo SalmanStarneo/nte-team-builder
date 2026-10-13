@@ -17,8 +17,8 @@ import RankBadge from './RankBadge.jsx';
 const CAPS = [20, 30, 40, 50, 60, 70, 80];
 const fmt = (n) => n.toLocaleString('en-US');
 
-// Arcs we have art for (public/arcs/<id>.webp).
-const NO_ART = new Set(['crime-and-punishment']);
+// Arcs without art yet (everything else has public/arcs/<id>.webp).
+const NO_ART = new Set([]);
 
 export default function ArcDetail({ arc: a, onClose }) {
   const [from, setFrom] = useState(20);
