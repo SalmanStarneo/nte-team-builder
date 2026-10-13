@@ -9,6 +9,8 @@ import {
   arcAscensionTable,
 } from '../data/arcMaterials.js';
 import { arcImageUrl } from '../lib/icons.js';
+import { renderArcFarmCard } from '../lib/farmCard.js';
+import ExportDialog from './ExportDialog.jsx';
 import ArcTypeIcon from './ArcTypeIcon.jsx';
 import MaterialIcon from './MaterialIcon.jsx';
 import Portrait from './Portrait.jsx';
@@ -24,6 +26,7 @@ export default function ArcDetail({ arc: a, onClose }) {
   const [from, setFrom] = useState(20);
   const [to, setTo] = useState(ARC_MAX_LEVEL);
   const [showPhases, setShowPhases] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   const sig = a.signature && CHARACTER_BY_ID[a.signature];
   const recs = Object.entries(RECOMMENDED)
@@ -214,6 +217,30 @@ export default function ArcDetail({ arc: a, onClose }) {
           </section>
         )}
       </div>
+
+      {cost && (
+        <section className="farm-cta" aria-labelledby="arc-farm-title">
+          <div className="farm-cta__text">
+            <h3 id="arc-farm-title" className="mini-title">Farming list</h3>
+            <p className="muted small">
+              Every material to take {a.name} from Lv 20 to {ARC_MAX_LEVEL}, grouped by where to farm it.
+            </p>
+          </div>
+          <button type="button" className="btn" onClick={() => setSharing(true)}>
+            Share farming list
+          </button>
+        </section>
+      )}
+
+      {sharing && (
+        <ExportDialog
+          title="Arc farming list image"
+          name={a.name}
+          suffix="nte-arc-farming-list"
+          onClose={() => setSharing(false)}
+          render={(opts) => renderArcFarmCard(a, opts)}
+        />
+      )}
     </article>
   );
 }

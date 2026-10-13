@@ -7,6 +7,9 @@ import { bestBuild } from '../data/bestBuild.js';
 import { CARTRIDGE_BY_ID } from '../data/gear.js';
 import { SET_SHAPES, SHAPES } from '../data/console.js';
 import { materialIconUrl } from './icons.js';
+import { ARC_DYES, ARC_MATERIAL_SOURCE, arcAscensionCost } from '../data/arcMaterials.js';
+import { RECOMMENDED } from '../data/arcs.js';
+import { CHARACTER_BY_ID } from '../data/characters.js';
 import {
   BODY, DISPLAY, EL, MONO, clipCard, drawRank, drawSilverFrame, ensureFonts, loadImage, roundRect, wrap,
 } from './teamCard.js';
@@ -380,5 +383,176 @@ export async function renderFarmCard(character, { base = '/' } = {}) {
   );
 
   drawSilverFrame(ctx, FARM_W, FARM_H);
+  return canvas;
+}
+
+// ---------- Arc farming card ----------
+const ARC_COLORS = { Solid: '#8a7cf0', Liquid: '#18b3d8', Gas: '#8fa6d6', Plasma: '#3d63f0', Condensate: '#e0405e' };
+export const ARC_FARM_H = 740;
+
+function circleImage(ctx, img, x, y, d, ring) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x + d / 2, y + d / 2, d / 2, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.fillStyle = '#1b1c22';
+  ctx.fill();
+  ctx.clip();
+  if (img) ctx.drawImage(img, x, y, d, d);
+  ctx.restore();
+  ctx.strokeStyle = ring;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(x + d / 2, y + d / 2, d / 2, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+/** Renders the farming card for one Arc (Lv 20 → 80), or null without data. */
+export async function renderArcFarmCard(arc, { base = '/' } = {}) {
+  const cost = arcAscensionCost(arc);
+  if (!cost) return null;
+  await ensureFonts();
+  const color = ARC_COLORS[arc.type] ?? K.pink;
+
+  const arcMats = cost.filter((m) => m.source === ARC_MATERIAL_SOURCE);
+  const anomaly = cost.filter((m) => m.kind.startsWith('tier') && m.source !== ARC_MATERIAL_SOURCE);
+  const coins = cost.find((m) => m.kind === 'coins');
+  const groups = {
+    arc: { title: 'Bubble Can Factory', where: 'Anomaly Zone · Character Pixels', items: arcMats },
+    anomaly: { title: 'Open-world anomalies', where: 'Drops from anomalies', items: anomaly },
+    exp: {
+      title: 'Arc EXP',
+      where: 'Houdinii’s Magic Stage',
+      items: ARC_DYES.map((d, i) => ({ name: d.name, qty: null, kind: `tier${i + 1}` })),
+    },
+    money: { title: 'Currency', where: 'EXP & Beetle Coins zone', items: [coins] },
+  };
+
+  const sig = arc.signature && CHARACTER_BY_ID[arc.signature];
+  const recs = Object.entries(RECOMMENDED)
+    .filter(([cid, ids]) => ids.includes(arc.id) && cid !== arc.signature)
+    .map(([cid]) => CHARACTER_BY_ID[cid])
+    .filter(Boolean);
+  const users = [...(sig ? [sig] : []), ...recs].slice(0, 5);
+
+  const names = [...new Set(Object.values(groups).flatMap((g) => g.items.map((i) => i.name)))];
+  const [art, typeIcon, ...rest] = await Promise.all([
+    loadImage(`${base}arcs/${arc.id}.webp`),
+    loadImage(`${base}icons/arc-types/${arc.type.toLowerCase()}.webp`),
+    ...names.map((n) => (materialIconUrl(n) ? loadImage(materialIconUrl(n)) : null)),
+    ...users.map((c) => loadImage(`${base}characters/${c.id}.webp`)),
+  ]);
+  const imgs = new Map(names.map((n, i) => [n, rest[i]]));
+  const userImgs = rest.slice(names.length);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = FARM_W;
+  canvas.height = ARC_FARM_H;
+  const ctx = canvas.getContext('2d');
+  clipCard(ctx, FARM_W, ARC_FARM_H);
+  ctx.fillStyle = K.bg;
+  ctx.fillRect(0, 0, FARM_W, ARC_FARM_H);
+  drawBackdrop(ctx);
+
+  const PAD = 32;
+  const LW = 340;
+  const AH = 300;
+  // ---- Left: Arc art ----
+  const glow = ctx.createRadialGradient(PAD + LW / 2, PAD + AH / 2, 10, PAD + LW / 2, PAD + AH / 2, LW * 0.7);
+  glow.addColorStop(0, `${color}66`);
+  glow.addColorStop(1, 'rgba(18,19,24,0)');
+  ctx.fillStyle = '#1b1c22';
+  roundRect(ctx, PAD, PAD, LW, AH, 22);
+  ctx.fill();
+  ctx.fillStyle = glow;
+  roundRect(ctx, PAD, PAD, LW, AH, 22);
+  ctx.fill();
+  if (art) {
+    const s = AH - 30;
+    ctx.drawImage(art, PAD + (LW - s) / 2, PAD + 15, s, s);
+  }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  roundRect(ctx, PAD, PAD, LW, AH, 22);
+  ctx.stroke();
+
+  let ly = PAD + AH + 52;
+  let size = 44;
+  ctx.fillStyle = K.fg;
+  const title = arc.name.toUpperCase();
+  ctx.font = `italic 800 ${size}px ${DISPLAY}`;
+  const nameLines = (() => {
+    while (size > 30 && ctx.measureText(title).width > LW) {
+      size -= 2;
+      ctx.font = `italic 800 ${size}px ${DISPLAY}`;
+    }
+    return ctx.measureText(title).width > LW ? wrap(ctx, title, LW, 2) : [title];
+  })();
+  nameLines.forEach((l, i) => ctx.fillText(l, PAD, ly + i * (size + 2)));
+  ly += (nameLines.length - 1) * (size + 2) + 38;
+
+  drawRank(ctx, arc.rarity, PAD, ly - 8, 34);
+  if (typeIcon) ctx.drawImage(typeIcon, PAD + 44, ly - 24, 30, 30);
+  ctx.fillStyle = color;
+  ctx.font = `700 19px ${BODY}`;
+  ctx.fillText(`${arc.type} Arc`, PAD + 82, ly);
+  ctx.fillStyle = K.muted;
+  ctx.font = `500 17px ${BODY}`;
+  ctx.fillText(` · ${arc.sub}`, PAD + 82 + ctx.measureText(`${arc.type} Arc`).width + 8, ly);
+
+  // Who it's for
+  if (users.length) {
+    ly += 30;
+    ctx.fillStyle = K.pink;
+    ctx.font = `700 13px ${MONO}`;
+    ctx.fillText(sig && recs.length ? 'SIGNATURE · RECOMMENDED FOR' : sig ? 'SIGNATURE ARC OF' : 'RECOMMENDED FOR', PAD, ly);
+    users.forEach((c, i) => {
+      const d = 52;
+      const x = PAD + i * (d + 12);
+      circleImage(ctx, userImgs[i], x, ly + 12, d, i === 0 && sig ? '#f2c14e' : K.line);
+    });
+    ctx.fillStyle = K.fg;
+    ctx.font = `600 15px ${BODY}`;
+    const label = users.map((c) => c.name).join(', ');
+    wrap(ctx, label, LW, 1).forEach((l) => ctx.fillText(l, PAD, ly + 90));
+  }
+
+  // ---- Header strip ----
+  const RX = PAD + LW + 28;
+  const RW = FARM_W - RX - PAD;
+  ctx.fillStyle = K.panel;
+  roundRect(ctx, RX, PAD, RW, 84, 16);
+  ctx.fill();
+  ctx.strokeStyle = K.line;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = K.fg;
+  ctx.font = `italic 800 40px ${DISPLAY}`;
+  ctx.fillText('ARC MATERIALS TO FARM', RX + 24, PAD + 55);
+  const hw = ctx.measureText('ARC MATERIALS TO FARM').width;
+  ctx.fillStyle = K.muted;
+  ctx.font = `500 17px ${BODY}`;
+  ctx.fillText('Level cap 20 → 80 · all 6 ascensions', RX + 24 + hw + 20, PAD + 53);
+
+  // ---- Groups ----
+  const GAP = 20;
+  const TOP = PAD + 84 + GAP;
+  const ROW = 252;
+  const half = (RW - GAP) / 2;
+  group(ctx, RX, TOP, half, ROW, groups.arc, imgs);
+  group(ctx, RX + half + GAP, TOP, half, ROW, groups.anomaly, imgs);
+  const r2 = TOP + ROW + GAP;
+  const wide = Math.round(RW * 0.62);
+  group(ctx, RX, r2, wide, ROW, groups.exp, imgs);
+  group(ctx, RX + wide + GAP, r2, RW - wide - GAP, ROW, groups.money, imgs);
+
+  ctx.font = `500 13px ${BODY}`;
+  ctx.fillStyle = K.muted;
+  ctx.fillText(
+    'Unofficial fan project · Neverness to Everness © Hotta Studio / Perfect World Games · Amounts may change with updates',
+    PAD, ARC_FARM_H - 28,
+  );
+
+  drawSilverFrame(ctx, FARM_W, ARC_FARM_H);
   return canvas;
 }
