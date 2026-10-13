@@ -94,7 +94,7 @@ The app has no backend, accounts, analytics or tracking. Teams are stored only i
 
 **Trademarks and game content.** *Neverness to Everness*, *NTE*, and all related names, characters, artwork and other game content are trademarks or copyrighted material of their respective owners. They are referenced here for identification and informational purposes only, and all rights remain with their owners.
 
-**Artwork.** Element symbols and placeholder portraits in this project are original. Any official artwork added to the project is used only where its publisher has made it available for free public or fan use, under that publisher's terms, and is not covered by this repository's license.
+**Artwork.** Element symbols and placeholder portraits in this project are original. Cortado, the site mascot, is original artwork licensed separately under [CC BY-NC-ND 4.0](LICENSE-ARTWORK.md): share him unchanged with credit, but don't edit him, remove his watermark or use him commercially. Any official artwork added to the project is used only where its publisher has made it available for free public or fan use, under that publisher's terms, and is not covered by this repository's license.
 
 **No monetisation.** The project carries no advertising, paid features or donations and will not be monetised.
 
@@ -105,3 +105,5 @@ See [NOTICE.md](NOTICE.md) for full attribution.
 ## License
 
 The source code is released under the [MIT License](LICENSE). The license covers this project's original code only; it grants no rights to third-party game content, trademarks or artwork.
+
+Cortado, the site mascot, and all Cortado stickers and images are licensed under [CC BY-NC-ND 4.0](LICENSE-ARTWORK.md), not the MIT License.
