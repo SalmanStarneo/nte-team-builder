@@ -27,6 +27,8 @@ const C = {
   muted: '#9aa3b7',
   accent: '#8e9cff',
   sig: '#f3d03e',
+  num: '#ffc061',
+  label: '#c9cdd8',
 };
 
 // Bright element colours (same values as the --elb-* tokens).
@@ -58,7 +60,7 @@ const STAT_SHORT = {
   'Incantation DMG%': 'INCANT. DMG%',
   'Chaos DMG%': 'CHAOS DMG%',
   'Psyche DMG%': 'PSYCHE DMG%',
-  'Lakshana DMG%': 'LAKSH. DMG%',
+  'Lakshana DMG%': 'LAK. DMG%',
   'Mental DMG%': 'MENTAL DMG%',
   'Charge Efficiency%': 'CHARGE EFF.',
 };
@@ -374,7 +376,7 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   const top = 136;
   const gap = 18;
   const cw = (CARD_W - PAD * 2 - gap * 3) / 4;
-  const ch = 400;
+  const ch = 416;
   members.forEach((c, i) => {
     const x = PAD + i * (cw + gap);
     if (!c) {
@@ -579,9 +581,9 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
     if (hasBonus) {
       // Sits right under the Cartridge row: label, then up to 4 rows x 2 columns.
       const rows = 4;
-      const lineH = 13;
+      const lineH = 17;
       const colW = (gw - 10) / 2;
-      const by = gy + 8;
+      const by = gy + 10;
       ctx.fillStyle = C.muted;
       ctx.font = `500 11px ${MONO}`;
       ctx.fillText('BONUS STATS', gx, gy - 6);
@@ -591,13 +593,20 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
         const yy = by + (k % rows) * lineH;
         const v = Number.isInteger(b.value) ? String(b.value) : b.value.toFixed(2).replace(/0$/, '');
         const valText = `${v}${isPercentStat(b.stat) ? '%' : ''}`;
-        ctx.font = `700 12px ${MONO}`;
+        ctx.font = `700 14px ${MONO}`;
         const vw = ctx.measureText(valText).width;
-        ctx.fillStyle = C.muted;
-        ctx.font = `500 11px ${MONO}`;
-        ctx.fillText(wrap(ctx, STAT_SHORT[b.stat] ?? b.stat, colW - vw - 6, 1)[0], bx, yy);
-        ctx.fillStyle = C.fg;
-        ctx.font = `700 12px ${MONO}`;
+        ctx.fillStyle = C.label;
+        // Long names (Lakshana DMG%, Charge Eff.) step down a little before they'd be cut off.
+        const name = STAT_SHORT[b.stat] ?? b.stat;
+        let fs = 12;
+        ctx.font = `500 ${fs}px ${MONO}`;
+        while (fs > 10 && ctx.measureText(name).width > colW - vw - 5) {
+          fs -= 0.5;
+          ctx.font = `500 ${fs}px ${MONO}`;
+        }
+        ctx.fillText(wrap(ctx, name, colW - vw - 5, 1)[0], bx, yy);
+        ctx.fillStyle = C.num;
+        ctx.font = `700 14px ${MONO}`;
         ctx.textAlign = 'right';
         ctx.fillText(valText, bx + colW, yy);
         ctx.textAlign = 'left';
@@ -611,7 +620,7 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   });
 
   // Reactions
-  const ry = top + ch + 46;
+  const ry = top + ch + 30;
   ctx.fillStyle = C.muted;
   ctx.font = `500 12px ${MONO}`;
   ctx.fillText('REACTIONS', PAD, ry);

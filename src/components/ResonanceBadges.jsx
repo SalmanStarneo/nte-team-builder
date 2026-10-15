@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { RESONANCES, activeResonance } from '../data/awakenings.js';
+import StatText from './StatText.jsx';
 
 // Two circles, R3 and R6. Lit when the character has 3 / 6 awakenings on.
 // Clicking a circle shows (or hides) its description underneath.
@@ -36,7 +37,7 @@ export default function ResonanceBadges({ characterId, awakeningCount = 0, showS
               {active[shown.id] ? 'Active' : `Needs ${shown.at} awakenings`}
             </span>
           )}
-          <p>{shown.effect}</p>
+          <p><StatText>{shown.effect}</StatText></p>
         </div>
       )}
     </div>

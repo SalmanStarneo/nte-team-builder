@@ -2,6 +2,7 @@ import { ELEMENT_BY_ID } from '../data/elements.js';
 import EsperCycle from './EsperCycle.jsx';
 import ElementGlyph from './ElementGlyph.jsx';
 import { roleIconUrl } from '../lib/icons.js';
+import StatText from './StatText.jsx';
 
 export default function Analysis({ analysis }) {
   const { elementCounts, reactions, trios, roleCounts, notes } = analysis;
@@ -30,7 +31,7 @@ export default function Analysis({ analysis }) {
                     <span className="reaction__name">{t.name}</span>
                     <span className="reaction__kind">Trio</span>
                   </div>
-                  <p>{t.effect}</p>
+                  <p><StatText>{t.effect}</StatText></p>
                 </li>
               ))}
               {reactions.map((r) => (
@@ -44,7 +45,7 @@ export default function Analysis({ analysis }) {
                     <span className="reaction__name">{r.name}</span>
                     <span className="reaction__kind">{r.kind}</span>
                   </div>
-                  <p>{r.effect}</p>
+                  <p><StatText>{r.effect}</StatText></p>
                 </li>
               ))}
             </ul>

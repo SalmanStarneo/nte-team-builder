@@ -13,6 +13,7 @@ import { MAX_STATS, MAX_STATS_LEVEL } from '../data/maxStats.js';
 import { ENDGAME } from '../data/endgame.js';
 import { AWAKENING_ORDER } from '../data/awakeningOrder.js';
 import { encodeConsoleCode } from './consoleCode.js';
+import { fillStatText } from './statText.js';
 import { loadoutOf } from './teamsReducer.js';
 import {
   BODY, DISPLAY, EL, MONO, clipCard, drawRank, drawSilverFrame, ensureFonts, loadImage, roundRect, wrap,
@@ -34,6 +35,10 @@ const K = {
   gold: '#f2c14e',
   goldDeep: '#c98a23',
   goldTile: '#3b3120',
+  // Stat highlights: values warm gold, stat names a soft periwinkle, labels light grey.
+  num: '#ffc061',
+  key: '#b9c3ff',
+  label: '#cfd2dc',
 };
 
 const ROMAN = { 2: 'II', 3: 'III', 4: 'IV' };
@@ -568,9 +573,10 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
   ctx.fillStyle = K.fg;
   ctx.font = `italic 800 30px ${DISPLAY}`;
   ctx.fillText('CONSOLE DEVELOPMENT', RX + 98, PAD + 38);
-  ctx.font = `500 18px ${BODY}`;
-  ctx.fillStyle = K.muted;
-  ctx.fillText(info ? specText(info.spec) : 'Console data not published yet.', RX + 98, PAD + 66);
+  fillStatText(ctx, info ? specText(info.spec) : 'Console data not published yet.', RX + 98, PAD + 67, {
+    font: `500 19px ${BODY}`, numFont: `700 19px ${BODY}`, color: K.muted, keyColor: K.key, numColor: K.num,
+    maxWidth: RW - 98 - 200,
+  });
   ctx.textAlign = 'right';
   ctx.font = `700 14px ${MONO}`;
   ctx.fillStyle = K.pink;
@@ -660,11 +666,12 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
         ctx.fill();
       }
       const base = sy + rowH / 2 + 5;
-      ctx.font = `500 15px ${BODY}`;
-      ctx.fillStyle = K.fg;
+      ctx.font = `500 16px ${BODY}`;
+      ctx.fillStyle = K.label;
       ctx.fillText(wrap(ctx, statLabel(st.stat), valueX - LCX - 130, 1)[0], LCX + 24, base);
       ctx.textAlign = 'right';
-      ctx.font = `600 15px ${MONO}`;
+      ctx.font = `700 17px ${MONO}`;
+      ctx.fillStyle = st.value == null ? K.muted : K.num;
       const capped = st.stat === 'CRIT Rate' && Number(st.value) > 100;
       // Estimated base (no in-game Level 80 values yet): mark HP/ATK/DEF as approximate.
       const approx = ms?.estimated && ['HP', 'ATK', 'DEF'].includes(st.stat) && st.value != null;
@@ -673,9 +680,9 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
       ctx.fillText(v, valueX, base);
       const t = target(st.stat);
       if (t) {
-        ctx.font = `500 14px ${MONO}`;
-        ctx.fillStyle = K.gold;
-        ctx.fillText(short(t), LCX + LCW - 24, base);
+        ctx.font = `500 15px ${MONO}`;
+        ctx.fillStyle = K.label;
+        ctx.fillText(`\u2192 ${short(t)}`, LCX + LCW - 24, base);
       }
       ctx.textAlign = 'left';
     });
@@ -721,9 +728,19 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     const dupes = build.arcDupes ? ` · +${build.arcDupes}` : '';
     if (arcImg) ctx.drawImage(arcImg, tx, arcY + 76, 18, 18);
     ctx.fillText(`${a.rarity}-rank ${a.type}${dupes}`, tx + (arcImg ? 24 : 0), arcY + 90);
-    ctx.fillStyle = K.fg;
-    ctx.font = `600 16px ${MONO}`;
-    ctx.fillText(`ATK ${a.atk}   ${a.sub}`, tx, arcY + 114);
+    // "ATK 570   Crit DMG 48%": names light, values gold.
+    let sx = tx;
+    const [subName, subVal] = [a.sub.replace(/\s*[\d.]+%?$/, ''), (a.sub.match(/[\d.]+%?$/) || [''])[0]];
+    for (const [name, val] of [['ATK', String(a.atk)], [subName, subVal]]) {
+      ctx.font = `500 17px ${BODY}`;
+      ctx.fillStyle = K.label;
+      ctx.fillText(name, sx, arcY + 115);
+      sx += ctx.measureText(name).width + 7;
+      ctx.font = `700 18px ${MONO}`;
+      ctx.fillStyle = K.num;
+      ctx.fillText(val, sx, arcY + 115);
+      sx += ctx.measureText(val).width + 22;
+    }
   } else {
     ctx.fillStyle = K.muted;
     ctx.font = `500 16px ${BODY}`;
@@ -767,12 +784,13 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     ctx.font = `700 12px ${MONO}`;
     ctx.fillStyle = i === 0 ? K.gold : K.muted;
     ctx.fillText(r.k.toUpperCase(), LCX + 30, ry + rowH / 2 + 2);
-    ctx.font = `500 15px ${BODY}`;
-    ctx.fillStyle = K.fg;
+    ctx.font = `600 16px ${BODY}`;
+    ctx.fillStyle = r.value ? K.label : K.key;
     ctx.fillText(statLabel(r.stat), LCX + 82, ry + rowH / 2 + 3);
     if (r.value) {
       ctx.textAlign = 'right';
-      ctx.font = `600 15px ${MONO}`;
+      ctx.font = `700 17px ${MONO}`;
+      ctx.fillStyle = K.num;
       ctx.fillText(statValue(r.stat, r.value), LCX + LCW - 30, ry + rowH / 2 + 3);
       ctx.textAlign = 'left';
     }
@@ -828,8 +846,8 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     ctx.font = `700 11px ${MONO}`;
     ctx.fillStyle = i === 0 ? K.gold : K.muted;
     ctx.fillText(i === 0 ? 'MAIN' : `SUB ${i}`, innerX + 10, ry + (lh - 6) / 2 + 4);
-    ctx.font = `500 15px ${BODY}`;
-    ctx.fillStyle = K.fg;
+    ctx.font = `600 16px ${BODY}`;
+    ctx.fillStyle = i === 0 ? K.num : K.key;
     ctx.fillText(wrap(ctx, statLabel(stat), lw - 70, 1)[0], innerX + 62, ry + (lh - 6) / 2 + 5);
   });
 

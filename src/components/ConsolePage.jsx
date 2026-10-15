@@ -20,6 +20,7 @@ import {
 import Portrait from './Portrait.jsx';
 import ExportDialog from './ExportDialog.jsx';
 import { characterBuild, renderBuildCard } from '../lib/buildCard.js';
+import StatText from './StatText.jsx';
 
 const TYPE_NAMES = { 2: 'Type Ⅱ', 3: 'Type Ⅲ', 4: 'Type Ⅳ' };
 const PLAYABLE = CHARACTERS.filter((c) => CHARACTER_CONSOLE[c.id]);
@@ -357,8 +358,8 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
                   ))}
                 </div>
                 <ul className="console-tiers">
-                  <li className={set.two ? 'is-on' : undefined}><b>2</b> {cart.two}</li>
-                  <li className={set.four ? 'is-on' : undefined}><b>4</b> {cart.four}</li>
+                  <li className={set.two ? 'is-on' : undefined}><b>2</b> <StatText>{cart.two}</StatText></li>
+                  <li className={set.four ? 'is-on' : undefined}><b>4</b> <StatText>{cart.four}</StatText></li>
                 </ul>
               </div>
             )}

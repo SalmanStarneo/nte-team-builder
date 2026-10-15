@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import MaterialIcon from './MaterialIcon.jsx';
 import { LIFE_MAX, SKILL_LEVEL_COSTS, SKILL_MAX, SKILLS, skillCost } from '../data/skills.js';
+import StatText from './StatText.jsx';
 
 const fmt = (n) => n.toLocaleString('en-US');
 const LEVELS = Array.from({ length: SKILL_MAX }, (_, i) => i + 1);
@@ -36,7 +37,7 @@ export default function SkillsSection({ character }) {
               <span className="skill-type">{sk.type}</span>
               <span className="awaken-body">
                 <b>{sk.name ?? 'Not published yet'}</b>
-                {sk.summary && <span>{sk.summary}</span>}
+                {sk.summary && <span><StatText>{sk.summary}</StatText></span>}
               </span>
             </li>
           ))}
@@ -50,7 +51,7 @@ export default function SkillsSection({ character }) {
                 <span className="skill-type skill-type--life">{sk.type}</span>
                 <span className="awaken-body">
                   <b>{sk.name}</b>
-                  <span>{sk.summary}</span>
+                  <span><StatText>{sk.summary}</StatText></span>
                 </span>
               </li>
             ))}

@@ -24,6 +24,7 @@ import { bestBuild } from '../data/bestBuild.js';
 import MyBuildEditor, { myBuildCurrent } from './MyBuildEditor.jsx';
 import { farmList } from '../data/farmList.js';
 import { renderFarmCard } from '../lib/farmCard.js';
+import StatText from './StatText.jsx';
 
 const fmt = (n) => n.toLocaleString('en-US');
 
@@ -201,7 +202,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
                         <span className="awaken-rank">{ORDINAL[AWAKENING_ORDER[c.id].order.indexOf(w.id)]} pick</span>
                       )}
                     </b>
-                    <span>{w.effect}</span>
+                    <span><StatText>{w.effect}</StatText></span>
                   </span>
                 </li>
               ))}
@@ -218,7 +219,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
                       <span className="reso__dot is-on is-static">{r.id}</span>
                       <span className="awaken-body">
                         <b>{r.name}</b>
-                        <span>{r.effect}</span>
+                        <span><StatText>{r.effect}</StatText></span>
                         <span className="reso-when">Active with {r.at} awakenings on</span>
                       </span>
                     </li>

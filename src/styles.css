@@ -12,6 +12,9 @@
   --good: #1d8a5b;
   --warn: #b5560f;
   --danger: #c33246;
+  /* Stat highlights: values warm, stat names in the accent */
+  --hl-num: #a34a00;
+  --hl-key: #2a3bbd;
 
   /* Element colours (from the in-game Esper Cycle), tuned for contrast per theme */
   --el-cosmos: #75809a;
@@ -61,6 +64,8 @@
     --good: #4fc58f;
     --warn: #f0a15a;
     --danger: #ff7488;
+    --hl-num: #ffc061;
+    --hl-key: #b9c3ff;
   --el-cosmos: #dfe4ee;
   --el-anima: #3fd3ad;
   --el-incantation: #f0576b;
@@ -93,6 +98,8 @@
   --good: #4fc58f;
   --warn: #f0a15a;
   --danger: #ff7488;
+    --hl-num: #ffc061;
+    --hl-key: #b9c3ff;
   color-scheme: dark;
 }
 
@@ -4380,4 +4387,80 @@ th[aria-sort='descending'] .th-btn {
     grid-column: 3;
     justify-content: flex-start;
   }
+}
+
+/* ---- Stat highlights and readable stat sizes ---- */
+.hl-num {
+  color: var(--hl-num);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.hl-key {
+  color: var(--hl-key);
+  font-weight: 650;
+}
+/* Max stats tables */
+.stats th,
+.stats td {
+  padding: 8px 0;
+  font-size: 1rem;
+}
+.stats th {
+  color: color-mix(in srgb, var(--fg) 72%, var(--muted));
+}
+.stats td {
+  color: var(--hl-num);
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+.stats tr.is-zero td {
+  font-weight: 500;
+  opacity: 0.75;
+}
+/* Recommended endgame stats: label above, value below, so long names fit */
+.endgame__list > div {
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 2px;
+  padding: 8px 12px;
+}
+.endgame__list dt {
+  color: color-mix(in srgb, var(--fg) 72%, var(--muted));
+  font-size: 0.95rem;
+}
+.endgame__list dd {
+  color: var(--hl-num);
+  font: 700 1.2rem var(--font-mono);
+  text-align: left;
+}
+.endgame__prio ol {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--hl-key);
+}
+/* Arc facts and passive text */
+.facts dd {
+  font-size: 1.05rem;
+}
+.arc-passive p {
+  font-size: 0.98rem;
+}
+.arc-card__passive {
+  font-size: 0.9rem;
+}
+/* Console totals and Cartridge stat values */
+.console-totals {
+  font-size: 0.95rem;
+}
+.cstat__value input {
+  font-weight: 700;
+  color: var(--hl-num);
+}
+/* Awakening, resonance and skill descriptions */
+.awaken-body {
+  font-size: 0.92rem;
+}
+.awaken-body span {
+  color: color-mix(in srgb, var(--fg) 78%, var(--muted));
 }

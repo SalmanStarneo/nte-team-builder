@@ -13,6 +13,7 @@ import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
 import { AWAKENINGS, MAX_ARC_DUPES, MAX_DUPES } from '../data/awakenings.js';
 import ResonanceBadges from './ResonanceBadges.jsx';
+import StatText from './StatText.jsx';
 
 // Gear editor for one team member: Arc, Cartridge set and Console build.
 export default function LoadoutPanel({ character: c, loadout, onChange, onClose, dispatch }) {
@@ -94,7 +95,7 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
                       <span className="awaken-id">{w.id}</span>
                       <span className="awaken-body">
                         <b>{w.name}</b>
-                        <span>{w.effect}</span>
+                        <span><StatText>{w.effect}</StatText></span>
                       </span>
                     </button>
                   </li>
@@ -157,7 +158,7 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
                 <div><dt>Base ATK</dt><dd>{arc.atk}</dd></div>
                 <div><dt>Secondary</dt><dd>{arc.sub}</dd></div>
               </dl>
-              <p>{arc.passive}</p>
+              <p><StatText>{arc.passive}</StatText></p>
             </div>
           ) : (
             <div className="arc-picks">
@@ -211,8 +212,8 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
                 {cartIsRec && <span className="arc-tag arc-tag--rec">Recommended</span>}
               </div>
               <dl className="gear-bonus">
-                <div><dt>2-piece</dt><dd>{cart.two}</dd></div>
-                <div><dt>4-piece</dt><dd>{cart.four}</dd></div>
+                <div><dt>2-piece</dt><dd><StatText>{cart.two}</StatText></dd></div>
+                <div><dt>4-piece</dt><dd><StatText>{cart.four}</StatText></dd></div>
               </dl>
             </div>
           ) : (

@@ -7,6 +7,7 @@ import { ARC_TYPES, CHARACTERS, CHARACTER_BY_ID } from '../data/characters.js';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
 import ArcTypeIcon from './ArcTypeIcon.jsx';
+import StatText from './StatText.jsx';
 
 const RANKS = ['S', 'A', 'B'];
 const RANK_ORDER = { S: 0, A: 1, B: 2 };
@@ -134,7 +135,7 @@ export default function ArcsPage({ arcType, arcId }) {
                   <div><dt>Base ATK</dt><dd>{a.atk}</dd></div>
                   <div><dt>Secondary</dt><dd>{a.sub}</dd></div>
                 </dl>
-                <p className="arc-card__passive">{a.passive}</p>
+                <p className="arc-card__passive"><StatText>{a.passive}</StatText></p>
                 {FIELD_EFFECTS[a.id] && <p className="arc-card__field">Outside combat: {FIELD_EFFECTS[a.id].name}</p>}
                 {(sig || recs.length > 0) && (
                   <div className="arc-card__users">

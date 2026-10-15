@@ -16,6 +16,7 @@ import ArcTypeIcon from './ArcTypeIcon.jsx';
 import MaterialIcon from './MaterialIcon.jsx';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
+import StatText from './StatText.jsx';
 
 const CAPS = [20, 30, 40, 50, 60, 70, 80];
 const fmt = (n) => n.toLocaleString('en-US');
@@ -76,15 +77,15 @@ export default function ArcDetail({ arc: a, onClose }) {
           <dl className="facts">
             <div><dt>Base ATK</dt><dd>{a.atk} <span className="muted">at Lv {ARC_MAX_LEVEL}</span></dd></div>
             <div><dt>Secondary</dt><dd>{a.sub}</dd></div>
-            {!full && <div><dt>Passive</dt><dd>{a.passive}</dd></div>}
+            {!full && <div><dt>Passive</dt><dd><StatText>{a.passive}</StatText></dd></div>}
           </dl>
 
           {full && (
             <section className="arc-passive" aria-label="Passive">
               <span className="arc-passive__label">Passive · {full.name}</span>
-              {full.text.map((t) => <p key={t}>{t}</p>)}
+              {full.text.map((t) => <p key={t}><StatText>{t}</StatText></p>)}
               {full.max && (
-                <p className="arc-passive__max"><strong>Fully mixed (4 duplicates):</strong> {full.max}</p>
+                <p className="arc-passive__max"><strong>Fully mixed (4 duplicates):</strong> <StatText>{full.max}</StatText></p>
               )}
             </section>
           )}
@@ -93,7 +94,7 @@ export default function ArcDetail({ arc: a, onClose }) {
             <aside className="arc-field">
               <span className="arc-field__label">Outside combat</span>
               <strong>{field.name}</strong>
-              <p>{field.text}</p>
+              <p><StatText>{field.text}</StatText></p>
             </aside>
           )}
 
