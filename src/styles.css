@@ -3976,6 +3976,12 @@ th[aria-sort='descending'] .th-btn {
   .eyebrow__meta {
     white-space: normal;
   }
+  /* Long one-word Arc names ("Contemplative") must fit beside the art. */
+  .detail__name {
+    font-size: min(1.8rem, 6.4vw);
+    hyphens: auto;
+    overflow-wrap: anywhere;
+  }
 }
 @media (max-width: 340px) {
   .detail__head .portrait--xl {
@@ -4093,6 +4099,10 @@ th[aria-sort='descending'] .th-btn {
 @media (max-width: 520px) {
   .arc-detail__art { width: 84px; height: 84px; border-radius: 12px; }
   .arc-detail__art img { width: 76px; height: 76px; }
+}
+@media (max-width: 400px) {
+  .arc-detail__art { width: 64px; height: 64px; }
+  .arc-detail__art img { width: 58px; height: 58px; }
 }
 
 /* ---------- Achievements ---------- */
@@ -4375,6 +4385,9 @@ th[aria-sort='descending'] .th-btn {
   outline-offset: 2px;
 }
 .swipe__track {
+  /* Positioned, so absolutely placed badges in off-screen slides are clipped
+     here instead of widening the page. */
+  position: relative;
   display: flex;
   align-items: flex-start;
   overflow-x: auto;
@@ -4388,6 +4401,7 @@ th[aria-sort='descending'] .th-btn {
   display: none;
 }
 .swipe__slide {
+  position: relative;
   flex: 0 0 100%;
   min-width: 0;
   display: grid;
