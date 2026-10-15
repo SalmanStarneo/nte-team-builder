@@ -302,6 +302,14 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   const elementIds = [...new Set(members.filter(Boolean).map((c) => c.element))];
   const roleIds = [...new Set(members.filter(Boolean).flatMap((c) => c.roles))];
   const cartIds = [...new Set(members.filter(Boolean).map((c) => loadoutOf(team, c.id).cartridge).filter(Boolean))];
+  // Arc type icons, shown before each Arc name.
+  const arcTypes = [...new Set(team.members.map((id) => {
+    const g = id && loadoutOf(team, id);
+    return g?.arc && ARC_BY_ID[g.arc]?.type;
+  }).filter(Boolean))];
+  const arcTypeIcons = Object.fromEntries(
+    await Promise.all(arcTypes.map(async (t) => [t, await loadImage(`${base}icons/arc-types/${t.toLowerCase()}.webp`)])),
+  );
   const cartIcons = Object.fromEntries(
     await Promise.all(cartIds.map(async (id) => [id, await loadImage(`${base}icons/cartridges/${id}.webp`)])),
   );
@@ -564,7 +572,7 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
       lines.forEach((ln, k) => ctx.fillText(ln, tx, gy + 24 + k * 19));
       gy += 30 + lines.length * 19;
     };
-    gearRow('ARC', arc?.name, arc ? arcTag(arc, c) : null, arc && gear.arcDupes ? `+${gear.arcDupes}` : null);
+    gearRow('ARC', arc?.name, arc ? arcTag(arc, c) : null, arc && gear.arcDupes ? `+${gear.arcDupes}` : null, arc && arcTypeIcons[arc.type]);
     gearRow('CARTRIDGE', cart?.name, cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null, null, cart && cartIcons[cart.id]);
 
     // Bonus stats: Arc + Cartridge, two columns along the bottom of the panel.

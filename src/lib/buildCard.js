@@ -463,13 +463,14 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
   const el = ELEMENT_BY_ID[c.element];
   const info = CHARACTER_CONSOLE[c.id];
   const elColor = EL[c.element] ?? K.pink;
-  const [portrait, elIcon, cartImg, recCartImg, arcImg] = await Promise.all([
+  const [portrait, elIcon, cartImg, recCartImg, arcImg, arcArt] = await Promise.all([
     // 512 px portrait (AI-upscaled from the 256 px source) so the card stays sharp.
     loadImage(`${base}characters/hd/${c.id}.webp`),
     loadImage(`${base}icons/elements/${c.element}.webp`),
     build.cartridge ? loadImage(`${base}icons/cartridges/${build.cartridge}.webp`) : null,
     build.recommended ? loadImage(`${base}icons/cartridges/${build.recommended.cartridge}.webp`) : null,
     build.arc ? loadImage(`${base}icons/arc-types/${build.arc.type.toLowerCase()}.webp`) : null,
+    build.arc ? loadImage(`${base}arcs/hd/${build.arc.id}.webp`) : null,
   ]);
 
   const canvas = document.createElement('canvas');
@@ -686,11 +687,27 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
   panel(ctx, LCX, arcY, LCW, arcH, 'Arc');
   if (build.arc) {
     const a = build.arc;
-    if (arcImg) ctx.drawImage(arcImg, LCX + 18, arcY + 46, 64, 64);
+    // Arc art in a tile, with the Arc type icon on the details line.
+    const AS = 80;
+    const ax = LCX + 16;
+    const ay = arcY + 40;
+    ctx.save();
+    roundRect(ctx, ax, ay, AS, AS, 14);
+    ctx.fillStyle = '#1b1c22';
+    ctx.fill();
+    ctx.clip();
+    if (arcArt) ctx.drawImage(arcArt, ax - 4, ay - 4, AS + 8, AS + 8);
+    else if (arcImg) ctx.drawImage(arcImg, ax + 12, ay + 12, AS - 24, AS - 24);
+    ctx.restore();
+    ctx.strokeStyle = K.line;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, ax, ay, AS, AS, 14);
+    ctx.stroke();
+    const tx = ax + AS + 16;
     ctx.fillStyle = K.fg;
     ctx.font = `700 22px ${BODY}`;
-    const nm = wrap(ctx, a.name, LCW - 230, 1)[0];
-    ctx.fillText(nm, LCX + 96, arcY + 66);
+    const nm = wrap(ctx, a.name, LCX + LCW - tx - 150, 1)[0];
+    ctx.fillText(nm, tx, arcY + 66);
     const tag = arcTag(a, c) === 'sig' ? 'Signature' : build.source === 'Recommended build' ? 'Recommended' : build.arcState;
     ctx.font = `700 13px ${MONO}`;
     const tw = ctx.measureText(tag.toUpperCase()).width + 16;
@@ -702,10 +719,11 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
     ctx.font = `500 16px ${BODY}`;
     ctx.fillStyle = K.muted;
     const dupes = build.arcDupes ? ` · +${build.arcDupes}` : '';
-    ctx.fillText(`${a.rarity}-rank ${a.type}${dupes}`, LCX + 96, arcY + 90);
+    if (arcImg) ctx.drawImage(arcImg, tx, arcY + 76, 18, 18);
+    ctx.fillText(`${a.rarity}-rank ${a.type}${dupes}`, tx + (arcImg ? 24 : 0), arcY + 90);
     ctx.fillStyle = K.fg;
     ctx.font = `600 16px ${MONO}`;
-    ctx.fillText(`ATK ${a.atk}   ${a.sub}`, LCX + 96, arcY + 114);
+    ctx.fillText(`ATK ${a.atk}   ${a.sub}`, tx, arcY + 114);
   } else {
     ctx.fillStyle = K.muted;
     ctx.font = `500 16px ${BODY}`;
