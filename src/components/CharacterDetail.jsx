@@ -24,6 +24,8 @@ import MyBuildEditor, { myBuildCurrent } from './MyBuildEditor.jsx';
 import { farmList } from '../data/farmList.js';
 import { renderFarmCard } from '../lib/farmCard.js';
 import StatText from './StatText.jsx';
+import SwipeTabs from './SwipeTabs.jsx';
+import { PHONE, useMedia } from '../lib/useMedia.js';
 
 
 export default function CharacterDetail({ character: c, activeTeam, inActiveTeam, teamFull, onAdd, onClose }) {
@@ -36,6 +38,204 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
   const presets = PRESETS.filter((p) => p.members.includes(c.id));
   const signature = ARCS.find((a) => a.signature === c.id);
   const arcCount = ARCS.filter((a) => a.type === c.arcType).length;
+  const phone = useMedia(PHONE);
+
+  // Page sections: stacked on wider screens, swipeable slides on phones.
+  const overview = (
+    <div className="detail__main">
+      <dl className="facts">
+        <div><dt>Arc type</dt><dd>
+          {c.arcType ? (
+            <>
+              <ArcTypeIcon type={c.arcType} size={18} />
+              {c.arcType}{' '}
+              <a className="muted" href={`#arcs-${c.arcType.toLowerCase()}`}>· {arcCount} Arcs</a>
+            </>
+          ) : (
+            <span className="muted">Not announced yet</span>
+          )}
+        </dd></div>
+        {signature && <div><dt>Signature Arc</dt><dd>{signature.name}</dd></div>}
+        {RECOMMENDED[c.id]?.length > 0 && (
+          <div>
+            <dt>Recommended Arcs</dt>
+            <dd>
+              {RECOMMENDED[c.id]
+                .filter((id) => ARC_BY_ID[id].signature !== c.id)
+                .map((id) => ARC_BY_ID[id].name)
+                .join(', ')}
+            </dd>
+          </div>
+        )}
+        <div><dt>Faction</dt><dd>
+          {c.faction ?? (c.formerFaction ? '' : '—')}
+          {c.unit && <span className="muted"> · {c.unit}</span>}
+          {c.formerFaction && (
+            <span className="former">
+              {c.faction && ' '}
+              <span className="former__tag">Former</span> {c.formerFaction}
+            </span>
+          )}
+        </dd></div>
+        <div><dt>Esper ability</dt><dd>{c.ability ?? '—'}</dd></div>
+        <div>
+          <dt>Recommended Cartridges</dt>
+          <dd className="cart-list">
+            {cartridgesFor(c).map((id) => (
+              <span key={id} className="cart-list__item">
+                <CartridgeIcon id={id} size={22} />
+                {CARTRIDGE_BY_ID[id].name}
+              </span>
+            ))}
+          </dd>
+        </div>
+        {c.upcoming && <div><dt>Status</dt><dd>Upcoming</dd></div>}
+      </dl>
+
+    <section className="detail__reacts">
+      <h3 className="mini-title">Reacts with</h3>
+      <p className="muted small">
+        {element.name} sits between {neighbours[0].name} and {neighbours[1].name} on the Esper Cycle.
+      </p>
+      <ul className="detail__reactions">
+        {reactions.map((r) => {
+          const other = r.elements.find((e) => e !== c.element);
+          return (
+            <li key={r.id}>
+              <ElementGlyph element={other} size={14} />
+              <b>{r.name}</b>
+              <span className="muted">with {ELEMENT_BY_ID[other].name}</span>
+            </li>
+          );
+        })}
+        {trios.map((t) => (
+          <li key={t.id}>
+            <span className="trio-dots">
+              {t.elements.map((e) => <ElementGlyph key={e} element={e} size={11} />)}
+            </span>
+            <b>{t.name}</b>
+            <span className="muted">trio</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    {presets.length > 0 && (
+      <section>
+        <h3 className="mini-title">Featured in</h3>
+        <ul className="detail__presets">
+          {presets.map((p) => (
+            <li key={p.name}>
+              <span className="detail__preset-name">{p.name}</span>
+              <span className="detail__preset-team">
+                {p.members.map((id) => (
+                  <Portrait key={id} character={CHARACTER_BY_ID[id]} size="sm" />
+                ))}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+    </div>
+  );
+  const stats = (
+    <div className="stats">
+      {MAX_STATS[c.id] ? (
+        <MaxStats stats={MAX_STATS[c.id]} />
+      ) : (
+        <>
+          <h3 className="mini-title">Stats</h3>
+          <p className="muted">Level 80 stats not added yet.</p>
+        </>
+      )}
+      <EndgameStats character={c} />
+    </div>
+  );
+  const awakenings = (
+    <section>
+      <h3 className="mini-title">Awakenings</h3>
+      {AWAKENINGS[c.id] ? (
+        <>
+          {AWAKENING_ORDER[c.id] && (
+            <div className="awaken-order" data-el={c.element}>
+              <p className="awaken-order__title">Suggested unlock order <span>one per duplicate</span></p>
+              <ol className="awaken-chain" aria-label="Unlock order">
+                {AWAKENING_ORDER[c.id].order.map((id, i) => (
+                  <li key={id} title={`${ORDINAL[i]} duplicate`}>
+                    {i > 0 && <span className="awaken-chain__arrow" aria-hidden="true">→</span>}
+                    <span className={`awaken-chain__id${i === 0 ? ' is-first' : ''}`}>{id}</span>
+                  </li>
+                ))}
+              </ol>
+              {AWAKENING_ORDER[c.id].alt && <p className="muted small">{AWAKENING_ORDER[c.id].alt}</p>}
+            </div>
+          )}
+          <ol className="awaken-list">
+            {AWAKENINGS[c.id].map((w) => (
+              <li key={w.id}>
+                <span className="awaken-id">{w.id}</span>
+                <span className="awaken-body">
+                  <b>
+                    {w.name}
+                    {AWAKENING_ORDER[c.id]?.order.includes(w.id) && (
+                      <span className="awaken-rank">{ORDINAL[AWAKENING_ORDER[c.id].order.indexOf(w.id)]} pick</span>
+                    )}
+                  </b>
+                  <span><StatText>{w.effect}</StatText></span>
+                </span>
+              </li>
+            ))}
+          </ol>
+          <p className="muted small">
+            Each duplicate unlocks one awakening of your choice, in any order.
+          </p>
+          {RESONANCES[c.id] && (
+            <>
+              <h3 className="mini-title reso-title">Resonance</h3>
+              <ol className="awaken-list reso-list">
+                {RESONANCES[c.id].map((r) => (
+                  <li key={r.id}>
+                    <span className="reso__dot is-on is-static">{r.id}</span>
+                    <span className="awaken-body">
+                      <b>{r.name}</b>
+                      <span><StatText>{r.effect}</StatText></span>
+                      <span className="reso-when">Active with {r.at} awakenings on</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </>
+          )}
+        </>
+      ) : (
+        <p className="muted small">Awakenings will be added once they’re published.</p>
+      )}
+    </section>
+);
+  const skills = <SkillsSection key={`skills-${c.id}`} character={c} />;
+  const materials = (
+    <>
+      <AscensionPlanner key={c.id} character={c} />
+
+      {farmList(c.id) && (
+        <section className="farm-cta" aria-labelledby="farm-cta-title">
+          <div className="farm-cta__text">
+            <h3 id="farm-cta-title" className="mini-title">Farming list</h3>
+            <p className="muted small">
+              Every material to ascend {c.name} to Lv 80 and max all skills, grouped by where to farm it.
+            </p>
+          </div>
+          <button type="button" className="btn" onClick={() => setSharing({ farm: true })}>
+            Share farming list
+          </button>
+        </section>
+      )}
+    </>
+  );
+  const myBuild = CHARACTER_CONSOLE[c.id] ? (
+    <MyBuildEditor character={c} activeTeam={activeTeam} onShare={(b) => setSharing({ mine: b })} />
+  ) : null;
 
   return (
     <article className="detail" style={{ '--el': element.color }} aria-labelledby="detail-name">
@@ -60,199 +260,31 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
         <button className="btn btn--quiet detail__close" onClick={onClose} aria-label="Close details">×</button>
       </header>
 
-      <div className="detail__grid">
-        <div className="detail__main">
-          <dl className="facts">
-            <div><dt>Arc type</dt><dd>
-              {c.arcType ? (
-                <>
-                  <ArcTypeIcon type={c.arcType} size={18} />
-                  {c.arcType}{' '}
-                  <a className="muted" href={`#arcs-${c.arcType.toLowerCase()}`}>· {arcCount} Arcs</a>
-                </>
-              ) : (
-                <span className="muted">Not announced yet</span>
-              )}
-            </dd></div>
-            {signature && <div><dt>Signature Arc</dt><dd>{signature.name}</dd></div>}
-            {RECOMMENDED[c.id]?.length > 0 && (
-              <div>
-                <dt>Recommended Arcs</dt>
-                <dd>
-                  {RECOMMENDED[c.id]
-                    .filter((id) => ARC_BY_ID[id].signature !== c.id)
-                    .map((id) => ARC_BY_ID[id].name)
-                    .join(', ')}
-                </dd>
-              </div>
-            )}
-            <div><dt>Faction</dt><dd>
-              {c.faction ?? (c.formerFaction ? '' : '—')}
-              {c.unit && <span className="muted"> · {c.unit}</span>}
-              {c.formerFaction && (
-                <span className="former">
-                  {c.faction && ' '}
-                  <span className="former__tag">Former</span> {c.formerFaction}
-                </span>
-              )}
-            </dd></div>
-            <div><dt>Esper ability</dt><dd>{c.ability ?? '—'}</dd></div>
-            <div>
-              <dt>Recommended Cartridges</dt>
-              <dd className="cart-list">
-                {cartridgesFor(c).map((id) => (
-                  <span key={id} className="cart-list__item">
-                    <CartridgeIcon id={id} size={22} />
-                    {CARTRIDGE_BY_ID[id].name}
-                  </span>
-                ))}
-              </dd>
-            </div>
-            {c.upcoming && <div><dt>Status</dt><dd>Upcoming</dd></div>}
-          </dl>
-
-        <section className="detail__reacts">
-          <h3 className="mini-title">Reacts with</h3>
-          <p className="muted small">
-            {element.name} sits between {neighbours[0].name} and {neighbours[1].name} on the Esper Cycle.
-          </p>
-          <ul className="detail__reactions">
-            {reactions.map((r) => {
-              const other = r.elements.find((e) => e !== c.element);
-              return (
-                <li key={r.id}>
-                  <ElementGlyph element={other} size={14} />
-                  <b>{r.name}</b>
-                  <span className="muted">with {ELEMENT_BY_ID[other].name}</span>
-                </li>
-              );
-            })}
-            {trios.map((t) => (
-              <li key={t.id}>
-                <span className="trio-dots">
-                  {t.elements.map((e) => <ElementGlyph key={e} element={e} size={11} />)}
-                </span>
-                <b>{t.name}</b>
-                <span className="muted">trio</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {presets.length > 0 && (
-          <section>
-            <h3 className="mini-title">Featured in</h3>
-            <ul className="detail__presets">
-              {presets.map((p) => (
-                <li key={p.name}>
-                  <span className="detail__preset-name">{p.name}</span>
-                  <span className="detail__preset-team">
-                    {p.members.map((id) => (
-                      <Portrait key={id} character={CHARACTER_BY_ID[id]} size="sm" />
-                    ))}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-        </div>
-
-        <div className="stats">
-          {MAX_STATS[c.id] ? (
-            <MaxStats stats={MAX_STATS[c.id]} />
-          ) : (
-            <>
-              <h3 className="mini-title">Stats</h3>
-              <p className="muted">Level 80 stats not added yet.</p>
-            </>
-          )}
-          <EndgameStats character={c} />
-        </div>
-      </div>
-
-      <section>
-        <h3 className="mini-title">Awakenings</h3>
-        {AWAKENINGS[c.id] ? (
-          <>
-            {AWAKENING_ORDER[c.id] && (
-              <div className="awaken-order" data-el={c.element}>
-                <p className="awaken-order__title">Suggested unlock order <span>one per duplicate</span></p>
-                <ol className="awaken-chain" aria-label="Unlock order">
-                  {AWAKENING_ORDER[c.id].order.map((id, i) => (
-                    <li key={id} title={`${ORDINAL[i]} duplicate`}>
-                      {i > 0 && <span className="awaken-chain__arrow" aria-hidden="true">→</span>}
-                      <span className={`awaken-chain__id${i === 0 ? ' is-first' : ''}`}>{id}</span>
-                    </li>
-                  ))}
-                </ol>
-                {AWAKENING_ORDER[c.id].alt && <p className="muted small">{AWAKENING_ORDER[c.id].alt}</p>}
-              </div>
-            )}
-            <ol className="awaken-list">
-              {AWAKENINGS[c.id].map((w) => (
-                <li key={w.id}>
-                  <span className="awaken-id">{w.id}</span>
-                  <span className="awaken-body">
-                    <b>
-                      {w.name}
-                      {AWAKENING_ORDER[c.id]?.order.includes(w.id) && (
-                        <span className="awaken-rank">{ORDINAL[AWAKENING_ORDER[c.id].order.indexOf(w.id)]} pick</span>
-                      )}
-                    </b>
-                    <span><StatText>{w.effect}</StatText></span>
-                  </span>
-                </li>
-              ))}
-            </ol>
-            <p className="muted small">
-              Each duplicate unlocks one awakening of your choice, in any order.
-            </p>
-            {RESONANCES[c.id] && (
-              <>
-                <h3 className="mini-title reso-title">Resonance</h3>
-                <ol className="awaken-list reso-list">
-                  {RESONANCES[c.id].map((r) => (
-                    <li key={r.id}>
-                      <span className="reso__dot is-on is-static">{r.id}</span>
-                      <span className="awaken-body">
-                        <b>{r.name}</b>
-                        <span><StatText>{r.effect}</StatText></span>
-                        <span className="reso-when">Active with {r.at} awakenings on</span>
-                      </span>
-                    </li>
-                  ))}
-                </ol>
-              </>
-            )}
-          </>
-        ) : (
-          <p className="muted small">Awakenings will be added once they’re published.</p>
-        )}
-      </section>
-
-      <SkillsSection key={`skills-${c.id}`} character={c} />
-
-      <AscensionPlanner key={c.id} character={c} />
-
-      {farmList(c.id) && (
-        <section className="farm-cta" aria-labelledby="farm-cta-title">
-          <div className="farm-cta__text">
-            <h3 id="farm-cta-title" className="mini-title">Farming list</h3>
-            <p className="muted small">
-              Every material to ascend {c.name} to Lv 80 and max all skills, grouped by where to farm it.
-            </p>
+      {phone ? (
+        <SwipeTabs
+          key={c.id}
+          label={`${c.name} details`}
+          slides={[
+            { id: 'overview', label: 'Overview', content: overview },
+            { id: 'stats', label: 'Stats', content: stats },
+            { id: 'awakenings', label: 'Awakenings', content: awakenings },
+            { id: 'skills', label: 'Skills', content: skills },
+            { id: 'materials', label: 'Materials', content: materials },
+            myBuild && { id: 'build', label: 'My build', content: myBuild },
+          ].filter(Boolean)}
+        />
+      ) : (
+        <>
+          <div className="detail__grid">
+            {overview}
+            {stats}
           </div>
-          <button type="button" className="btn" onClick={() => setSharing({ farm: true })}>
-            Share farming list
-          </button>
-        </section>
+          {awakenings}
+          {skills}
+          {materials}
+          {myBuild}
+        </>
       )}
-
-      {CHARACTER_CONSOLE[c.id] && (
-        <MyBuildEditor character={c} activeTeam={activeTeam} onShare={(b) => setSharing({ mine: b })} />
-      )}
-
 
       <div className="detail__actions">
         <button className="btn btn--primary" onClick={onAdd} disabled={inActiveTeam || teamFull}>
