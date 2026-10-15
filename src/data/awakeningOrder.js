@@ -2,8 +2,8 @@
 // unlocks one Awakening of your choice, in any order).
 // Source (Oct 2026): Icy Veins "Guide and Best Builds" page for each character
 // (https://www.icy-veins.com/neverness-to-everness/<name>-guide-best-builds),
-// which ranks all six. Akane: only her first pick is ranked so far (Gurugamer,
-// mone.gg). `alt`: a note when another playstyle changes the order.
+// which ranks all six. Akane: guides only rank her first pick so far (A1 for its
+// Crit Rate; Gurugamer, mone.gg, Oct 2026). `alt`: a note when another playstyle changes the order.
 
 const o = (order, alt = null) => ({ order, alt });
 

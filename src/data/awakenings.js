@@ -187,6 +187,15 @@ export const AWAKENINGS = {
     ['Blood in Bloom', 'Sanguine Dash guarantees Break once per target; team Break DMG +300%.'],
     ['Blood-Stained Eyes', 'Oblivion final hit +12% per DoT stack, up to 240%.'],
   ),
+  // Akane: from the CN release (Oct 2026), Kaiden and mone.gg; matches the CN client text.
+  akane: a(
+    ['After-School Tabs', 'Crit Rate +12%; each Synced Resonance heals her for 100% of Base ATK.'],
+    ['Window Capo', 'Overtone targets lose 7.5% of all RES; the active character in her Reverb Field deals 12.5% more DMG.'],
+    ['Shade Capsules', 'Tapped Rhythm Wave DMG +150%; Reverb Field 25% wider and pulls enemies in when held.'],
+    ['Headphone Static', 'ATK +16% for 10s after Synced Resonance.'],
+    ['Rehearsal Click', 'Relayed Basic Attack bonus rises to 50% with Overtone and 60% in Reverb Field.'],
+    ['Front-Row Supernova', 'Starlit Anthem also gives the whole team 10% more DMG.'],
+  ),
   zero: a(
     ['Blooming Gaze', 'First hit on lower-level enemies adds 200% ATK, ignoring 75% DEF.'],
     ['Finding the Calling', 'Appraise and Engrave grants 8 Ultimate Energy.'],
@@ -230,6 +239,7 @@ export const RESONANCES = {
   shinku: r(['Awakened Resolve', 'Basic Attack, Redirect Skill and Ultimate +1 level; DMG +30% in Surging Crimson.'], ['Crimson Hero', 'Crit Rate +10% and ignores 15% DEF.']),
   skia: r(['Cubical Survival Manual', 'Arresting Art, Shadow Hound Chase and The Pack +1 skill level.'], ['Employee of the Month', 'Each Fang Thrust lock lowers the target’s Lakshana RES.']),
   zankou: r(['Scarlet Feast', 'Six skills +1 level; Bloodfeast Reverie and Inferno Flamenco DMG +20%.'], ['Venom Flame', 'ATK +40% for 20s after dealing DMG; enhanced for 60s after defeating a Scorched target.']),
+  akane: r(['Diatonic', 'Basic Attack, Redirect Skill and Ultimate +1 skill level; ATK +20%.'], ['Counterpoint', 'Starts battle with full String Energy, refunds 10 after each Synced Resonance, then Crit DMG +50% for 25s.']),
   zero: r(['Discern', 'Appraisal, Appraise and Engrave and Divide by Zero +1 skill level.'], ['Zero Display', 'Team ATK +10% for 20s when Zero triggers a Cosmos Esper Cycle.']),
 };
 

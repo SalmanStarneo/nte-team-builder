@@ -89,7 +89,8 @@ export const FIELD_EFFECTS = {
 // "Character banners" are the Scarborough Fair boards (GameWith: "Gacha"),
 // "Arc banners" the Arc Research Program, and the Arc Shop is the Arc
 // Exchange paid in U-00NE from anomaly bosses.
-// Far Side of the Moon, Ravenous Blade, The Wrong Gate and Voice of the
+// Far Side of the Moon: Celestial Special Arc banner (AllThings.how, 1.4 banners).
+// Ravenous Blade, The Wrong Gate and Voice of the
 // Voyager follow the signature-Arc pattern (limited Arc banner alongside their
 // character); no guide lists their source yet. The Great Thief has no source
 // listed anywhere yet, so it shows none.
@@ -109,7 +110,7 @@ export const ARC_SOURCES = {
   'crime-and-punishment': [LIMITED],
   'day-off': ['Eclipse side quest at the Bureau of Anomaly Control'],
   'eternal-waltz': ['Anomaly Pilgrimage: first clear against The Never-ending Arachne'],
-  'far-side-of-the-moon': [LIMITED],
+  'far-side-of-the-moon': ['Limited Arc banner “Celestial Special” (Arc Research Program, Tri-Keys), alongside Akane Rin’s banner'],
   'fluff-of-fearlessness': [PASS],
   'fluff-of-ferocity': [PASS],
   'fluff-of-finesse': [PASS],
@@ -164,9 +165,10 @@ export const ARC_BY_ID = Object.fromEntries(ARCS.map((a) => [a.id, a]));
 // Stellar Veil).
 // Sources (Oct 2026): GameWith "best Arcs by character" (its "Doomrain" is
 // The Rain That Shook the World); neverness.gg build guides for Linko, Zankou
-// and Blackbird; Akane Rin's guides list only her signature so far.
+// and Blackbird; Icy Veins best-builds ranking for Akane Rin (Oct 2026).
 export const RECOMMENDED = {
   adler: ['umbrella', 'the-fools-spring', 'a-time-will-come'],
+  akane: ['the-wrong-gate', 'fluff-of-fleetness', 'youthful-fantasy', 'shiny-days'],
   aurelia: ['stellar-veil', 'fluff-of-fortitude', 'oraora'],
   baicang: ['camellia-society', 'a-time-will-come', 'fluff-of-ferocity'],
   blackbird: ['ravenous-blade', 'watch-your-heads'],

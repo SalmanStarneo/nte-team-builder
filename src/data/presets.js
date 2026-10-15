@@ -1,6 +1,7 @@
 // Community team archetypes (Mobalytics team guide, Sep 2026; Blackbird,
 // Aurelia, Mint and Skia teams from Kaiden, Icy Veins, GameWith and other community guides,
-// Oct 2026). Loading one copies it into the team you're editing, with each
+// Oct 2026; Akane Rin teams from Gurugamer, mone.gg and TopUpLive, Oct 2026,
+// pre-release ideas until she is out on global). Loading one copies it into the team you're editing, with each
 // member's recommended kit (see presetLoadouts).
 import { CHARACTER_BY_ID } from './characters.js';
 import { bestBuild } from './bestBuild.js';
@@ -21,6 +22,8 @@ export const PRESETS = [
   { name: 'Aurelia Nova', members: ['aurelia', 'daffodill', 'haniel', 'fadia'] },
   { name: 'Mint Hexed', members: ['mint', 'zero', 'sakiri', 'linko'] },
   { name: 'Skia Remora', members: ['skia', 'zero', 'nanally', 'haniel'] },
+  { name: 'Akane Remora', members: ['akane', 'blackbird', 'zero', 'iroi'] },
+  { name: 'Akane Stain', members: ['akane', 'blackbird', 'haniel', 'fadia'] },
 ];
 
 /**

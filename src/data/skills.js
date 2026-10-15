@@ -271,14 +271,19 @@ export const SKILLS = {
       s('Life', 'All In', 'Spend extra City Stamina on Fight Club matches for better rewards.'),
     ],
   },
+  // Akane: kit from the CN release (Oct 2026) via Kaiden, mone.gg and CN wikis.
+  // Life skill names are translated from the CN client until global names are out.
   akane: {
     combat: [
-      s(B, 'Stringblade', 'Up to 4 hits of guitar and sound-blade Lakshana damage.'),
-      s(R, 'Rhythm Wave', 'Tap to mark a target or hold for a reverb field; stronger with full String Energy.'),
-      s(U, 'Sonic Boom', 'One huge hit, then the Solo Cadenza state and a follow-up.'),
-      s(S, null, null),
+      s(B, 'Stringblade', 'Up to 4 hits of guitar and sound-blade Lakshana damage that build String Energy (max 30).'),
+      s(R, 'Rhythm Wave', 'Tap to mark a target with Overtone or hold for a Reverb Field; at 30 String Energy it fires Synced Resonance.'),
+      s(U, 'Sonic Boom', 'A huge hit that starts Solo Cadenza; recast late in it for a second, bigger hit.'),
+      s(S, 'Altered Chord', 'A heavy strum: one hit of Lakshana damage that triggers a Reaction.'),
     ],
-    life: [],
+    life: [
+      s('Life', 'Bar Special', 'More shop customers while she works there.'),
+      s('Life', 'Stage Star', 'Unlocks Super Sound rounds on stage, for 1 extra City Stamina each.'),
+    ],
   },
   adler: {
     combat: [
