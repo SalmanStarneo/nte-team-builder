@@ -20,7 +20,7 @@ const LINKS = [
   {
     id: 'facebook',
     label: 'Facebook',
-    handle: 'SilverStarneo-Cortado',
+    handle: 'SSN-Cortado',
     href: 'https://www.facebook.com/share/19TtHpBbu3/',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">

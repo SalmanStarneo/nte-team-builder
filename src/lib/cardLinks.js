@@ -1,18 +1,21 @@
 // The site address and the project's own channels (not official NTE ones),
 // printed small on export cards so people who see a shared image can find
 // the builder. Facebook's share link isn't readable as text, so images carry
-// X and Discord only; the site footer has all three.
+// the page name (SSN-Cortado) with the Facebook icon instead.
 
 export const SITE = 'silverneostar.github.io/nte-team-builder';
 
 const X_PATH =
   'M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.65l-5.21-6.82-5.97 6.82H1.68l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.83L7.08 4.13H5.12l11.96 15.64Z';
+const FB_PATH =
+  'M13.5 21.9v-7.4h2.6l.4-3.1h-3V9.5c0-.9.3-1.5 1.6-1.5h1.6V5.2c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.3H7.9v3.1h2.6v7.4a10 10 0 1 1 3 0Z';
 // A plain chat bubble, not the Discord logo (brand kit rule).
 const BUBBLE_PATH = 'M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12Z';
 
 export const LINKS = [
   { icon: 'web', text: SITE, main: true },
   { icon: 'x', text: '@SilverStarneo' },
+  { icon: 'fb', text: 'SSN-Cortado' },
   { icon: 'chat', text: 'discord.gg/YnC439yB3' },
 ];
 
@@ -28,6 +31,8 @@ function drawIcon(ctx, kind, x, y, size, color) {
   ctx.lineJoin = 'round';
   if (kind === 'x') {
     ctx.fill(new Path2D(X_PATH));
+  } else if (kind === 'fb') {
+    ctx.fill(new Path2D(FB_PATH));
   } else if (kind === 'chat') {
     ctx.stroke(new Path2D(BUBBLE_PATH));
     for (const dx of [8.5, 12, 15.5]) {
