@@ -92,7 +92,8 @@ export const FIELD_EFFECTS = {
 // Limited Arc banner names (Oct 2026): NTE Global on X (Resolve Special);
 // GameWith banner list (Dreamgate, Spellbound, Tiger, Bright Moon, Chorus);
 // The Games Wiki (Nocturne, Pursuit); AllThings.how 1.4 banners (Roostfeather,
-// Celestial). The Great Thief has no source listed anywhere yet, so it shows none.
+// Celestial).
+// The Great Thief: Arc Exchange, like the other A-rank Arcs (confirmed by the site owner).
 const limited = (banner, who) =>
   `Limited Arc banner “${banner} Special” (Arc Research Program, Tri-Keys), alongside ${who} banner`;
 const CHAR_BANNERS = 'Character banners (Scarborough Fair)';
@@ -146,6 +147,7 @@ export const ARC_SOURCES = {
   'the-fools-spring': [ARC_SHOP],
   'the-forgotten': ['Pre-release reward', CHAR_BANNERS, ARC_SHOP],
   'the-good-the-bad-the-bitter': [ARC_SHOP],
+  'the-great-thief': [ARC_SHOP],
   'time-bandit': ['Arc Shop (Arc Exchange): 100 U-00NE'],
   umbrella: [commission('Prepare for Rain'), CHAR_BANNERS, ARC_BANNERS, ARC_SHOP],
   'watch-your-heads': [CHAR_BANNERS, ARC_BANNERS, ARC_SHOP],
