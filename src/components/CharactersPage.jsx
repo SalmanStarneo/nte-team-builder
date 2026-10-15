@@ -214,7 +214,13 @@ export default function CharactersPage({ characterId, activeTeam, onAdd }) {
                   aria-current={c.id === characterId ? 'true' : undefined}
                 >
                   <span className="char-tile__art">
-                    <img src={`${BASE}characters/${c.id}.webp`} alt="" loading="lazy" />
+                    <img
+                      src={`${BASE}characters/${c.id}.webp`}
+                      srcSet={`${BASE}characters/${c.id}.webp 256w, ${BASE}characters/hd/${c.id}.webp 512w`}
+                      sizes="(max-width: 600px) 45vw, 170px"
+                      alt=""
+                      loading="lazy"
+                    />
                     <span className="char-tile__rank"><RankBadge rank={c.rarity} size={24} /></span>
                     <span className="char-tile__el"><ElementGlyph element={c.element} size={20} title={ELEMENT_BY_ID[c.element].name} /></span>
                     {c.upcoming && <span className="char-tile__tag">Upcoming</span>}

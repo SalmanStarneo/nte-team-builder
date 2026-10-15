@@ -23,6 +23,8 @@ Character names, elements, roles, ranks and reaction rules are factual informati
 
 Any official artwork included in this repository is used only where the publisher has released it for free public or fan use, and only within the publisher's terms. It will be removed on request.
 
+The `hd/` versions of character and Arc images are 2× copies of the same official art, upscaled with Real-ESRGAN (anime model) so exported cards stay sharp. Mint's portrait is slightly toned down to match the others. No content has been added or changed beyond resizing and tone.
+
 ## Third-party software
 
 - [React](https://react.dev): MIT License

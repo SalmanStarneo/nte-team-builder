@@ -464,7 +464,8 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
   const info = CHARACTER_CONSOLE[c.id];
   const elColor = EL[c.element] ?? K.pink;
   const [portrait, elIcon, cartImg, recCartImg, arcImg] = await Promise.all([
-    loadImage(`${base}characters/${c.id}.webp`),
+    // 512 px portrait (AI-upscaled from the 256 px source) so the card stays sharp.
+    loadImage(`${base}characters/hd/${c.id}.webp`),
     loadImage(`${base}icons/elements/${c.element}.webp`),
     build.cartridge ? loadImage(`${base}icons/cartridges/${build.cartridge}.webp`) : null,
     build.recommended ? loadImage(`${base}icons/cartridges/${build.recommended.cartridge}.webp`) : null,

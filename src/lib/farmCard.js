@@ -246,7 +246,7 @@ export async function renderFarmCard(character, { base = '/' } = {}) {
 
   const names = [...new Set(list.groups.flatMap((g) => g.items.map((i) => i.name)))];
   const [portrait, elIcon, ...icons] = await Promise.all([
-    loadImage(`${base}characters/${c.id}.webp`),
+    loadImage(`${base}characters/hd/${c.id}.webp`),
     loadImage(`${base}icons/elements/${c.element}.webp`),
     ...names.map((n) => (materialIconUrl(n) ? loadImage(materialIconUrl(n)) : null)),
   ]);
@@ -437,7 +437,7 @@ export async function renderArcFarmCard(arc, { base = '/' } = {}) {
 
   const names = [...new Set(Object.values(groups).flatMap((g) => g.items.map((i) => i.name)))];
   const [art, typeIcon, ...rest] = await Promise.all([
-    loadImage(`${base}arcs/${arc.id}.webp`),
+    loadImage(`${base}arcs/hd/${arc.id}.webp`),
     loadImage(`${base}icons/arc-types/${arc.type.toLowerCase()}.webp`),
     ...names.map((n) => (materialIconUrl(n) ? loadImage(materialIconUrl(n)) : null)),
     ...users.map((c) => loadImage(`${base}characters/${c.id}.webp`)),

@@ -295,7 +295,7 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   await ensureFonts();
   const members = team.members.map((id) => (id ? CHARACTER_BY_ID[id] : null));
   const images = await Promise.all(
-    members.map((c) => (c ? loadImage(`${base}characters/${c.id}.webp`) : null)),
+    members.map((c) => (c ? loadImage(`${base}characters/hd/${c.id}.webp`) : null)),
   );
   const analysis = analyzeTeam(team.members);
   // Official element and role icons.
