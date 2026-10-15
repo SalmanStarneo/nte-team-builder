@@ -4,7 +4,7 @@
 // Development panel with current and recommended modules plus the grid.
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import { ARCS, ARC_BY_ID, RECOMMENDED, arcTag } from '../data/arcs.js';
-import { CARTRIDGE_BY_ID, bonusStats, isPercentStat, moduleLevel } from '../data/gear.js';
+import { CARTRIDGE_BY_ID, bonusStats, cartridgesFor, isPercentStat, moduleLevel } from '../data/gear.js';
 import {
   CHARACTER_CONSOLE, CONSOLE_SIZE, SHAPES, consoleStats, maskOf, occupancy, setProgress,
 } from '../data/console.js';
@@ -22,7 +22,7 @@ import {
 } from './teamCard.js';
 
 export const BUILD_W = 1600;
-export const BUILD_H = 820;
+export const BUILD_H = 880;
 
 // Charcoal panels and gold modules, like the in-game guide.
 const K = {
@@ -82,10 +82,12 @@ export function characterBuild(character, { team = null, current = null, source 
   const cartridge = current?.cartridge ?? lo?.cartridge ?? null;
   const cartStats = current?.cartStats ?? lo?.cartStats ?? null;
   const rec = suggestedBuild(character.id, cartridge);
+  const shownArc = arc ?? (recArcId ? ARC_BY_ID[recArcId] : null);
+  const shownCart = cartridge ?? rec?.cartridge ?? null;
   return {
     character,
     source: source ?? (current ? 'Console build' : inTeam ? `Team · ${team.name}` : 'Recommended build'),
-    arc: arc ?? (recArcId ? ARC_BY_ID[recArcId] : null),
+    arc: shownArc,
     arcState: arc ? 'Equipped' : 'Recommended',
     arcDupes: current?.arcDupes ?? lo?.arcDupes ?? null,
     awakeningOrder: current?.awakeningOrder ?? null,
@@ -94,7 +96,20 @@ export function characterBuild(character, { team = null, current = null, source 
     pieces,
     recommended: rec,
     recStats: recStats ?? suggestedCartStats(character, cartridge ?? rec?.cartridge ?? null),
+    alternatives: alternativesFor(character, shownArc?.id, [shownCart, rec?.cartridge]),
   };
+}
+
+/**
+ * Best backup picks beside what the card shows: the next Arc from the
+ * signature + guide list, and the next Cartridge sets from the guides' ranking.
+ */
+export function alternativesFor(character, arcId, shownCarts = []) {
+  const sig = ARCS.find((a) => a.signature === character.id)?.id;
+  const arcIds = [...new Set([sig, ...(RECOMMENDED[character.id] ?? [])])].filter(Boolean);
+  const altArc = arcIds.find((id) => id !== arcId && ARC_BY_ID[id]?.type === character.arcType);
+  const carts = cartridgesFor(character).filter((id) => !shownCarts.includes(id)).slice(0, 2);
+  return { arc: altArc ? ARC_BY_ID[altArc] : null, cartridges: carts };
 }
 
 function panel(ctx, x, y, w, h, title) {
@@ -155,6 +170,44 @@ function cartTile(ctx, x, y, size, img) {
 }
 
 // One "Current" / "Recommended" row. Returns the height used.
+/**
+ * One line of alternatives: a small mono label, then icon + name items.
+ * Items that don't fit before `right` are dropped; the last kept name is shortened.
+ */
+function altLine(ctx, x, y, right, label, items) {
+  ctx.font = `700 12px ${MONO}`;
+  ctx.fillStyle = K.muted;
+  ctx.fillText(label, x, y);
+  let cx = x + ctx.measureText(label).width + 14;
+  const ICON = 24;
+  items.forEach((it, i) => {
+    if (cx + ICON + 40 > right) return;
+    if (it.img) {
+      ctx.save();
+      roundRect(ctx, cx, y - 18, ICON, ICON, 6);
+      ctx.clip();
+      ctx.drawImage(it.img, cx, y - 18, ICON, ICON);
+      ctx.restore();
+      cx += ICON + 7;
+    }
+    ctx.font = `600 16px ${BODY}`;
+    ctx.fillStyle = K.fg;
+    const name = wrap(ctx, it.name, right - cx, 1)[0];
+    ctx.fillText(name, cx, y);
+    cx += ctx.measureText(name).width;
+    if (it.note) {
+      ctx.font = `500 14px ${BODY}`;
+      ctx.fillStyle = K.muted;
+      const note = `  ·  ${it.note}`;
+      if (cx + ctx.measureText(note).width <= right) {
+        ctx.fillText(note, cx, y);
+        cx += ctx.measureText(note).width;
+      }
+    }
+    if (i < items.length - 1) cx += 22;
+  });
+}
+
 function moduleRow(ctx, x, y, w, label, cartId, pieces, cartImg) {
   ctx.fillStyle = K.muted;
   ctx.font = `600 16px ${BODY}`;
@@ -437,6 +490,11 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
   const el = ELEMENT_BY_ID[c.element];
   const info = CHARACTER_CONSOLE[c.id];
   const elColor = EL[c.element] ?? K.pink;
+  const alt = build.alternatives ?? { arc: null, cartridges: [] };
+  const [altArcArt, ...altCartImgs] = await Promise.all([
+    alt.arc ? loadImage(`${base}arcs/${alt.arc.id}.webp`) : null,
+    ...alt.cartridges.map((id) => loadImage(`${base}icons/cartridges/${id}.webp`)),
+  ]);
   const [portrait, elIcon, cartImg, recCartImg, arcImg, arcArt] = await Promise.all([
     // 512 px portrait (AI-upscaled from the 256 px source) so the card stays sharp.
     loadImage(`${base}characters/hd/${c.id}.webp`),
@@ -665,7 +723,7 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
 
   // ---- Arc ----
   const arcY = top + statsH + 14;
-  const arcH = 132;
+  const arcH = build.arc && alt.arc ? 172 : 132;
   panel(ctx, LCX, arcY, LCW, arcH, 'Arc');
   if (build.arc) {
     const a = build.arc;
@@ -715,6 +773,18 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
       ctx.fillStyle = K.num;
       ctx.fillText(val, sx, arcY + 115);
       sx += ctx.measureText(val).width + 22;
+    }
+    if (alt.arc) {
+      // Best backup Arc, under a hairline.
+      ctx.strokeStyle = K.line;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(LCX + 18, arcY + 134.5);
+      ctx.lineTo(LCX + LCW - 18, arcY + 134.5);
+      ctx.stroke();
+      altLine(ctx, LCX + 18, arcY + 160, LCX + LCW - 18, 'ALTERNATIVE', [
+        { img: altArcArt, name: alt.arc.name, note: `${alt.arc.rarity}-rank` },
+      ]);
     }
   } else {
     ctx.fillStyle = K.muted;
@@ -787,6 +857,13 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
   }
   if (build.recommended && !ownBuild) {
     y += moduleRow(ctx, innerX, y, innerW, 'Recommended', build.recommended.cartridge, build.recommended.pieces, recCartImg) + 14;
+  }
+  if (alt.cartridges.length) {
+    // Other sets the build guides rank for this character.
+    altLine(ctx, innerX, y + 14, innerX + innerW, 'ALTERNATIVE SETS', alt.cartridges.map((id, i) => ({
+      img: altCartImgs[i], name: CARTRIDGE_BY_ID[id].name,
+    })));
+    y += 34;
   }
 
   // Attribute priorities + grid template.
