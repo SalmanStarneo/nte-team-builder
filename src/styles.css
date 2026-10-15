@@ -3357,7 +3357,7 @@ th[aria-sort='descending'] .th-btn {
   font-size: 0.84rem;
   color: var(--muted);
 }
-.console-tiers b {
+.console-tiers li > b:first-child {
   display: inline-grid;
   place-items: center;
   width: 18px;
@@ -3370,7 +3370,7 @@ th[aria-sort='descending'] .th-btn {
 .console-tiers li.is-on {
   color: var(--fg);
 }
-.console-tiers li.is-on b {
+.console-tiers li.is-on > b:first-child {
   background: #3fd3ad;
   border-color: #3fd3ad;
   color: #062018;
