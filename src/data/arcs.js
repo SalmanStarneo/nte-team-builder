@@ -89,12 +89,12 @@ export const FIELD_EFFECTS = {
 // "Character banners" are the Scarborough Fair boards (GameWith: "Gacha"),
 // "Arc banners" the Arc Research Program, and the Arc Shop is the Arc
 // Exchange paid in U-00NE from anomaly bosses.
-// Far Side of the Moon: Celestial Special Arc banner (AllThings.how, 1.4 banners).
-// Ravenous Blade, The Wrong Gate and Voice of the
-// Voyager follow the signature-Arc pattern (limited Arc banner alongside their
-// character); no guide lists their source yet. The Great Thief has no source
-// listed anywhere yet, so it shows none.
-const LIMITED = 'Limited Arc banner (Arc Research Program, Tri-Keys), alongside its character’s banner';
+// Limited Arc banner names (Oct 2026): NTE Global on X (Resolve Special);
+// GameWith banner list (Dreamgate, Spellbound, Tiger, Bright Moon, Chorus);
+// The Games Wiki (Nocturne, Pursuit); AllThings.how 1.4 banners (Roostfeather,
+// Celestial). The Great Thief has no source listed anywhere yet, so it shows none.
+const limited = (banner, who) =>
+  `Limited Arc banner “${banner} Special” (Arc Research Program, Tri-Keys), alongside ${who} banner`;
 const CHAR_BANNERS = 'Character banners (Scarborough Fair)';
 const ARC_BANNERS = 'Arc banners (Arc Research Program)';
 const ARC_SHOP = 'Arc Shop (Arc Exchange, paid in U-00NE from anomaly bosses)';
@@ -104,13 +104,13 @@ const commission = (name, where) => `Anomaly Commission “${name}”${where ? `
 export const ARC_SOURCES = {
   // S-rank
   'blow-up-the-crowd': [commission('Rhythm Master', 'Illusion Town')],
-  'blushing-mirage': [LIMITED],
+  'blushing-mirage': [limited('Resolve', 'Shinku’s')],
   'camellia-society': ['First clear of the Serenetti Anomaly Hunt', ARC_BANNERS],
   'contemplative-cat': ['City Tycoon reward at Tycoon Level 21'],
-  'crime-and-punishment': [LIMITED],
+  'crime-and-punishment': [limited('Roostfeather', 'Blackbird’s')],
   'day-off': ['Eclipse side quest at the Bureau of Anomaly Control'],
   'eternal-waltz': ['Anomaly Pilgrimage: first clear against The Never-ending Arachne'],
-  'far-side-of-the-moon': ['Limited Arc banner “Celestial Special” (Arc Research Program, Tri-Keys), alongside Akane Rin’s banner'],
+  'far-side-of-the-moon': [limited('Celestial', 'Akane Rin’s')],
   'fluff-of-fearlessness': [PASS],
   'fluff-of-ferocity': [PASS],
   'fluff-of-finesse': [PASS],
@@ -118,19 +118,19 @@ export const ARC_SOURCES = {
   'fluff-of-fortitude': [PASS],
   'good-boys-grand-adventure': ['Anomaly Pilgrimage: first clear against Morphix', ARC_BANNERS],
   'hethereaus-keeper': ['Max out your Wanted Level, defeat the Justice Executioner, then visit the Security Office'],
-  'marching-beyond-time': [LIMITED],
+  'marching-beyond-time': [limited('Bright Moon', 'Hotori’s')],
   'raging-flames': [commission('Ride Assault', 'Bridge Crossings'), ARC_BANNERS],
-  'ravenous-blade': [LIMITED],
-  'ready-ready': [LIMITED],
+  'ravenous-blade': [limited('Spellbound', 'Zankou’s')],
+  'ready-ready': [limited('Tiger', 'Nanally’s')],
   'reality-refuge': [commission('Let’s Go See a Movie', 'New Herland District'), ARC_BANNERS],
   'song-of-the-whale': [commission('Deep Blue Sorrow', 'New Herland District')],
   'stellar-veil': ['Login bonus event'],
   'tears-beneath-the-mask': [commission('Call of the Lost', 'New Herland District')],
-  'the-last-rose': [LIMITED],
+  'the-last-rose': [limited('Nocturne', 'Lacrimosa’s')],
   'the-rain-that-shook-the-world': ['Limited Press Arc Pack in the Mall (paid)', 'Arc Shop, after buying the pack'],
-  'the-wrong-gate': [LIMITED],
-  'voice-of-the-voyager': [LIMITED],
-  'whats-desired': [LIMITED],
+  'the-wrong-gate': [limited('Dreamgate', 'Iroi’s')],
+  'voice-of-the-voyager': [limited('Chorus', 'Linko’s')],
+  'whats-desired': [limited('Pursuit', 'Chaos’s')],
   'your-happiness-is-priceless': ['Mall, for Nacupeda Coins: “Make a Sincere Wish” once a day at Nacupeda’s Pool, southwest Illusion Town'],
   'youthful-fantasy': [commission('The Book of Post-Adolescence', 'New Herland District'), ARC_BANNERS],
   // A-rank
