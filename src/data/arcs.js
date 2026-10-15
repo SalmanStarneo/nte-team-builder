@@ -195,6 +195,22 @@ export const RECOMMENDED = {
   zero: ['day-off', 'blow-up-the-crowd'],
 };
 
+/**
+ * How an Arc is obtained, from ARC_SOURCES:
+ * 'limited' (limited banners only), 'paid' (paid pack), 'pass' (Elite Hunter
+ * Supplies battle pass), 'free' (commissions, quests, events, Arc Exchange)
+ * or 'banner' (standard banners only).
+ */
+export function arcAccess(id) {
+  const src = ARC_SOURCES[id] ?? [];
+  if (!src.length) return null;
+  if (src.every((x) => x.startsWith('Limited Arc banner'))) return 'limited';
+  if (src.some((x) => /\(paid\)/.test(x))) return 'paid';
+  if (src.includes(PASS)) return 'pass';
+  if (src.some((x) => x !== CHAR_BANNERS && x !== ARC_BANNERS && !x.startsWith('Limited Arc banner'))) return 'free';
+  return 'banner';
+}
+
 /** 'sig', 'rec' or null for an Arc on a given character. */
 export function arcTag(arc, character) {
   if (arc.signature === character.id) return 'sig';

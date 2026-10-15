@@ -3,7 +3,7 @@
 // Console bonus, build stats / Arc / Cartridge panels, and a Console
 // Development panel with current and recommended modules plus the grid.
 import { ELEMENT_BY_ID } from '../data/elements.js';
-import { ARCS, ARC_BY_ID, RECOMMENDED, arcTag } from '../data/arcs.js';
+import { ARCS, ARC_BY_ID, RECOMMENDED, arcAccess, arcTag } from '../data/arcs.js';
 import { CARTRIDGE_BY_ID, bonusStats, cartridgesFor, isPercentStat, moduleLevel } from '../data/gear.js';
 import {
   CHARACTER_CONSOLE, CONSOLE_SIZE, SHAPES, consoleStats, maskOf, occupancy, setProgress,
@@ -100,16 +100,24 @@ export function characterBuild(character, { team = null, current = null, source 
   };
 }
 
+const EASY = ['free', 'pass'];
+
 /**
- * Best backup picks beside what the card shows: the next Arc from the
- * signature + guide list, and the next Cartridge sets from the guides' ranking.
+ * Best backup picks beside what the card shows. The Arc is one anyone can
+ * get: the first free or battle-pass S/A-rank Arc in the signature + guide
+ * list, else the Fluff Arc of the character's type, else the strongest free
+ * Arc of that type. Limited and paid Arcs are never suggested. Cartridge sets
+ * are the next ones in the guides' ranking.
  */
 export function alternativesFor(character, arcId, shownCarts = []) {
+  const ok = (a) => a && a.id !== arcId && a.type === character.arcType && a.rarity !== 'B' && EASY.includes(arcAccess(a.id));
   const sig = ARCS.find((a) => a.signature === character.id)?.id;
-  const arcIds = [...new Set([sig, ...(RECOMMENDED[character.id] ?? [])])].filter(Boolean);
-  const altArc = arcIds.find((id) => id !== arcId && ARC_BY_ID[id]?.type === character.arcType);
+  const listed = [...new Set([sig, ...(RECOMMENDED[character.id] ?? [])])].map((id) => ARC_BY_ID[id]);
+  const altArc = listed.find(ok)
+    ?? ARCS.find((a) => ok(a) && a.name.startsWith('Fluff of'))
+    ?? ARCS.filter(ok).sort((a, b) => b.atk - a.atk)[0];
   const carts = cartridgesFor(character).filter((id) => !shownCarts.includes(id)).slice(0, 2);
-  return { arc: altArc ? ARC_BY_ID[altArc] : null, cartridges: carts };
+  return { arc: altArc ?? null, cartridges: carts };
 }
 
 function panel(ctx, x, y, w, h, title) {
@@ -783,7 +791,7 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
       ctx.lineTo(LCX + LCW - 18, arcY + 134.5);
       ctx.stroke();
       altLine(ctx, LCX + 18, arcY + 160, LCX + LCW - 18, 'ALTERNATIVE', [
-        { img: altArcArt, name: alt.arc.name, note: `${alt.arc.rarity}-rank` },
+        { img: altArcArt, name: alt.arc.name, note: `${alt.arc.rarity}-rank · ${arcAccess(alt.arc.id) === 'pass' ? 'Battle pass' : 'Free'}` },
       ]);
     }
   } else {
