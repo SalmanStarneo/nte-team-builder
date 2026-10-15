@@ -116,37 +116,14 @@ const toBits = (chars) =>
     return [4, 3, 2, 1, 0].map((i) => (v >> i) & 1);
   });
 
-const group = (s) => s.match(new RegExp(`.{1,${GROUP}}`, 'g')).join('-');
-
 // ---- head ----------------------------------------------------------------
+// Older 4-character-group codes (head + gear tail) are only decoded now, so
+// cards shared before the v5 format still import. New codes use encodeV5.
 
 function headCheck(value) {
   let sum = 0n;
   for (let i = 0n; i < 14n; i += 1n) sum += ((value >> (i * 4n)) & 15n) * (i + 1n);
   return Number(sum % 16n) ^ HEAD_SALT;
-}
-
-function encodeHead(team, loadoutOf) {
-  let value = 0n;
-  for (let i = 0; i < TEAM_SIZE; i += 1) {
-    const id = team.members[i];
-    let c = 0, d = 0, a = 0;
-    if (id && CHAR_ORDER.includes(id)) {
-      const lo = loadoutOf(team, id);
-      c = CHAR_ORDER.indexOf(id) + 1;
-      d = Math.min(Math.max(lo.dupes | 0, 0), MAX_DUPES);
-      const list = arcsOfType(CHARACTER_BY_ID[id].arcType);
-      a = lo.arc ? list.indexOf(lo.arc) + 1 : 0;
-    }
-    value = (((((value << 6n) | BigInt(c)) << 3n) | BigInt(d)) << 5n) | BigInt(a);
-  }
-  value = (value << 4n) | BigInt(headCheck(value));
-  let out = '';
-  for (let i = 0; i < HEAD_CHARS; i += 1) {
-    out = ALPHABET[Number(value & 31n)] + out;
-    value >>= 5n;
-  }
-  return out;
 }
 
 function decodeHead(chars) {
@@ -195,60 +172,8 @@ function tailCheck(head, bits) {
 // Percentages are stored in hundredths, flat stats as whole numbers.
 const VALUE_BITS = [8, 11, 14, 17]; // legacy tails
 
-function writeValue(w, stat, value) {
-  const scale = isPercentStat(stat) ? 100 : 1;
-  const v = Math.max(0, Math.min(2 ** 17 - 1, Math.round(Number(value || 0) * scale)));
-  const cls = VALUE_BITS.findIndex((b) => v < 2 ** b);
-  w.write(cls, 2);
-  w.write(v, VALUE_BITS[cls]);
-}
-
 function readValue(r, stat) {
   return r.read(VALUE_BITS[r.read(2)]) / (isPercentStat(stat) ? 100 : 1);
-}
-
-const validStat = (x, list) => x && list.includes(x.stat);
-
-function encodeTail(head, team, loadoutOf) {
-  const w = new BitWriter();
-  let anyGear = false;
-  for (const id of team.members) {
-    if (!id || !CHAR_ORDER.includes(id)) continue;
-    const lo = loadoutOf(team, id);
-    const cart = CART_ORDER.indexOf(lo.cartridge);
-    const main = validStat(lo.cartStats?.main, MAIN_STAT_ORDER) ? lo.cartStats.main : null;
-    const subs = Array.from({ length: CARTRIDGE_SUB_SLOTS }, (_, i) => {
-      const x = lo.cartStats?.subs?.[i];
-      return validStat(x, SUB_STAT_ORDER) ? x : null;
-    });
-    const hasCart = cart >= 0;
-    const hasStats = Boolean(main) || subs.some(Boolean);
-    anyGear ||= hasCart || hasStats;
-    w.write(hasCart ? 1 : 0, 1);
-    w.write(hasStats ? 1 : 0, 1);
-    if (hasCart) w.write(cart, 5);
-    if (hasStats) {
-      w.write(main ? 1 : 0, 1);
-      if (main) {
-        w.write(MAIN_STAT_ORDER.indexOf(main.stat), 4);
-        writeValue(w, main.stat, main.value);
-      }
-      subs.forEach((x) => w.write(x ? 1 : 0, 1));
-      for (const x of subs) {
-        if (!x) continue;
-        w.write(SUB_STAT_ORDER.indexOf(x.stat), 4);
-        writeValue(w, x.stat, x.value);
-      }
-    }
-  }
-  if (!anyGear) return '';
-  const body = w.bits;
-  // Pad so check (5 bits) + body fills whole groups.
-  const total = Math.ceil((5 + body.length) / (5 * GROUP)) * 5 * GROUP;
-  while (body.length < total - 5) body.push(0);
-  const check = new BitWriter();
-  check.write(tailCheck(head, body), 5);
-  return toChars([...check.bits, ...body]);
 }
 
 function decodeTail(head, chars, base) {

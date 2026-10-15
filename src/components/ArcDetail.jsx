@@ -17,9 +17,9 @@ import MaterialIcon from './MaterialIcon.jsx';
 import Portrait from './Portrait.jsx';
 import RankBadge from './RankBadge.jsx';
 import StatText from './StatText.jsx';
+import { fmt } from '../lib/format.js';
 
 const CAPS = [20, 30, 40, 50, 60, 70, 80];
-const fmt = (n) => n.toLocaleString('en-US');
 
 // Arcs without art yet (everything else has public/arcs/<id>.webp).
 const NO_ART = new Set([]);

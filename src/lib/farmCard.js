@@ -12,8 +12,10 @@ import { ARC_SOURCES, RECOMMENDED } from '../data/arcs.js';
 import { CHARACTER_BY_ID } from '../data/characters.js';
 import {
   BODY, DISPLAY, EL, MONO, clipCard, drawRank, drawSilverFrame, ensureFonts, loadImage, roundRect, wrap,
+  drawBandBackdrop, goldCells,
 } from './teamCard.js';
 import { drawLinksLine } from './cardLinks.js';
+import { fmt } from './format.js';
 
 export const FARM_W = 1600;
 export const FARM_H = 920;
@@ -28,6 +30,9 @@ const K = {
   pink: '#e8488c',
 };
 
+// Diagonal pink bands behind the panels.
+const BANDS = [{ y: -60, h: 190, a: 1 }, { y: 380, h: 130, a: 0.6 }, { y: 800, h: 180, a: 0.8 }];
+
 // Tile accent per material kind (tiers read low → high like the game's rarity colours).
 const KIND = {
   tier1: '#6fbf73',
@@ -39,30 +44,7 @@ const KIND = {
   life: '#e8488c',
 };
 
-const fmt = (n) => n.toLocaleString('en-US');
 const short = (n) => (n >= 1e6 ? `${+(n / 1e6).toFixed(2)}M` : n >= 1e4 ? `${+(n / 1e3).toFixed(1)}K` : fmt(n));
-
-function drawBackdrop(ctx) {
-  ctx.fillStyle = K.bg;
-  ctx.fillRect(0, 0, FARM_W, FARM_H);
-  ctx.save();
-  ctx.translate(FARM_W / 2, FARM_H / 2);
-  ctx.rotate((-14 * Math.PI) / 180);
-  ctx.translate(-FARM_W / 2, -FARM_H / 2);
-  for (const b of [{ y: -60, h: 190, a: 1 }, { y: 380, h: 130, a: 0.6 }, { y: 800, h: 180, a: 0.8 }]) {
-    ctx.globalAlpha = b.a;
-    ctx.fillStyle = 'rgba(194, 24, 91, 0.2)';
-    roundRect(ctx, -400, b.y, FARM_W + 800, b.h, b.h / 2);
-    ctx.fill();
-    ctx.setLineDash([12, 9]);
-    ctx.strokeStyle = 'rgba(232, 72, 140, 0.28)';
-    ctx.lineWidth = 2;
-    roundRect(ctx, -300, b.y + 24, FARM_W + 600, b.h - 48, (b.h - 48) / 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-  ctx.restore();
-}
 
 function panel(ctx, x, y, w, h, title, where) {
   ctx.fillStyle = K.panel;
@@ -148,19 +130,6 @@ function group(ctx, x, y, w, h, g, imgs, size = 104) {
 }
 
 const ROMAN = { 2: 'II', 3: 'III', 4: 'IV' };
-
-function goldCells(ctx, x, y, cells, size, gap) {
-  for (const [r, c] of cells) {
-    const cx = x + c * (size + gap);
-    const cy = y + r * (size + gap);
-    const g = ctx.createLinearGradient(cx, cy, cx + size, cy + size);
-    g.addColorStop(0, '#f8c27a');
-    g.addColorStop(1, '#c46a2c');
-    ctx.fillStyle = g;
-    roundRect(ctx, cx, cy, size, size, Math.max(2, size * 0.18));
-    ctx.fill();
-  }
-}
 
 // The recommended Cartridge set and the modules to farm for it.
 function consolePanel(ctx, x, y, w, h, build, cartImg) {
@@ -260,7 +229,7 @@ export async function renderFarmCard(character, { base = '/' } = {}) {
   canvas.height = FARM_H;
   const ctx = canvas.getContext('2d');
   clipCard(ctx, FARM_W, FARM_H);
-  drawBackdrop(ctx);
+  drawBandBackdrop(ctx, FARM_W, FARM_H, BANDS);
 
   const PAD = 32;
 
@@ -454,7 +423,7 @@ export async function renderArcFarmCard(arc, { base = '/' } = {}) {
   clipCard(ctx, FARM_W, ARC_FARM_H);
   ctx.fillStyle = K.bg;
   ctx.fillRect(0, 0, FARM_W, ARC_FARM_H);
-  drawBackdrop(ctx);
+  drawBandBackdrop(ctx, FARM_W, FARM_H, BANDS);
 
   const PAD = 32;
   const LW = 340;
@@ -508,7 +477,7 @@ export async function renderArcFarmCard(arc, { base = '/' } = {}) {
     ctx.fillStyle = K.pink;
     ctx.font = `700 13px ${MONO}`;
     ctx.fillText(sig && recs.length ? 'SIGNATURE · RECOMMENDED FOR' : sig ? 'SIGNATURE ARC OF' : 'RECOMMENDED FOR', PAD, ly);
-    users.forEach((c, i) => {
+    users.forEach((_, i) => {
       const d = 52;
       const x = PAD + i * (d + 12);
       circleImage(ctx, userImgs[i], x, ly + 12, d, i === 0 && sig ? '#f2c14e' : K.line);

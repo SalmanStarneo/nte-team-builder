@@ -455,8 +455,6 @@ export const ACHIEVEMENTS = Object.entries(RAW).flatMap(([category, rows]) => {
   });
 });
 
-export const ACHIEVEMENT_BY_ID = Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, a]));
-
 // Characters named in Social achievements, for the character filter there.
 export const ACHIEVEMENT_CHARACTERS = [
   ...new Set(

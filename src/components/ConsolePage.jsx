@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { decodeConsoleCode, encodeConsoleCode } from '../lib/consoleCode.js';
 import { CHARACTERS, CHARACTER_BY_ID } from '../data/characters.js';
-import { CARTRIDGES, CARTRIDGE_BY_ID } from '../data/gear.js';
 import {
   CHARACTER_CONSOLE, CONSOLE_SIZE, FREE_CELLS, LAYOUT_NAMES, SET_SHAPES, SHAPES, SHAPE_ORDER,
   canPlace, charactersWithLayout, consoleStats, footprint, maskOf, occupancy, setProgress, specBonus, usedCells,
@@ -14,8 +13,8 @@ import StatAdvice from './StatAdvice.jsx';
 import { suggestedBuild } from '../data/consoleBuilds.js';
 import { loadSavedConsoles, storeSavedConsoles } from '../lib/consoles.js';
 import {
-  CARTRIDGE_SUB_SLOTS, MODULE_MAX_LEVEL, MODULE_SUB_STATS, SUB_UNLOCK_LEVELS, bonusStats, formatStat, isPercentStat,
-  moduleLevel, moduleRange, unlockedSubs,
+  CARTRIDGES, CARTRIDGE_BY_ID, CARTRIDGE_SUB_SLOTS, MODULE_MAX_LEVEL, MODULE_SUB_STATS, SUB_UNLOCK_LEVELS, bonusStats,
+  formatStat, isPercentStat, keepCartValues, moduleLevel, moduleRange, unlockedSubs,
 } from '../data/gear.js';
 import Portrait from './Portrait.jsx';
 import ExportDialog from './ExportDialog.jsx';
@@ -236,10 +235,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
                   type="button"
                   className="btn btn--quiet"
                   onClick={() => {
-                    // Keep values already entered for the same stats.
-                    const old = [cartStats.main, ...cartStats.subs].filter(Boolean);
-                    const keep = (x) => x && { ...x, value: x.value || old.find((o) => o.stat === x.stat)?.value || 0 };
-                    applyBuild({ ...suggested, cartStats: { main: keep(suggested.cartStats.main), subs: suggested.cartStats.subs.map(keep) } });
+                    applyBuild({ ...suggested, cartStats: keepCartValues(cartStats, suggested.cartStats) });
                     setStatus(`Loaded the suggested layout for ${CARTRIDGE_BY_ID[suggested.cartridge].name}. Adjust the stats below the set.`);
                   }}
                 >

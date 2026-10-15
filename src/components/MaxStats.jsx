@@ -3,8 +3,8 @@ import { DMG_TYPES, MAX_STATS_LEVEL } from '../data/maxStats.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import ElementGlyph from './ElementGlyph.jsx';
 import StatIcon from './StatIcon.jsx';
+import { fmt } from '../lib/format.js';
 
-const num = (n) => n.toLocaleString('en-US');
 const pct = (n) => `${Number.isInteger(n) ? n : n.toFixed(2).replace(/0$/, '')}%`;
 const label = (type) => (type === 'mental' ? 'Mental' : ELEMENT_BY_ID[type].name);
 
@@ -20,7 +20,7 @@ export default function MaxStats({ stats }) {
             {[['hp', 'HP', stats.hp], ['atk', 'ATK', stats.atk], ['def', 'DEF', stats.def]].map(([key, name, v]) => (
               <tr key={key}>
                 <th scope="row"><span className="stat-label"><StatIcon stat={key} />{name}</span></th>
-                <td>≈ {num(v)}</td>
+                <td>≈ {fmt(v)}</td>
               </tr>
             ))}
           </tbody>
@@ -33,17 +33,17 @@ export default function MaxStats({ stats }) {
     );
   }
   const rows = [
-    ['hp', 'HP', num(stats.hp)],
-    ['atk', 'ATK', num(stats.atk)],
-    ['def', 'DEF', num(stats.def)],
-    ['stamina', 'Stamina', num(stats.stamina)],
+    ['hp', 'HP', fmt(stats.hp)],
+    ['atk', 'ATK', fmt(stats.atk)],
+    ['def', 'DEF', fmt(stats.def)],
+    ['stamina', 'Stamina', fmt(stats.stamina)],
   ];
   const advanced = [
     ['critRate', 'Crit Rate', pct(stats.critRate)],
     ['critDmg', 'Crit DMG', pct(stats.critDmg)],
     ['charge', 'Charge Efficiency', pct(stats.charge)],
-    ['cycle', 'Cycle Intensity', num(stats.cycle)],
-    ['breakInt', 'Break Intensity', num(stats.breakInt)],
+    ['cycle', 'Cycle Intensity', fmt(stats.cycle)],
+    ['breakInt', 'Break Intensity', fmt(stats.breakInt)],
     ['dmgBonus', 'Universal DMG Bonus', pct(stats.universal)],
   ];
   const healing = [

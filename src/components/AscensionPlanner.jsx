@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import MaterialIcon from './MaterialIcon.jsx';
 import { ASCENSION_PHASES, MAX_LEVEL, ascensionCost, ascensionTable } from '../data/ascension.js';
+import { fmt } from '../lib/format.js';
 
 const CAPS = [20, 30, 40, 50, 60, 70, 80];
-const fmt = (n) => n.toLocaleString('en-US');
 
 // Shows what a character needs to raise their level cap, with a from/to planner.
 export default function AscensionPlanner({ character }) {

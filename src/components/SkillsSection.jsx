@@ -2,8 +2,8 @@ import { useState } from 'react';
 import MaterialIcon from './MaterialIcon.jsx';
 import { LIFE_MAX, SKILL_LEVEL_COSTS, SKILL_MAX, SKILLS, skillCost } from '../data/skills.js';
 import StatText from './StatText.jsx';
+import { fmt } from '../lib/format.js';
 
-const fmt = (n) => n.toLocaleString('en-US');
 const LEVELS = Array.from({ length: SKILL_MAX }, (_, i) => i + 1);
 
 // A character's combat and life skills, plus a planner for the materials

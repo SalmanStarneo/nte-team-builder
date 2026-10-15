@@ -3,7 +3,7 @@ import CartridgeIcon from './CartridgeIcon.jsx';
 import ArcTypeIcon from './ArcTypeIcon.jsx';
 import { MiniBoard } from './ConsolePage.jsx';
 import { CHARACTER_CONSOLE, FREE_CELLS, setProgress, specBonus, usedCells } from '../data/console.js';
-import { CARTRIDGES, CARTRIDGE_BY_ID, cartridgesFor } from '../data/gear.js';
+import { CARTRIDGES, CARTRIDGE_BY_ID, cartridgesFor, keepCartValues } from '../data/gear.js';
 import { suggestedBuild, suggestedCartStats } from '../data/consoleBuilds.js';
 import StatAdvice from './StatAdvice.jsx';
 import { loadSavedConsoles } from '../lib/consoles.js';
@@ -250,11 +250,7 @@ export default function LoadoutPanel({ character: c, loadout, onChange, onClose,
           const sb = specBonus(c.id, loadout.console);
           const setName = cart ? cart.name : 'the recommended set';
           // Keep values the person already entered for the same stat.
-          const withValues = (st) => {
-            const old = [loadout.cartStats.main, ...loadout.cartStats.subs].filter(Boolean);
-            const keep = (x) => x && { ...x, value: x.value || old.find((o) => o.stat === x.stat)?.value || 0 };
-            return { main: keep(st.main), subs: st.subs.map(keep) };
-          };
+          const withValues = (st) => keepCartValues(loadout.cartStats, st);
           return (
             <div className="gear-block gear-block--wide">
               <label className="mini-title" htmlFor="gear-console">

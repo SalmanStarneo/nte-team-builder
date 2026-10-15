@@ -18,6 +18,7 @@ import { drawLinksBlock } from './cardLinks.js';
 import { loadoutOf } from './teamsReducer.js';
 import {
   BODY, DISPLAY, EL, MONO, clipCard, drawRank, drawSilverFrame, ensureFonts, loadImage, roundRect, wrap,
+  drawBandBackdrop, goldCells,
 } from './teamCard.js';
 
 export const BUILD_W = 1600;
@@ -41,6 +42,9 @@ const K = {
   key: '#b9c3ff',
   label: '#cfd2dc',
 };
+
+// Diagonal pink bands behind the panels.
+const BANDS = [{ y: -60, h: 190, a: 1 }, { y: 360, h: 130, a: 0.6 }, { y: 760, h: 180, a: 0.8 }];
 
 const ROMAN = { 2: 'II', 3: 'III', 4: 'IV' };
 
@@ -104,19 +108,6 @@ function panel(ctx, x, y, w, h, title) {
     ctx.fillStyle = K.muted;
     ctx.font = `600 17px ${BODY}`;
     ctx.fillText(title, x + 18, y + 30);
-  }
-}
-
-function goldCells(ctx, x, y, cells, size, gap) {
-  for (const [r, c] of cells) {
-    const cx = x + c * (size + gap);
-    const cy = y + r * (size + gap);
-    const g = ctx.createLinearGradient(cx, cy, cx + size, cy + size);
-    g.addColorStop(0, '#f8c27a');
-    g.addColorStop(1, '#c46a2c');
-    ctx.fillStyle = g;
-    roundRect(ctx, cx, cy, size, size, Math.max(2, size * 0.18));
-    ctx.fill();
   }
 }
 
@@ -201,7 +192,6 @@ function moduleRow(ctx, x, y, w, label, cartId, pieces, cartImg) {
   return 34 + Math.max(72, rows * (tile + gap + 6) + 4);
 }
 
-// The 5x5 template: each module is one gold block, seams between modules,
 // Outline of a module on the grid as a clockwise list of corner points.
 // Each square spans [at, at + cell]; squares of the same module are joined
 // across the gap between them.
@@ -270,12 +260,13 @@ function roundedPolygon(ctx, pts, radius) {
   ctx.closePath();
 }
 
+// The 5x5 template: each module is one gold block, seams between modules,
 // blocked cells left as faint outlines.
 function consoleGrid(ctx, x, y, cell, layout, pieces) {
   const mask = maskOf(layout);
   const occ = occupancy(pieces);
   const gap = 5;
-  const at = (r, c) => x + c * (cell + gap);
+  const at = (_r, c) => x + c * (cell + gap);
   const atY = (r) => y + r * (cell + gap);
   const same = (r, c, me) => r >= 0 && c >= 0 && r < CONSOLE_SIZE && c < CONSOLE_SIZE && occ[r][c] === me;
   for (let r = 0; r < CONSOLE_SIZE; r += 1) {
@@ -439,29 +430,6 @@ function shade(hex, amt) {
   return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
 }
 
-function drawBackdrop(ctx) {
-  ctx.fillStyle = K.bg;
-  ctx.fillRect(0, 0, BUILD_W, BUILD_H);
-  ctx.save();
-  ctx.translate(BUILD_W / 2, BUILD_H / 2);
-  ctx.rotate((-14 * Math.PI) / 180);
-  ctx.translate(-BUILD_W / 2, -BUILD_H / 2);
-  const bands = [{ y: -60, h: 190, a: 1 }, { y: 360, h: 130, a: 0.6 }, { y: 760, h: 180, a: 0.8 }];
-  for (const b of bands) {
-    ctx.globalAlpha = b.a;
-    ctx.fillStyle = 'rgba(194, 24, 91, 0.2)';
-    roundRect(ctx, -400, b.y, BUILD_W + 800, b.h, b.h / 2);
-    ctx.fill();
-    ctx.setLineDash([12, 9]);
-    ctx.strokeStyle = 'rgba(232, 72, 140, 0.28)';
-    ctx.lineWidth = 2;
-    roundRect(ctx, -300, b.y + 24, BUILD_W + 600, b.h - 48, (b.h - 48) / 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-  ctx.restore();
-}
-
 /** Renders the build card and returns the canvas. */
 export async function renderBuildCard(build, { base = '/' } = {}) {
   await ensureFonts();
@@ -484,7 +452,7 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
   canvas.height = BUILD_H;
   const ctx = canvas.getContext('2d');
   clipCard(ctx, BUILD_W, BUILD_H);
-  drawBackdrop(ctx);
+  drawBandBackdrop(ctx, BUILD_W, BUILD_H, BANDS);
 
   const PAD = 32;
 

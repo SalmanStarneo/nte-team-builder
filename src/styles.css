@@ -752,6 +752,9 @@ button {
   border: 1px dashed var(--line);
   color: var(--muted);
   font-size: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .gear-chip--on {
   border-style: solid;
@@ -878,6 +881,7 @@ button {
   fill: var(--surface);
   stroke: var(--line);
   stroke-width: 2;
+  r: 18px;
 }
 .station--on > circle {
   fill: var(--station-bg);
@@ -888,7 +892,8 @@ button {
   filter: drop-shadow(0 0 5px var(--glow));
 }
 .station:not(.station--on) .glyph {
-  opacity: 0.5;
+  opacity: 0.45;
+  filter: grayscale(0.7);
 }
 .station__name {
   font: 600 10.5px var(--font-body);
@@ -939,6 +944,9 @@ button {
   background: var(--surface-2);
   color: var(--muted);
   font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 .role-chip b {
   font-family: var(--font-mono);
@@ -1227,6 +1235,10 @@ button {
 }
 .card__tag--used {
   color: var(--warn);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .empty {
@@ -1413,6 +1425,7 @@ button {
   background: var(--surface-2);
   max-width: 100%;
   overflow-x: auto;
+  flex: 0 1 auto;
 }
 .nav__link {
   flex: none;
@@ -1470,6 +1483,8 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--muted);
+  flex-wrap: wrap;
+  row-gap: 2px;
 }
 .mini-title {
   margin: 0 0 6px;
@@ -1529,6 +1544,7 @@ button {
   gap: 4px;
   min-width: 0;
   flex: 1;
+  padding-right: 4px;
 }
 .detail__name {
   margin: 0;
@@ -1587,6 +1603,7 @@ button {
 .facts dd {
   margin: 0;
   font-weight: 500;
+  font-size: 1.05rem;
 }
 
 /* Where an Arc comes from */
@@ -1624,18 +1641,21 @@ button {
 }
 .stats th,
 .stats td {
-  padding: 6px 0;
+  padding: 8px 0;
   border-bottom: 1px solid var(--line);
   text-align: left;
+  font-size: 1rem;
 }
 .stats th {
   font-weight: 500;
-  color: var(--muted);
+  color: color-mix(in srgb, var(--fg) 72%, var(--muted));
 }
 .stats td {
   text-align: right;
   font-family: var(--font-mono);
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--hl-num);
+  font-size: 1.08rem;
 }
 .detail__reactions,
 .detail__presets {
@@ -1879,8 +1899,7 @@ th[aria-sort='descending'] .th-btn {
   align-content: start;
   min-width: 0;
 }
-.gear-block select,
-.module select {
+.gear-block select {
   width: 100%;
   min-width: 0;
   padding: 8px 10px;
@@ -1970,44 +1989,6 @@ th[aria-sort='descending'] .th-btn {
 }
 .gear-bonus dd {
   margin: 0;
-}
-.modules {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 8px;
-}
-@media (min-width: 720px) {
-  .modules {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-.module {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  border: 1px dashed var(--line);
-  border-radius: 8px;
-}
-.module--on {
-  border-style: solid;
-}
-.module__cells {
-  display: grid;
-  grid-template-columns: repeat(2, 9px);
-  gap: 2px;
-}
-.cell {
-  width: 9px;
-  height: 9px;
-  border-radius: 2px;
-  background: var(--surface-2);
-}
-.cell--on {
-  background: var(--el);
 }
 
 /* ---------- Arcs page ---------- */
@@ -2185,17 +2166,18 @@ th[aria-sort='descending'] .th-btn {
       color-mix(in srgb, #d8203f 30%, var(--arc-base)));
 }
 
-
 .arc-card__type {
   margin-left: auto;
   font: 500 0.7rem var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--muted);
+  display: inline-flex;
+  align-items: center;
 }
 .arc-card__passive {
   margin: 0;
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   color: var(--muted);
 }
 .arc-card__users {
@@ -2488,10 +2470,10 @@ th[aria-sort='descending'] .th-btn {
   display: grid;
   gap: 1px;
   min-width: 0;
-  font-size: 0.84rem;
+  font-size: 0.92rem;
 }
 .awaken-body span {
-  color: var(--muted);
+  color: color-mix(in srgb, var(--fg) 78%, var(--muted));
 }
 
 /* ---------- Awakening picker ---------- */
@@ -2602,9 +2584,7 @@ th[aria-sort='descending'] .th-btn {
 .loadout__grid > * {
   min-width: 0;
 }
-.nav {
-  flex: 0 1 auto;
-}
+
 @media (max-width: 959px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
@@ -2615,12 +2595,7 @@ th[aria-sort='descending'] .th-btn {
 .analysis > * {
   min-width: 0;
 }
-/* Gear chips: the name truncates, the Sig/Rec tag always stays visible. */
-.gear-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
+
 .gear-chip__name {
   min-width: 0;
   overflow: hidden;
@@ -2630,11 +2605,9 @@ th[aria-sort='descending'] .th-btn {
 .gear-chip .chip-tag {
   flex: none;
   white-space: nowrap;
-}
-
-.gear-chip .chip-tag {
   margin-left: 0.3em;
 }
+
 @media (max-width: 520px) {
   /* Navigation and team actions fill the row, each sized to its label. */
   .nav {
@@ -2678,13 +2651,6 @@ th[aria-sort='descending'] .th-btn {
   .team-name {
     font-size: 1.4rem;
   }
-}
-
-.card__tag--used {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* ---------- Resonance ---------- */
@@ -2775,14 +2741,7 @@ th[aria-sort='descending'] .th-btn {
 .glyph image {
   image-rendering: auto;
 }
-/* Esper Cycle: inactive stations are dimmed and desaturated */
-.station:not(.station--on) .glyph {
-  opacity: 0.45;
-  filter: grayscale(0.7);
-}
-.station > circle {
-  r: 18px;
-}
+
 .role-list {
   display: inline-flex;
   flex-wrap: wrap;
@@ -2808,11 +2767,7 @@ th[aria-sort='descending'] .th-btn {
 .slot__meta .role-list {
   justify-content: center;
 }
-.role-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
+
 .eyebrow .role-list {
   text-transform: none;
   letter-spacing: 0;
@@ -2821,10 +2776,7 @@ th[aria-sort='descending'] .th-btn {
 .detail__head > * {
   min-width: 0;
 }
-.eyebrow {
-  flex-wrap: wrap;
-  row-gap: 2px;
-}
+
 /* Character profile: element, rank and version stay on one line; roles wrap as a unit. */
 .detail__title .eyebrow {
   column-gap: 12px;
@@ -2845,9 +2797,6 @@ th[aria-sort='descending'] .th-btn {
   white-space: nowrap;
   text-transform: none;
   letter-spacing: 0.04em;
-}
-.detail__title {
-  padding-right: 4px;
 }
 
 /* Skills on the character page */
@@ -3011,7 +2960,13 @@ th[aria-sort='descending'] .th-btn {
 }
 .char-tile__roles .role-list {
   flex-wrap: wrap;
-  gap: 2px 8px;
+  gap: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: calc(2 * 1.35em + 2px);
+  /* room for two roles on every tile */
+  line-height: 1.35;
 }
 @media (max-width: 420px) {
   .char-grid {
@@ -3150,10 +3105,7 @@ th[aria-sort='descending'] .th-btn {
 .type-tab .arctype-icon {
   margin-right: 2px;
 }
-.arc-card__type {
-  display: inline-flex;
-  align-items: center;
-}
+
 .mat-icon {
   flex: none;
   border-radius: 6px;
@@ -3517,31 +3469,7 @@ th[aria-sort='descending'] .th-btn {
 .console-stats-title {
   margin-top: 10px;
 }
-.cstat-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
-  gap: 4px 12px;
-  font-size: 0.85rem;
-}
-.cstat-list li {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.cstat-list li.is-main {
-  grid-column: 1 / -1;
-  font-weight: 600;
-}
-.cstat-list__tag {
-  min-width: 3em;
-  font: 600 0.62rem var(--font-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--muted);
-}
+
 .gear-block #gear-console {
   margin-bottom: 10px;
 }
@@ -3616,6 +3544,7 @@ th[aria-sort='descending'] .th-btn {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr));
   gap: 4px 12px;
   font: 600 0.85rem var(--font-mono);
+  font-size: 0.95rem;
 }
 .console-code-in {
   margin-top: 8px;
@@ -3675,32 +3604,35 @@ th[aria-sort='descending'] .th-btn {
 }
 .endgame__list > div {
   display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 6px 10px;
+  justify-content: flex-start;
+  gap: 2px;
+  padding: 8px 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
+  flex-direction: column;
 }
 .endgame__list dt {
-  color: var(--muted);
-  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--fg) 72%, var(--muted));
+  font-size: 0.95rem;
 }
 .endgame__list dd {
   margin: 0;
-  font: 600 0.9rem var(--font-mono);
-  text-align: right;
+  font: 700 1.2rem var(--font-mono);
+  text-align: left;
+  color: var(--hl-num);
 }
 .endgame__alt-title {
   margin: 12px 0 0;
   font-weight: 600;
   font-size: 0.85rem;
+  margin-top: 6px;
 }
 .endgame__note {
   margin: 6px 0 0;
 }
 .endgame__best {
-  margin-top: 16px;
+  margin-top: 6px;
 }
 .endgame__prio {
   display: flex;
@@ -3723,7 +3655,9 @@ th[aria-sort='descending'] .th-btn {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--hl-key);
 }
 .endgame__prio li:not(:last-child)::after {
   content: '›';
@@ -3748,12 +3682,6 @@ th[aria-sort='descending'] .th-btn {
 .cstats__rule {
   grid-column: 1 / -1;
   margin: 2px 0;
-}
-.endgame__best {
-  margin-top: 6px;
-}
-.endgame__alt-title {
-  margin-top: 6px;
 }
 
 /* Characters list on phones: each row becomes a compact card, no sideways scroll. */
@@ -3817,6 +3745,8 @@ th[aria-sort='descending'] .th-btn {
   }
   .index-table .cell-meta-roles {
     font-size: 0.82rem;
+    grid-row: 3;
+    grid-column: 1 / -1;
   }
   .index-table .cell-meta-roles .role-list,
   .index-table .cell-meta-roles > * {
@@ -3833,6 +3763,7 @@ th[aria-sort='descending'] .th-btn {
     text-align: left;
     font-size: 0.82rem;
     overflow-wrap: anywhere;
+    white-space: nowrap;
   }
   .index-table .cell-stat::before {
     content: attr(data-label);
@@ -3849,9 +3780,7 @@ th[aria-sort='descending'] .th-btn {
   .index-table .cell-other.is-empty {
     visibility: hidden; /* keeps every card the same height */
   }
-  .index-table .cell-stat {
-    white-space: nowrap;
-  }
+  
 }
 
 /* Equal tiles and rows for characters with two roles (e.g. Damage + Buff). */
@@ -3863,14 +3792,7 @@ th[aria-sort='descending'] .th-btn {
   grid-template-rows: auto auto 1fr;
   align-content: start;
 }
-.char-tile__roles .role-list {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  min-height: calc(2 * 1.35em + 2px); /* room for two roles on every tile */
-  line-height: 1.35;
-}
+
 .index-table .role-list {
   flex-wrap: nowrap;
   white-space: nowrap;
@@ -3885,10 +3807,7 @@ th[aria-sort='descending'] .th-btn {
     grid-row: 2;
     grid-column: 2 / -1;
   }
-  .index-table .cell-meta-roles {
-    grid-row: 3;
-    grid-column: 1 / -1;
-  }
+  
   .index-table .cell-meta-roles .role-list {
     flex-wrap: nowrap;
   }
@@ -3972,7 +3891,6 @@ th[aria-sort='descending'] .th-btn {
   text-transform: uppercase;
   vertical-align: 2px;
 }
-
 
 /* "Your build" editor on character profiles */
 .mybuild {
@@ -4159,7 +4077,11 @@ th[aria-sort='descending'] .th-btn {
   background: var(--surface);
 }
 .arc-passive__label { font: 600 0.7rem var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--accent, var(--muted)); }
-.arc-passive p { margin: 0; font-size: 0.9rem; line-height: 1.5; }
+.arc-passive p {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
 .arc-passive__max { padding-top: 6px; border-top: 1px dashed var(--line); color: var(--muted); font-size: 0.84rem !important; }
 .arc-users-detail { display: grid; gap: 10px; margin-top: 16px; }
 .arc-users-detail__row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
@@ -4389,7 +4311,7 @@ th[aria-sort='descending'] .th-btn {
   }
 }
 
-/* ---- Stat highlights and readable stat sizes ---- */
+/* ---- Stat highlights: stat names in the accent, values warm ---- */
 .hl-num {
   color: var(--hl-num);
   font-weight: 700;
@@ -4400,67 +4322,11 @@ th[aria-sort='descending'] .th-btn {
   color: var(--hl-key);
   font-weight: 650;
 }
-/* Max stats tables */
-.stats th,
-.stats td {
-  padding: 8px 0;
-  font-size: 1rem;
-}
-.stats th {
-  color: color-mix(in srgb, var(--fg) 72%, var(--muted));
-}
-.stats td {
-  color: var(--hl-num);
-  font-size: 1.08rem;
-  font-weight: 700;
-}
 .stats tr.is-zero td {
   font-weight: 500;
   opacity: 0.75;
 }
-/* Recommended endgame stats: label above, value below, so long names fit */
-.endgame__list > div {
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 2px;
-  padding: 8px 12px;
-}
-.endgame__list dt {
-  color: color-mix(in srgb, var(--fg) 72%, var(--muted));
-  font-size: 0.95rem;
-}
-.endgame__list dd {
-  color: var(--hl-num);
-  font: 700 1.2rem var(--font-mono);
-  text-align: left;
-}
-.endgame__prio ol {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--hl-key);
-}
-/* Arc facts and passive text */
-.facts dd {
-  font-size: 1.05rem;
-}
-.arc-passive p {
-  font-size: 0.98rem;
-}
-.arc-card__passive {
-  font-size: 0.9rem;
-}
-/* Console totals and Cartridge stat values */
-.console-totals {
-  font-size: 0.95rem;
-}
 .cstat__value input {
   font-weight: 700;
   color: var(--hl-num);
-}
-/* Awakening, resonance and skill descriptions */
-.awaken-body {
-  font-size: 0.92rem;
-}
-.awaken-body span {
-  color: color-mix(in srgb, var(--fg) 78%, var(--muted));
 }

@@ -86,6 +86,43 @@ export function roundRect(ctx, x, y, w, h, r) {
 }
 
 // Fits text to maxWidth, wrapping onto at most `lines` lines with an ellipsis.
+/** Charcoal background with the brand's diagonal pink bands (build and farm cards). */
+export function drawBandBackdrop(ctx, w, h, bands) {
+  ctx.fillStyle = '#121318';
+  ctx.fillRect(0, 0, w, h);
+  ctx.save();
+  ctx.translate(w / 2, h / 2);
+  ctx.rotate((-14 * Math.PI) / 180);
+  ctx.translate(-w / 2, -h / 2);
+  for (const b of bands) {
+    ctx.globalAlpha = b.a;
+    ctx.fillStyle = 'rgba(194, 24, 91, 0.2)';
+    roundRect(ctx, -400, b.y, w + 800, b.h, b.h / 2);
+    ctx.fill();
+    ctx.setLineDash([12, 9]);
+    ctx.strokeStyle = 'rgba(232, 72, 140, 0.28)';
+    ctx.lineWidth = 2;
+    roundRect(ctx, -300, b.y + 24, w + 600, b.h - 48, (b.h - 48) / 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+
+/** Gold module squares at grid cells [[row, col], …]. */
+export function goldCells(ctx, x, y, cells, size, gap) {
+  for (const [r, c] of cells) {
+    const cx = x + c * (size + gap);
+    const cy = y + r * (size + gap);
+    const g = ctx.createLinearGradient(cx, cy, cx + size, cy + size);
+    g.addColorStop(0, '#f8c27a');
+    g.addColorStop(1, '#c46a2c');
+    ctx.fillStyle = g;
+    roundRect(ctx, cx, cy, size, size, Math.max(2, size * 0.18));
+    ctx.fill();
+  }
+}
+
 export function wrap(ctx, text, maxWidth, lines) {
   const words = text.split(' ');
   const out = [];
@@ -290,8 +327,7 @@ export async function ensureFonts() {
 
 /**
  * Renders the team card and returns the canvas.
- * @param team   { name, members, loadouts }
- * @param base   URL prefix for /characters/<id>.webp
+ * team: { name, members, loadouts }; base: URL prefix for /characters/<id>.webp.
  */
 export async function renderTeamCard(team, { base = '/' } = {}) {
   await ensureFonts();

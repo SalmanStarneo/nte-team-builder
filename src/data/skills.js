@@ -10,8 +10,6 @@ import { CHARACTER_MATERIALS, FAMILIES } from './ascension.js';
 export const SKILL_MAX = 10;
 export const LIFE_MAX = 5;
 
-export const SKILL_TYPES = ['Basic Attack', 'Redirect Skill', 'Ultimate', 'Support Skill'];
-
 // Skill books: three tiers, dropped in Houdinii's Schemes (also Hunter Exchange,
 // selection boxes and city shops).
 export const SKILL_BOOKS = {

@@ -1,4 +1,4 @@
-import { CARTRIDGE_MAIN_STATS, MODULE_SUB_STATS, formatStat, isPercentStat } from '../data/gear.js';
+import { CARTRIDGE_MAIN_STATS, MODULE_SUB_STATS, isPercentStat } from '../data/gear.js';
 
 // Editor for a Cartridge's 1 main + 4 sub attributes.
 export default function CartStatsEditor({ value, onChange, idPrefix = 'cs' }) {
@@ -23,22 +23,6 @@ export default function CartStatsEditor({ value, onChange, idPrefix = 'cs' }) {
         />
       ))}
     </div>
-  );
-}
-
-/** Read-only list of a Cartridge's attributes. */
-export function CartStatsList({ value }) {
-  const rows = [value?.main && { ...value.main, main: true }, ...(value?.subs ?? [])].filter(Boolean);
-  if (!rows.length) return <p className="muted small">No Cartridge stats set.</p>;
-  return (
-    <ul className="cstat-list">
-      {rows.map((r, i) => (
-        <li key={i} className={r.main ? 'is-main' : undefined}>
-          <span className="cstat-list__tag">{r.main ? 'Main' : 'Sub'}</span>
-          {r.value ? formatStat(r.stat, r.value) : <>{r.stat} <span className="muted">· value not set</span></>}
-        </li>
-      ))}
-    </ul>
   );
 }
 

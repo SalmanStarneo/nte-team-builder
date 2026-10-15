@@ -12,7 +12,6 @@ import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import AscensionPlanner from './AscensionPlanner.jsx';
 import SkillsSection from './SkillsSection.jsx';
-import StatIcon from './StatIcon.jsx';
 import { AWAKENINGS, RESONANCES } from '../data/awakenings.js';
 import { AWAKENING_ORDER, ORDINAL } from '../data/awakeningOrder.js';
 import RoleList from './RoleList.jsx';
@@ -26,7 +25,6 @@ import { farmList } from '../data/farmList.js';
 import { renderFarmCard } from '../lib/farmCard.js';
 import StatText from './StatText.jsx';
 
-const fmt = (n) => n.toLocaleString('en-US');
 
 export default function CharacterDetail({ character: c, activeTeam, inActiveTeam, teamFull, onAdd, onClose }) {
   const [sharing, setSharing] = useState(false);

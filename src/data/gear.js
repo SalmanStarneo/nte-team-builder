@@ -60,13 +60,6 @@ export function cartridgesFor(character) {
   return [...new Set(sets)];
 }
 
-// Modules are Tetris-like pieces placed on the Console. Size is the number of cells.
-export const MODULE_TYPES = [
-  { id: 'II', label: 'Type II', cells: 2 },
-  { id: 'III', label: 'Type III', cells: 3 },
-  { id: 'IV', label: 'Type IV', cells: 4 },
-];
-
 // Main attributes a module can roll (in-game "Possible Attributes" table).
 export const MODULE_STATS = [
   'HP%',
@@ -110,6 +103,16 @@ export const MODULE_SLOTS = 4;
 // Stats shown as percentages (everything else is a flat number).
 export const isPercentStat = (stat) => /%$/.test(stat) || stat.startsWith('CRIT');
 
+/**
+ * Swaps in a new set of Cartridge stats, keeping any values already entered
+ * for the same stat (so loading a suggestion doesn't wipe the player's rolls).
+ */
+export function keepCartValues(prev, next) {
+  const old = [prev?.main, ...(prev?.subs ?? [])].filter(Boolean);
+  const keep = (x) => x && { ...x, value: x.value || old.find((o) => o.stat === x.stat)?.value || 0 };
+  return { main: keep(next.main), subs: next.subs.map(keep) };
+}
+
 export const formatStat = (stat, value) => {
   const n = Number(value);
   const text = Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/0$/, '');
@@ -152,7 +155,6 @@ export function bonusStats(arc, cartStats, extras = []) {
 // Console module (the Tetris-like pieces) attributes, from in-game observation.
 // Two main stats, always ATK then HP, and up to 4 random sub stats. Sub slots
 // unlock as the piece levels up: Lv 5, 10, 15 and 20.
-export const MODULE_MAIN_STATS = ['ATK', 'HP'];
 export const MODULE_MAX_LEVEL = 20;
 export const SUB_UNLOCK_LEVELS = [5, 10, 15, 20];
 /** A piece's level; pieces saved before levels existed count as max level. */
