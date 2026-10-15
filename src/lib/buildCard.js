@@ -14,6 +14,7 @@ import { ENDGAME } from '../data/endgame.js';
 import { AWAKENING_ORDER } from '../data/awakeningOrder.js';
 import { encodeConsoleCode } from './consoleCode.js';
 import { fillStatText } from './statText.js';
+import { drawLinksBlock } from './cardLinks.js';
 import { loadoutOf } from './teamsReducer.js';
 import {
   BODY, DISPLAY, EL, MONO, clipCard, drawRank, drawSilverFrame, ensureFonts, loadImage, roundRect, wrap,
@@ -553,6 +554,12 @@ export async function renderBuildCard(build, { base = '/' } = {}) {
       ctx.fillText(line, px, ly + 4);
       ly += 22;
     }
+  }
+
+  // Site and socials at the foot of the left column, under the character info.
+  const linksBottom = BUILD_H - 74 - 4;
+  if (linksBottom - 48 - 16 > ly) {
+    drawLinksBlock(ctx, px, linksBottom, { font: `500 15px ${BODY}`, color: K.muted, accent: K.fg });
   }
 
   // ---- Header strip ----

@@ -13,6 +13,7 @@ import { CHARACTER_BY_ID } from '../data/characters.js';
 import {
   BODY, DISPLAY, EL, MONO, clipCard, drawRank, drawSilverFrame, ensureFonts, loadImage, roundRect, wrap,
 } from './teamCard.js';
+import { drawLinksLine } from './cardLinks.js';
 
 export const FARM_W = 1600;
 export const FARM_H = 920;
@@ -381,6 +382,7 @@ export async function renderFarmCard(character, { base = '/' } = {}) {
     'Unofficial fan project · Neverness to Everness © Hotta Studio / Perfect World Games · Amounts may change with updates',
     PAD, FARM_H - 30,
   );
+  drawLinksLine(ctx, FARM_W - PAD, FARM_H - 30, { font: `500 13px ${BODY}`, color: K.muted, accent: K.fg, align: 'right' });
 
   drawSilverFrame(ctx, FARM_W, FARM_H);
   return canvas;
@@ -581,6 +583,7 @@ export async function renderArcFarmCard(arc, { base = '/' } = {}) {
     'Unofficial fan project · Neverness to Everness © Hotta Studio / Perfect World Games · Amounts may change with updates',
     PAD, ARC_FARM_H - 28,
   );
+  drawLinksLine(ctx, FARM_W - PAD, ARC_FARM_H - 28, { font: `500 13px ${BODY}`, color: K.muted, accent: K.fg, align: 'right' });
 
   drawSilverFrame(ctx, FARM_W, ARC_FARM_H);
   return canvas;

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { canvasToBlob, renderTeamCard } from '../lib/teamCard.js';
 
 const BASE = import.meta.env.BASE_URL;
-// The site address is left off the card while the app is in testing.
 
 const slug = (name) => (name || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'team';
 

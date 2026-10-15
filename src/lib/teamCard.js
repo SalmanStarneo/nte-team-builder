@@ -1,5 +1,6 @@
 // Draws a shareable team card on a canvas. No libraries: plain Canvas 2D,
 // so the image looks the same in every browser and works offline.
+import { drawLinksLine, measureLinksLine } from './cardLinks.js';
 import { CHARACTER_BY_ID } from '../data/characters.js';
 import { ELEMENT_BY_ID } from '../data/elements.js';
 import { ARC_BY_ID, arcTag } from '../data/arcs.js';
@@ -291,9 +292,8 @@ export async function ensureFonts() {
  * Renders the team card and returns the canvas.
  * @param team   { name, members, loadouts }
  * @param base   URL prefix for /characters/<id>.webp
- * @param site   address printed in the footer
  */
-export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
+export async function renderTeamCard(team, { base = '/' } = {}) {
   await ensureFonts();
   const members = team.members.map((id) => (id ? CHARACTER_BY_ID[id] : null));
   const images = await Promise.all(
@@ -683,9 +683,17 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   }
   const lineGap = codeSize + 4;
   const codeTop = CARD_H - 22 - (codeLines.length - 1) * lineGap;
+  // Site and socials sit right-aligned just above the code. When the legal
+  // line also moves up and the two would meet, the legal line goes one row higher.
+  const linksFont = `500 12px ${BODY}`;
+  const linksY = codeTop - codeSize - 10;
+  const linksW = measureLinksLine(ctx, { font: linksFont, iconSize: 13, gap: 18 });
+  let legalY = sideBySide ? CARD_H - 24 : linksY;
+  if (!sideBySide && PAD + legalW + 24 > CARD_W - PAD - linksW) legalY = linksY - 18;
   ctx.fillStyle = C.muted;
   ctx.font = `400 12px ${BODY}`;
-  ctx.fillText(LEGAL, PAD, sideBySide ? CARD_H - 24 : codeTop - codeSize - 10);
+  ctx.fillText(LEGAL, PAD, legalY);
+  drawLinksLine(ctx, CARD_W - PAD, linksY, { font: linksFont, color: C.muted, accent: C.fg, iconSize: 13, gap: 18, align: 'right' });
   // Card code: type it into the builder to rebuild this team and its gear.
   ctx.textAlign = 'right';
   ctx.font = `600 ${codeSize}px ${MONO}`;
@@ -695,10 +703,6 @@ export async function renderTeamCard(team, { base = '/', site = '' } = {}) {
   ctx.font = `500 11px ${MONO}`;
   ctx.fillStyle = C.muted;
   ctx.fillText('CODE', CARD_W - PAD - firstW - 12, codeTop - 2);
-  if (site) {
-    ctx.font = `500 12px ${MONO}`;
-    ctx.fillText(site, CARD_W - PAD, CARD_H - 52);
-  }
   ctx.textAlign = 'left';
 
 
