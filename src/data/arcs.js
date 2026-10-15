@@ -1,7 +1,7 @@
 // Arcs (weapons). Max-level base ATK and secondary stat.
 // Sources (Oct 2026): neverness.gg Arc list (type, rarity, stats) and Icy Veins
-// weapon pages for Arcs added after that list. Passives are short summaries;
-// check in-game text for exact values.
+// weapon pages for Arcs added after that list. `passive` is a short summary for
+// cards; the full S-rank passive text lives in arcPassives.js.
 // "signature" links an Arc to the character whose kit its passive is built
 // around. Signatures cross-checked against GameWith's top pick per character.
 
@@ -19,7 +19,7 @@ const arc = (name, rarity, type, atk, sub, passive, signature = null) => ({
 export const ARCS = [
   // S-rank
   arc('Blow up the Crowd', 'S', 'Solid', 512, 'ATK 27.5%', 'Raises ATK while off-field; Basic Attacks boost Psyche DMG.', 'haniel'),
-  arc('Blushing Mirage', 'S', 'Condensate', 570, 'Crit Rate 24%', 'ATK +20%. After Ultimate, Cosmos DMG +32% and ignores 12% DEF for 20s.', 'shinku'),
+  arc('Blushing Mirage', 'S', 'Condensate', 570, 'Crit Rate 24%', 'ATK +16%. After Ultimate, Cosmos DMG +30% and ignores 12% DEF for 20s.', 'shinku'),
   arc('Camellia Society', 'S', 'Condensate', 666, 'Crit Rate 12%', 'Crit DMG stacks as HP drops; triggers Silent Garden attacks.', 'baicang'),
   arc('Contemplative Cat', 'S', 'Gas', 512, 'Crit DMG 44%', 'Cosmos DMG rises with Fons held, up to 10 stacks.', 'chiz'),
   arc('Crime and Punishment', 'S', 'Gas', 570, 'Crit Rate 24%', 'Psyche DMG +20% and Cycle Intensity up. After Ultimate, team Crit DMG up.', 'blackbird'),

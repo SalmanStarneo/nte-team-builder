@@ -4142,6 +4142,18 @@ th[aria-sort='descending'] .th-btn {
 }
 .arc-field__label { font: 600 0.7rem var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--good); }
 .arc-field p { margin: 2px 0 0; font-size: 0.9rem; }
+.arc-passive {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.arc-passive__label { font: 600 0.7rem var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--accent, var(--muted)); }
+.arc-passive p { margin: 0; font-size: 0.9rem; line-height: 1.5; }
+.arc-passive__max { padding-top: 6px; border-top: 1px dashed var(--line); color: var(--muted); font-size: 0.84rem !important; }
 .arc-users-detail { display: grid; gap: 10px; margin-top: 16px; }
 .arc-users-detail__row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .arc-users-detail__row--others a { display: inline-flex; }

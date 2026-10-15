@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ARC_SOURCES, FIELD_EFFECTS, RECOMMENDED } from '../data/arcs.js';
+import { ARC_PASSIVES } from '../data/arcPassives.js';
 import { CHARACTERS, CHARACTER_BY_ID } from '../data/characters.js';
 import {
   ARC_DYES,
@@ -36,6 +37,7 @@ export default function ArcDetail({ arc: a, onClose }) {
   const named = new Set([a.signature, ...recs.map((c) => c.id)]);
   const others = CHARACTERS.filter((c) => c.arcType === a.type && !named.has(c.id));
   const field = FIELD_EFFECTS[a.id];
+  const full = ARC_PASSIVES[a.id];
   const sources = ARC_SOURCES[a.id] ?? [];
   const cost = arcAscensionCost(a, from, to);
   const table = arcAscensionTable(a);
@@ -74,8 +76,18 @@ export default function ArcDetail({ arc: a, onClose }) {
           <dl className="facts">
             <div><dt>Base ATK</dt><dd>{a.atk} <span className="muted">at Lv {ARC_MAX_LEVEL}</span></dd></div>
             <div><dt>Secondary</dt><dd>{a.sub}</dd></div>
-            <div><dt>Passive</dt><dd>{a.passive}</dd></div>
+            {!full && <div><dt>Passive</dt><dd>{a.passive}</dd></div>}
           </dl>
+
+          {full && (
+            <section className="arc-passive" aria-label="Passive">
+              <span className="arc-passive__label">Passive · {full.name}</span>
+              {full.text.map((t) => <p key={t}>{t}</p>)}
+              {full.max && (
+                <p className="arc-passive__max"><strong>Fully mixed (4 duplicates):</strong> {full.max}</p>
+              )}
+            </section>
+          )}
 
           {field && (
             <aside className="arc-field">

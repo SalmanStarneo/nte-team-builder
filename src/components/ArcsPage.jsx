@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ARCS, ARC_BY_ID, FIELD_EFFECTS, RECOMMENDED } from '../data/arcs.js';
+import { ARC_PASSIVES } from '../data/arcPassives.js';
 import { navigate } from '../lib/route.js';
 import ArcDetail from './ArcDetail.jsx';
 import { ARC_TYPES, CHARACTERS, CHARACTER_BY_ID } from '../data/characters.js';
@@ -35,7 +36,8 @@ export default function ArcsPage({ arcType, arcId }) {
       (a) =>
         (type === 'all' || a.type === type) &&
         (rank === 'all' || a.rarity === rank) &&
-        (!q || a.name.toLowerCase().includes(q) || a.passive.toLowerCase().includes(q)),
+        (!q || a.name.toLowerCase().includes(q) || a.passive.toLowerCase().includes(q) ||
+          (ARC_PASSIVES[a.id]?.text.join(' ').toLowerCase().includes(q) ?? false)),
     ).sort((a, b) => RANK_ORDER[a.rarity] - RANK_ORDER[b.rarity] || b.atk - a.atk || a.name.localeCompare(b.name));
   }, [type, rank, query]);
 
