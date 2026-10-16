@@ -56,6 +56,22 @@ function sectionLabel(ctx, text, x, y) {
   ctx.fillText(text, x, y);
 }
 
+/** Text with a dark outline and soft shadow, for headings over the pink bands. */
+function outlined(ctx, text, x, y, font, fill, width = 5) {
+  ctx.save();
+  ctx.font = font;
+  ctx.lineJoin = 'round';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = 10;
+  ctx.strokeStyle = 'rgba(10, 11, 16, 0.92)';
+  ctx.lineWidth = width;
+  ctx.strokeText(text, x, y);
+  ctx.shadowColor = 'transparent';
+  ctx.fillStyle = fill;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
 function circle(ctx, img, cx, cy, r, ring, ringW = 3) {
   ctx.save();
   ctx.beginPath();
@@ -306,13 +322,13 @@ export async function renderCharacterCard(character, { base = '/' } = {}) {
   }
 
   // ---- Right: featured teams ----
-  let ry = TOP + 12;
-  sectionLabel(ctx, `TEAM IDEAS WITH ${c.name.toUpperCase()}`, RX, ry);
-  ry += 40;
-  ctx.font = `italic 900 40px ${DISPLAY}`;
-  ctx.fillStyle = K.fg;
-  ctx.fillText('FEATURED TEAMS', RX, ry);
-  ry += 26;
+  let ry = TOP + 14;
+  ctx.font = `700 17px ${MONO}`;
+  const kicker = wrap(ctx, `TEAM IDEAS WITH ${c.name.toUpperCase()}`, COL, 1)[0];
+  outlined(ctx, kicker, RX, ry, `700 17px ${MONO}`, '#ff8fbe');
+  ry += 42;
+  outlined(ctx, 'FEATURED TEAMS', RX, ry, `italic 900 42px ${DISPLAY}`, K.fg, 6);
+  ry += 24;
   const avail = BOTTOM - ry - (teams.length > MAX_TEAMS ? 34 : 0);
   const TH = Math.min(214, (avail - (shown.length - 1) * 14) / Math.max(1, shown.length));
   shown.forEach((p) => {
