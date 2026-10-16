@@ -4468,3 +4468,28 @@ th[aria-sort='descending'] .th-btn {
   vertical-align: 2px;
   white-space: nowrap;
 }
+
+/* Kit-based team ideas in "Featured in" */
+.detail__presets li {
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+.idea-tag {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  color: var(--accent);
+  font: 600 0.62rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  vertical-align: 1px;
+}
+.detail__preset-why {
+  flex-basis: 100%;
+  width: 0;
+  min-width: 100%;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--muted);
+}

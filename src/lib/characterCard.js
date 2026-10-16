@@ -34,11 +34,11 @@ const K = {
 };
 const BANDS = [{ y: -60, h: 190, a: 1 }, { y: 520, h: 130, a: 0.6 }, { y: 1100, h: 180, a: 0.8 }];
 
-/** Presets this character is in, most useful first (their own named team leads). */
+/** Presets this character is in: community teams first (their own named team leading), then kit ideas. */
 export function teamsFor(character) {
   const list = PRESETS.filter((p) => p.members.includes(character.id));
   const own = (p) => (p.name.toLowerCase().includes(character.name.split(' ')[0].toLowerCase()) ? 0 : 1);
-  return [...list].sort((a, b) => own(a) - own(b));
+  return [...list].sort((a, b) => Number(!!a.idea) - Number(!!b.idea) || own(a) - own(b));
 }
 
 function panel(ctx, x, y, w, h) {
@@ -336,7 +336,18 @@ export async function renderCharacterCard(character, { base = '/' } = {}) {
     const tx = RX + 20;
     ctx.font = `700 21px ${BODY}`;
     ctx.fillStyle = K.fg;
-    ctx.fillText(wrap(ctx, p.name, COL - 40, 1)[0], tx, ry + 36);
+    const tname = wrap(ctx, p.name, COL - 40 - (p.idea ? 100 : 0), 1)[0];
+    ctx.fillText(tname, tx, ry + 36);
+    if (p.idea) {
+      const nx = tx + ctx.measureText(tname).width + 10;
+      ctx.font = `700 12px ${MONO}`;
+      const tw = ctx.measureText('KIT IDEA').width + 14;
+      ctx.fillStyle = 'rgba(142, 156, 255, 0.18)';
+      roundRect(ctx, nx, ry + 20, tw, 22, 11);
+      ctx.fill();
+      ctx.fillStyle = K.key;
+      ctx.fillText('KIT IDEA', nx + 7, ry + 35);
+    }
     // Members: the featured character gets a thicker gold ring.
     const R = Math.min(38, (TH - 120) / 2 + 18);
     const step = (COL - 40) / 4;

@@ -50,9 +50,12 @@ export default function SharePanel({ team, dispatch }) {
           }}
         >
           <option value="" disabled>Choose a preset…</option>
-          {PRESETS.map((p, i) => (
-            <option key={p.name} value={i}>{p.name}</option>
-          ))}
+          <optgroup label="Community teams">
+            {PRESETS.map((p, i) => !p.idea && <option key={p.name} value={i}>{p.name}</option>)}
+          </optgroup>
+          <optgroup label="Kit-based ideas">
+            {PRESETS.map((p, i) => p.idea && <option key={p.name} value={i}>{p.name}</option>)}
+          </optgroup>
         </select>
       </label>
 

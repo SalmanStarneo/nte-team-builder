@@ -36,7 +36,8 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
   const neighbours = [ELEMENTS[(index + 5) % 6], ELEMENTS[(index + 1) % 6]];
   const reactions = PAIR_REACTIONS.filter((r) => r.elements.includes(c.element));
   const trios = TRIO_REACTIONS.filter((r) => r.elements.includes(c.element));
-  const presets = PRESETS.filter((p) => p.members.includes(c.id));
+  // Community teams first, then this site's kit-based ideas.
+  const presets = PRESETS.filter((p) => p.members.includes(c.id)).sort((a, b) => Number(!!a.idea) - Number(!!b.idea));
   const signature = ARCS.find((a) => a.signature === c.id);
   const arcCount = ARCS.filter((a) => a.type === c.arcType).length;
   const phone = useMedia(PHONE);
@@ -131,13 +132,17 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
         </div>
         <ul className="detail__presets">
           {presets.map((p) => (
-            <li key={p.name}>
-              <span className="detail__preset-name">{p.name}</span>
+            <li key={p.name} className={p.idea ? 'is-idea' : undefined}>
+              <span className="detail__preset-name">
+                {p.name}
+                {p.idea && <span className="idea-tag">Kit idea</span>}
+              </span>
               <span className="detail__preset-team">
                 {p.members.map((id) => (
                   <Portrait key={id} character={CHARACTER_BY_ID[id]} size="sm" />
                 ))}
               </span>
+              {p.why && <span className="detail__preset-why">{p.why}</span>}
             </li>
           ))}
         </ul>
