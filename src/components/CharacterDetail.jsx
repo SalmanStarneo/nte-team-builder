@@ -26,6 +26,7 @@ import { renderFarmCard } from '../lib/farmCard.js';
 import StatText from './StatText.jsx';
 import SwipeTabs from './SwipeTabs.jsx';
 import { PHONE, useMedia } from '../lib/useMedia.js';
+import { renderCharacterCard } from '../lib/characterCard.js';
 
 
 export default function CharacterDetail({ character: c, activeTeam, inActiveTeam, teamFull, onAdd, onClose }) {
@@ -122,7 +123,12 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
 
     {presets.length > 0 && (
       <section>
-        <h3 className="mini-title">Featured in</h3>
+        <div className="featured-head">
+          <h3 className="mini-title">Featured in</h3>
+          <button type="button" className="btn btn--quiet btn--small" onClick={() => setSharing({ teams: true })}>
+            Share teams card
+          </button>
+        </div>
         <ul className="detail__presets">
           {presets.map((p) => (
             <li key={p.name}>
@@ -298,11 +304,12 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
       </div>
       {sharing && (
         <ExportDialog
-          title={sharing.farm ? 'Farming list image' : sharing.mine ? 'My build image' : 'Recommended build image'}
+          title={sharing.teams ? 'Character teams image' : sharing.farm ? 'Farming list image' : sharing.mine ? 'My build image' : 'Recommended build image'}
           name={c.name}
-          suffix={sharing.farm ? 'nte-farming-list' : sharing.mine ? 'my-nte-build' : 'nte-build'}
+          suffix={sharing.teams ? 'nte-teams' : sharing.farm ? 'nte-farming-list' : sharing.mine ? 'my-nte-build' : 'nte-build'}
           onClose={() => setSharing(false)}
           render={(opts) => {
+            if (sharing.teams) return renderCharacterCard(c, opts);
             if (sharing.farm) return renderFarmCard(c, opts);
             if (sharing.mine) {
               const mine = myBuildCurrent(sharing.mine);

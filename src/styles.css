@@ -4432,3 +4432,20 @@ th[aria-sort='descending'] .th-btn {
     transition: none;
   }
 }
+
+/* "Featured in" heading with its Share teams card button */
+.featured-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  margin-bottom: 6px;
+}
+.featured-head .mini-title {
+  margin: 0;
+}
+.btn--small {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}

@@ -164,7 +164,7 @@ function moduleTile(ctx, x, y, size, shape, level) {
   }
 }
 
-function cartTile(ctx, x, y, size, img) {
+export function cartTile(ctx, x, y, size, img) {
   const g = ctx.createRadialGradient(x + size / 2, y + size / 2, 4, x + size / 2, y + size / 2, size * 0.7);
   g.addColorStop(0, '#5a4422');
   g.addColorStop(1, K.goldTile);
@@ -439,7 +439,7 @@ function consoleGrid(ctx, x, y, cell, layout, pieces) {
 
 // A flat Awakening badge, like the game's Awakening screen: dark disc, thick
 // glowing ring in the element colour. `first` adds a stronger glow and a check badge.
-function drawOrb(ctx, cx, cy, r, color, first) {
+export function drawOrb(ctx, cx, cy, r, color, first) {
   const ring = Math.max(3, r * 0.17);
   ctx.save();
   // Outer glow
