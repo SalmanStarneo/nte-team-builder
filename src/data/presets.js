@@ -50,6 +50,8 @@ export const PRESETS = [
     why: 'Zankou’s Hexed with Linko’s Weakness Radar and RES shred; Iroi heals and Adler shields.' },
   { name: 'Akane Charge', members: ['akane', 'hotori', 'linko', 'iroi'], idea: true,
     why: 'Akane Rin’s Remora inside a Charge trio: Hotori buffs, Linko shreds RES and Iroi heals.' },
+  { name: 'The Whoots!!!!', members: ['akane', 'nanally', 'zero', 'haniel'], idea: true,
+    why: 'The band from the story: Akane Rin and Nanally lead on damage while Zero and Haniel support. Charge trio with Remora, Blossom and Stain.' },
   { name: 'Shinku Sustain Charge', members: ['shinku', 'hathor', 'jiuyuan', 'edgar'], idea: true,
     why: 'Shinku’s Lone Stride with a sturdier Charge trio: Hathor buffs, Jiuyuan adds Blossom and Edgar heals and refills Ultimate Energy.' },
   { name: 'Chiz Charge', members: ['chiz', 'skia', 'linko', 'iroi'], idea: true,
