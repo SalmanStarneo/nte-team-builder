@@ -4449,3 +4449,22 @@ th[aria-sort='descending'] .th-btn {
   padding: 4px 10px;
   font-size: 0.8rem;
 }
+
+/* Passives and traits in the skills list */
+.skill-type--passive {
+  background: color-mix(in srgb, var(--warn) 22%, var(--surface));
+}
+.skill-type--trait {
+  background: color-mix(in srgb, var(--good) 20%, var(--surface));
+}
+.passive-boost {
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--el, var(--accent)) 20%, var(--surface));
+  font: 600 0.66rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  vertical-align: 2px;
+  white-space: nowrap;
+}

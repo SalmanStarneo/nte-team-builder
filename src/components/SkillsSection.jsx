@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import MaterialIcon from './MaterialIcon.jsx';
 import { LIFE_MAX, SKILL_LEVEL_COSTS, SKILL_MAX, SKILLS, skillCost } from '../data/skills.js';
+import { PASSIVES } from '../data/passives.js';
 import StatText from './StatText.jsx';
 import { fmt } from '../lib/format.js';
 
@@ -10,6 +11,7 @@ const LEVELS = Array.from({ length: SKILL_MAX }, (_, i) => i + 1);
 // needed to level them.
 export default function SkillsSection({ character }) {
   const data = SKILLS[character.id];
+  const pas = PASSIVES[character.id];
   const [from, setFrom] = useState(1);
   const [to, setTo] = useState(SKILL_MAX);
   const [passives, setPassives] = useState(true);
@@ -42,6 +44,41 @@ export default function SkillsSection({ character }) {
             </li>
           ))}
         </ol>
+
+        <h3 className="mini-title skill-life-title">Passives <span>unlocked with skill books</span></h3>
+        {pas ? (
+          <ol className="skill-list">
+            {[['Passive 1', pas.p1], ['Passive 2', pas.p2]].map(([label, ps]) => (
+              <li key={label}>
+                <span className="skill-type skill-type--passive">{label}</span>
+                <span className="awaken-body">
+                  <b>
+                    {ps.name}
+                    {ps.boosts && <span className="passive-boost">{ps.boosts} Enhancement</span>}
+                  </b>
+                  <span><StatText>{ps.text}</StatText></span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="muted small">Passives will be added once they’re published.</p>
+        )}
+
+        {pas?.trait && (
+          <>
+            <h3 className="mini-title skill-life-title">Other abilities</h3>
+            <ol className="skill-list">
+              <li>
+                <span className="skill-type skill-type--trait">Trait</span>
+                <span className="awaken-body">
+                  <b>{pas.trait.name}</b>
+                  <span><StatText>{pas.trait.text}</StatText></span>
+                </span>
+              </li>
+            </ol>
+          </>
+        )}
 
         <h3 className="mini-title skill-life-title">Life skills <span>max Lv {LIFE_MAX}</span></h3>
         {data.life.length ? (
