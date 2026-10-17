@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ExportIcon from './ExportIcon.jsx';
 
 // The list of saved teams plus actions for the one being edited.
 export default function TeamTabs({ teams, activeId, dispatch, onExport }) {
@@ -46,7 +47,7 @@ export default function TeamTabs({ teams, activeId, dispatch, onExport }) {
             onClick={onExport}
             disabled={!active.members.some(Boolean)}
           >
-            Export image
+            <ExportIcon />Export image
           </button>
           <button className="btn btn--quiet" onClick={() => dispatch({ type: 'duplicate' })}>
             Duplicate

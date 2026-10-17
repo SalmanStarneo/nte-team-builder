@@ -12,6 +12,7 @@ import { loadoutOf } from '../lib/teamsReducer.js';
 import CartStatsEditor from './CartStatsEditor.jsx';
 import CartridgeIcon from './CartridgeIcon.jsx';
 import { MiniBoard } from './ConsolePage.jsx';
+import ExportIcon from './ExportIcon.jsx';
 
 const ALL_AWAKENINGS = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6'];
 
@@ -202,7 +203,7 @@ export default function MyBuildEditor({ character: c, activeTeam, onShare }) {
       </ol>
 
       <div className="mybuild__actions">
-        <button type="button" className="btn btn--primary" onClick={() => onShare(build)}>Share my build image</button>
+        <button type="button" className="btn btn--primary" onClick={() => onShare(build)}><ExportIcon />Share my build image</button>
       </div>
     </section>
   );

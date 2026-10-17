@@ -20,6 +20,7 @@ import StatText from './StatText.jsx';
 import { fmt } from '../lib/format.js';
 import SwipeTabs from './SwipeTabs.jsx';
 import { PHONE, useMedia } from '../lib/useMedia.js';
+import ExportIcon from './ExportIcon.jsx';
 
 const CAPS = [20, 30, 40, 50, 60, 70, 80];
 
@@ -226,7 +227,7 @@ export default function ArcDetail({ arc: a, onClose }) {
         </p>
       </div>
       <button type="button" className="btn" onClick={() => setSharing(true)}>
-        Share farming list
+        <ExportIcon />Share farming list
       </button>
     </section>
   ) : null;

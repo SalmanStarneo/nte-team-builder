@@ -4618,3 +4618,13 @@ th[aria-sort='descending'] .th-btn {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Export arrow on buttons that make a shareable image */
+.btn .export-icon {
+  flex-shrink: 0;
+  margin-right: 6px;
+  vertical-align: -2px;
+}
+.detail__export .export-icon {
+  margin-right: 0;
+}

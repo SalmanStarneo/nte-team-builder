@@ -20,6 +20,7 @@ import Portrait from './Portrait.jsx';
 import ExportDialog from './ExportDialog.jsx';
 import { characterBuild, renderBuildCard } from '../lib/buildCard.js';
 import StatText from './StatText.jsx';
+import ExportIcon from './ExportIcon.jsx';
 
 const TYPE_NAMES = { 2: 'Type Ⅱ', 3: 'Type Ⅲ', 4: 'Type Ⅳ' };
 const PLAYABLE = CHARACTERS.filter((c) => CHARACTER_CONSOLE[c.id]);
@@ -421,7 +422,7 @@ export default function ConsolePage({ characterId, activeTeam, onEquip }) {
               <button type="submit" className="btn" disabled={!codeInput.trim()}>Load</button>
             </form>
             <button type="button" className="btn btn--primary console-share" onClick={() => setSharing(true)}>
-              Share build image
+              <ExportIcon />Share build image
             </button>
             <p className="muted small">
               Share a build without sharing a team. Codes carry the grid, set and Cartridge stats; module stats stay

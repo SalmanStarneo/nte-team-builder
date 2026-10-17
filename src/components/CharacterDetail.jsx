@@ -29,6 +29,7 @@ import SwipeTabs from './SwipeTabs.jsx';
 import { PHONE, useMedia } from '../lib/useMedia.js';
 import { renderCharacterCard } from '../lib/characterCard.js';
 import { renderGuideCard } from '../lib/guideCard.js';
+import ExportIcon from './ExportIcon.jsx';
 
 
 export default function CharacterDetail({ character: c, activeTeam, inActiveTeam, teamFull, onAdd, onClose }) {
@@ -129,7 +130,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
         <div className="featured-head">
           <h3 className="mini-title">Featured in</h3>
           <button type="button" className="btn btn--quiet btn--small" onClick={() => setSharing({ teams: true })}>
-            Share teams card
+            <ExportIcon size={14} />Share teams card
           </button>
         </div>
         <ul className="detail__presets">
@@ -241,7 +242,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
             </p>
           </div>
           <button type="button" className="btn" onClick={() => setSharing({ farm: true })}>
-            Share farming list
+            <ExportIcon />Share farming list
           </button>
         </section>
       )}
@@ -280,11 +281,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
               title="Export a build guide image"
               aria-label={`Export ${c.name} build guide image`}
             >
-              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 15V3" />
-                <path d="M7 8l5-5 5 5" />
-                <path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
-              </svg>
+              <ExportIcon size={18} />
               <span className="detail__export-label">Build guide</span>
             </button>
           )}
@@ -326,7 +323,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
         </button>
         {CHARACTER_CONSOLE[c.id] && (
           <button className="btn" onClick={() => setSharing({ recommended: true })}>
-            Share recommended build
+            <ExportIcon />Share recommended build
           </button>
         )}
       </div>
