@@ -27,6 +27,7 @@ import StatText from './StatText.jsx';
 import SwipeTabs from './SwipeTabs.jsx';
 import { PHONE, useMedia } from '../lib/useMedia.js';
 import { renderCharacterCard } from '../lib/characterCard.js';
+import { renderGuideCard } from '../lib/guideCard.js';
 
 
 export default function CharacterDetail({ character: c, activeTeam, inActiveTeam, teamFull, onAdd, onClose }) {
@@ -256,7 +257,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
           <p className="eyebrow">
             <span className="eyebrow__meta">
               <ElementGlyph element={c.element} size={16} />
-              <span>{element.name} · {c.rarity}-rank</span>
+              <span>{element.name} · <span className="nowrap">{c.rarity}-rank</span></span>
             </span>
             {c.version && <span className="eyebrow__ver">Ver {c.version}</span>}
             <RoleList roles={c.roles} size={14} />
@@ -268,7 +269,25 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
             </ul>
           )}
         </div>
-        <button className="btn btn--quiet detail__close" onClick={onClose} aria-label="Close details">×</button>
+        <div className="detail__head-actions">
+          {CHARACTER_CONSOLE[c.id] && (
+            <button
+              type="button"
+              className="btn btn--quiet detail__export"
+              onClick={() => setSharing({ guide: true })}
+              title="Export a build guide image"
+              aria-label={`Export ${c.name} build guide image`}
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 15V3" />
+                <path d="M7 8l5-5 5 5" />
+                <path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
+              </svg>
+              <span className="detail__export-label">Build guide</span>
+            </button>
+          )}
+          <button className="btn btn--quiet detail__close" onClick={onClose} aria-label="Close details">×</button>
+        </div>
       </header>
 
       {phone ? (
@@ -309,11 +328,12 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
       </div>
       {sharing && (
         <ExportDialog
-          title={sharing.teams ? 'Character teams image' : sharing.farm ? 'Farming list image' : sharing.mine ? 'My build image' : 'Recommended build image'}
+          title={sharing.guide ? 'Build guide image' : sharing.teams ? 'Character teams image' : sharing.farm ? 'Farming list image' : sharing.mine ? 'My build image' : 'Recommended build image'}
           name={c.name}
-          suffix={sharing.teams ? 'nte-teams' : sharing.farm ? 'nte-farming-list' : sharing.mine ? 'my-nte-build' : 'nte-build'}
+          suffix={sharing.guide ? 'nte-build-guide' : sharing.teams ? 'nte-teams' : sharing.farm ? 'nte-farming-list' : sharing.mine ? 'my-nte-build' : 'nte-build'}
           onClose={() => setSharing(false)}
           render={(opts) => {
+            if (sharing.guide) return renderGuideCard(c, opts);
             if (sharing.teams) return renderCharacterCard(c, opts);
             if (sharing.farm) return renderFarmCard(c, opts);
             if (sharing.mine) {

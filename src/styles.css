@@ -1554,6 +1554,36 @@ button {
   line-height: 1;
   text-transform: uppercase;
 }
+.detail__head-actions {
+  align-self: flex-start;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.detail__export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.detail__export svg {
+  flex-shrink: 0;
+}
+/* Phones: the export button shows its icon only. */
+@media (max-width: 640px) {
+  .detail__export-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
 .detail__close {
   align-self: flex-start;
   font-size: 1.2rem;
@@ -4492,4 +4522,8 @@ th[aria-sort='descending'] .th-btn {
   font-size: 0.78rem;
   line-height: 1.35;
   color: var(--muted);
+}
+
+.nowrap {
+  white-space: nowrap;
 }
