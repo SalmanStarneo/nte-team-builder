@@ -4692,3 +4692,80 @@ th[aria-sort='descending'] .th-btn {
 .layout-pick {
   flex-wrap: wrap;
 }
+
+/* "Featured in": two-column team carousel */
+.featured__track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.featured__track::-webkit-scrollbar {
+  display: none;
+}
+.featured__page {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  list-style: none;
+  margin: 0;
+  padding: 2px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 8px;
+}
+.featured__team {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  min-width: 0;
+}
+.featured__team.is-idea {
+  border-style: dashed;
+}
+.featured__name {
+  font-weight: 600;
+  font-size: 0.86rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.featured__team .idea-tag {
+  display: inline-block;
+}
+.featured__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.featured__nav .btn {
+  min-width: 34px;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.featured__dots {
+  display: inline-flex;
+  gap: 6px;
+}
+.featured__dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.featured__dots span.is-on {
+  background: var(--el, var(--accent));
+}
+
+/* Phones: element and rank may wrap so they never run under the header buttons. */
+@media (max-width: 640px) {
+  .detail__title .eyebrow__meta {
+    white-space: normal;
+    flex-wrap: wrap;
+  }
+}

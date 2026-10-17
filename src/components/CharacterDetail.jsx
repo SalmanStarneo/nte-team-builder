@@ -26,6 +26,7 @@ import { farmList } from '../data/farmList.js';
 import { renderFarmCard } from '../lib/farmCard.js';
 import StatText from './StatText.jsx';
 import SwipeTabs from './SwipeTabs.jsx';
+import FeaturedTeams from './FeaturedTeams.jsx';
 import { PHONE, useMedia } from '../lib/useMedia.js';
 import { renderCharacterCard } from '../lib/characterCard.js';
 import { renderGuideCard } from '../lib/guideCard.js';
@@ -133,22 +134,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
             <ExportIcon size={14} />Share teams card
           </button>
         </div>
-        <ul className="detail__presets">
-          {presets.map((p) => (
-            <li key={p.name} className={p.idea ? 'is-idea' : undefined}>
-              <span className="detail__preset-name">
-                {p.name}
-                {p.idea && <span className="idea-tag">Kit idea</span>}
-              </span>
-              <span className="detail__preset-team">
-                {p.members.map((id) => (
-                  <Portrait key={id} character={CHARACTER_BY_ID[id]} size="sm" />
-                ))}
-              </span>
-              {p.why && <span className="detail__preset-why">{p.why}</span>}
-            </li>
-          ))}
-        </ul>
+        <FeaturedTeams presets={presets} />
       </section>
     )}
     </div>
