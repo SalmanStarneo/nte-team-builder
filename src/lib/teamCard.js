@@ -289,13 +289,15 @@ const BANDS = [
   { y: 500, x: -480, h: 120, a: 0.6 },
   { y: 660, x: -180, h: 160, a: 0.8 },
 ];
-function drawBands(ctx) {
+function drawBands(ctx, W = CARD_W, H = CARD_H) {
+  // Taller cards repeat the band pattern down the page.
+  const bands = H > CARD_H ? [...BANDS, ...BANDS.map((b) => ({ ...b, y: b.y + CARD_H }))] : BANDS;
   ctx.save();
-  ctx.translate(CARD_W / 2, CARD_H / 2);
+  ctx.translate(W / 2, H / 2);
   ctx.rotate((-12 * Math.PI) / 180);
-  ctx.translate(-CARD_W / 2, -CARD_H / 2);
-  for (const b of BANDS) {
-    const w = CARD_W * 1.6;
+  ctx.translate(-W / 2, -H / 2);
+  for (const b of bands) {
+    const w = W * 1.6;
     ctx.globalAlpha = b.a;
     ctx.fillStyle = 'rgba(194, 24, 91, 0.16)';
     roundRect(ctx, b.x, b.y, w, b.h, b.h / 2);
@@ -325,11 +327,30 @@ export async function ensureFonts() {
   }
 }
 
+// Team card layouts: 'row' is the wide 1x4 card (16:9), 'grid' a 2x2 card (4:5)
+// with twice the width per member, so names, gear and stats don't get cut off.
+export const TEAM_LAYOUTS = [
+  { id: 'row', label: '1 × 4', hint: 'Wide' },
+  { id: 'grid', label: '2 × 2', hint: 'Tall' },
+];
+export const GRID_W = 1080;
+export const GRID_H = 1350;
+// Member panel metrics per layout (offsets from the panel top).
+const METRICS = {
+  row: { r: 58, cy: 86, shift: 0, nameFont: 22, gearFont: 15, gearLine: 19, bonusLine: 17, bonusName: 12, bonusNum: 14, alwaysTwoLines: false },
+  grid: { r: 78, cy: 110, shift: 44, nameFont: 27, gearFont: 18, gearLine: 23, bonusLine: 25, bonusName: 14, bonusNum: 16, alwaysTwoLines: true },
+};
+
 /**
  * Renders the team card and returns the canvas.
- * team: { name, members, loadouts }; base: URL prefix for /characters/<id>.webp.
+ * team: { name, members, loadouts }; base: URL prefix for /characters/<id>.webp;
+ * layout: 'row' (1x4, default) or 'grid' (2x2).
  */
-export async function renderTeamCard(team, { base = '/' } = {}) {
+export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) {
+  const grid = layout === 'grid';
+  const W = grid ? GRID_W : CARD_W;
+  const H = grid ? GRID_H : CARD_H;
+  const M = METRICS[grid ? 'grid' : 'row'];
   await ensureFonts();
   const members = team.members.map((id) => (id ? CHARACTER_BY_ID[id] : null));
   const images = await Promise.all(
@@ -362,23 +383,23 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
 
   const canvas = document.createElement('canvas');
   const scale = 2; // sharp on high-density screens
-  canvas.width = CARD_W * scale;
-  canvas.height = CARD_H * scale;
+  canvas.width = W * scale;
+  canvas.height = H * scale;
   const ctx = canvas.getContext('2d');
   ctx.scale(scale, scale);
   // Best resampling when portraits are scaled onto the card.
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-  clipCard(ctx, CARD_W, CARD_H);
+  clipCard(ctx, W, H);
 
   // Background
-  const g = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
+  const g = ctx.createLinearGradient(0, 0, W, H);
   g.addColorStop(0, '#121624');
   g.addColorStop(1, C.bg);
   ctx.fillStyle = g;
-  ctx.fillRect(0, 0, CARD_W, CARD_H);
+  ctx.fillRect(0, 0, W, H);
 
-  drawBands(ctx);
+  drawBands(ctx, W, H);
 
   // Header
   const PAD = 48;
@@ -386,13 +407,21 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
   ctx.font = `500 13px ${MONO}`;
   ctx.fillText('NEVERNESS TO EVERNESS  \u00b7  TEAM BUILD', PAD, 52);
   ctx.fillStyle = C.fg;
-  ctx.font = `800 58px ${DISPLAY}`;
-  const title = wrap(ctx, (team.name || 'Untitled team').toUpperCase(), CARD_W - PAD * 2 - 300, 1)[0];
+  // Long names step the font down before they'd be cut off.
+  const titleText = (team.name || 'Untitled team').toUpperCase();
+  const titleW = W - PAD * 2 - 300;
+  let titleSize = 58;
+  ctx.font = `800 ${titleSize}px ${DISPLAY}`;
+  while (titleSize > 40 && ctx.measureText(titleText).width > titleW) {
+    titleSize -= 2;
+    ctx.font = `800 ${titleSize}px ${DISPLAY}`;
+  }
+  const title = wrap(ctx, titleText, titleW, 1)[0];
   ctx.fillText(title, PAD, 108);
 
   // Role counts, top right
   ctx.font = `600 15px ${BODY}`;
-  let rx = CARD_W - PAD;
+  let rx = W - PAD;
   for (const [role, n] of Object.entries(analysis.roleCounts).reverse()) {
     const text = `${n} ${role}`;
     ctx.font = `600 14px ${BODY}`;
@@ -411,10 +440,13 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
   // Member cards
   const top = 136;
   const gap = 18;
-  const cw = (CARD_W - PAD * 2 - gap * 3) / 4;
-  const ch = 416;
+  const cols = grid ? 2 : 4;
+  const cw = (W - PAD * 2 - gap * (cols - 1)) / cols;
+  // 2x2: two rows share the height left over by the header, reactions and footer.
+  const ch = grid ? Math.floor((H - top - gap - 180) / 2) : 416;
   members.forEach((c, i) => {
-    const x = PAD + i * (cw + gap);
+    const x = PAD + (i % cols) * (cw + gap);
+    const top = 136 + Math.floor(i / cols) * (ch + gap);
     if (!c) {
       ctx.strokeStyle = C.line;
       ctx.setLineDash([8, 6]);
@@ -443,8 +475,8 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
 
     // Portrait
     const cx = x + cw / 2;
-    const cy = top + 86;
-    const r = 58;
+    const cy = top + M.cy;
+    const r = M.r;
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -521,8 +553,9 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
     // Name and element
     ctx.textAlign = 'center';
     ctx.fillStyle = C.fg;
-    ctx.font = `700 22px ${BODY}`;
-    ctx.fillText(wrap(ctx, c.name, cw - 24, 1)[0], cx, top + 176);
+    const d = M.shift;
+    ctx.font = `700 ${M.nameFont}px ${BODY}`;
+    ctx.fillText(wrap(ctx, c.name, cw - 24, 1)[0], cx, top + 176 + d);
     ctx.font = `500 13px ${MONO}`;
     ctx.fillStyle = el;
     const elName = ELEMENT_BY_ID[c.element].name.toUpperCase();
@@ -531,9 +564,9 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
     const elIcon = elIcons[c.element];
     const iconW = elIcon ? 24 : 0;
     const startX = cx - (iconW + elW + 32) / 2;
-    if (elIcon) ctx.drawImage(elIcon, startX, top + 182, 20, 20);
-    ctx.fillText(elName, startX + iconW, top + 199);
-    drawRank(ctx, c.rarity, startX + iconW + elW + 8, top + 194, 24);
+    if (elIcon) ctx.drawImage(elIcon, startX, top + 182 + d, 20, 20);
+    ctx.fillText(elName, startX + iconW, top + 199 + d);
+    drawRank(ctx, c.rarity, startX + iconW + elW + 8, top + 194 + d, 24);
 
     // Roles, each with its icon, centred as one line
     ctx.font = `500 14px ${BODY}`;
@@ -546,12 +579,12 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
     ctx.fillStyle = C.muted;
     parts.forEach((p, k) => {
       if (k > 0) {
-        ctx.fillText('  \u00b7  ', rx2, top + 222);
+        ctx.fillText('  \u00b7  ', rx2, top + 222 + d);
         rx2 += sepW;
       }
       const icon = roleIcons[p.role];
-      if (icon) ctx.drawImage(icon, rx2, top + 209, ROLE_ICON, ROLE_ICON);
-      ctx.fillText(p.role, rx2 + ROLE_ICON + 4, top + 222);
+      if (icon) ctx.drawImage(icon, rx2, top + 209 + d, ROLE_ICON, ROLE_ICON);
+      ctx.fillText(p.role, rx2 + ROLE_ICON + 4, top + 222 + d);
       rx2 += p.w;
     });
     ctx.textAlign = 'left';
@@ -562,7 +595,7 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
     const cart = gear.cartridge && CARTRIDGE_BY_ID[gear.cartridge];
     const gx = x + 16;
     const gw = cw - 32;
-    let gy = top + 248;
+    let gy = top + 248 + d;
 
     ctx.strokeStyle = C.line;
     ctx.lineWidth = 1;
@@ -574,7 +607,7 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
     const bonus = bonusStats(arc, gear.cartStats, consoleStats(c.id, gear.console, gear.cartridge));
     const hasBonus = bonus.length > 0;
     // With bonus stats shown, names stay on one line so the stats have room.
-    const maxLines = hasBonus ? 1 : 2;
+    const maxLines = hasBonus && !M.alwaysTwoLines ? 1 : 2;
 
     const gearRow = (label, value, tag, extra, icon) => {
       ctx.fillStyle = C.muted;
@@ -596,7 +629,7 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
         });
       }
       ctx.fillStyle = value ? C.fg : C.muted;
-      ctx.font = `${value ? 600 : 400} 15px ${BODY}`;
+      ctx.font = `${value ? 600 : 400} ${M.gearFont}px ${BODY}`;
       const ICON = 20;
       const tx = icon ? gx + ICON + 6 : gx;
       if (icon) {
@@ -607,8 +640,8 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
         ctx.restore();
       }
       const lines = wrap(ctx, value || '\u2014', gw - (tx - gx), maxLines);
-      lines.forEach((ln, k) => ctx.fillText(ln, tx, gy + 24 + k * 19));
-      gy += 30 + lines.length * 19;
+      lines.forEach((ln, k) => ctx.fillText(ln, tx, gy + 24 + k * M.gearLine));
+      gy += 30 + lines.length * M.gearLine;
     };
     gearRow('ARC', arc?.name, arc ? arcTag(arc, c) : null, arc && gear.arcDupes ? `+${gear.arcDupes}` : null, arc && arcTypeIcons[arc.type]);
     gearRow('CARTRIDGE', cart?.name, cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null, null, cart && cartIcons[cart.id]);
@@ -617,7 +650,7 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
     if (hasBonus) {
       // Sits right under the Cartridge row: label, then up to 4 rows x 2 columns.
       const rows = 4;
-      const lineH = 17;
+      const lineH = M.bonusLine;
       const colW = (gw - 10) / 2;
       const by = gy + 10;
       ctx.fillStyle = C.muted;
@@ -629,20 +662,20 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
         const yy = by + (k % rows) * lineH;
         const v = Number.isInteger(b.value) ? String(b.value) : b.value.toFixed(2).replace(/0$/, '');
         const valText = `${v}${isPercentStat(b.stat) ? '%' : ''}`;
-        ctx.font = `700 14px ${MONO}`;
+        ctx.font = `700 ${M.bonusNum}px ${MONO}`;
         const vw = ctx.measureText(valText).width;
         ctx.fillStyle = C.label;
         // Long names (Lakshana DMG%, Charge Eff.) step down a little before they'd be cut off.
         const name = STAT_SHORT[b.stat] ?? b.stat;
-        let fs = 12;
+        let fs = M.bonusName;
         ctx.font = `500 ${fs}px ${MONO}`;
-        while (fs > 10 && ctx.measureText(name).width > colW - vw - 5) {
+        while (fs > M.bonusName - 2 && ctx.measureText(name).width > colW - vw - 5) {
           fs -= 0.5;
           ctx.font = `500 ${fs}px ${MONO}`;
         }
         ctx.fillText(wrap(ctx, name, colW - vw - 5, 1)[0], bx, yy);
         ctx.fillStyle = C.num;
-        ctx.font = `700 14px ${MONO}`;
+        ctx.font = `700 ${M.bonusNum}px ${MONO}`;
         ctx.textAlign = 'right';
         ctx.fillText(valText, bx + colW, yy);
         ctx.textAlign = 'left';
@@ -656,7 +689,8 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
   });
 
   // Reactions
-  const ry = top + ch + 30;
+  const rows = grid ? 2 : 1;
+  let ry = top + rows * ch + (rows - 1) * gap + 30;
   ctx.fillStyle = C.muted;
   ctx.font = `500 12px ${MONO}`;
   ctx.fillText('REACTIONS', PAD, ry);
@@ -670,11 +704,17 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
     ctx.font = `400 15px ${BODY}`;
     ctx.fillText('No reactions yet', px, ry);
   }
+  let line = 1;
   for (const chip of chips) {
     ctx.font = `600 15px ${BODY}`;
     const dots = chip.els.length * 12;
     const w = ctx.measureText(chip.text).width + 28 + dots;
-    if (px + w > CARD_W - PAD) break;
+    if (px + w > W - PAD) {
+      if (!grid || line === 2) break;
+      line += 1;
+      px = PAD + 96;
+      ry += 40;
+    }
     ctx.fillStyle = chip.trio ? '#262c4a' : C.panel2;
     roundRect(ctx, px, ry - 22, w, 32, 16);
     ctx.fill();
@@ -700,10 +740,10 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
     ctx.font = `600 ${size}px ${MONO}`;
     return ctx.measureText(text).width;
   };
-  const maxW = CARD_W - PAD * 2 - labelW;
+  const maxW = W - PAD * 2 - labelW;
   let codeSize = 20;
   let codeLines = [code];
-  const sideBySide = PAD + legalW + 32 + labelW + fits(code, 20) <= CARD_W - PAD;
+  const sideBySide = PAD + legalW + 32 + labelW + fits(code, 20) <= W - PAD;
   if (!sideBySide) {
     codeSize = Math.max(15, Math.min(20, Math.floor((20 * maxW) / fits(code, 20))));
     if (fits(code, codeSize) > maxW) {
@@ -718,31 +758,31 @@ export async function renderTeamCard(team, { base = '/' } = {}) {
     }
   }
   const lineGap = codeSize + 4;
-  const codeTop = CARD_H - 22 - (codeLines.length - 1) * lineGap;
+  const codeTop = H - 22 - (codeLines.length - 1) * lineGap;
   // Site and socials sit right-aligned just above the code. When the legal
   // line also moves up and the two would meet, the legal line goes one row higher.
   const linksFont = `500 12px ${BODY}`;
   const linksY = codeTop - codeSize - 10;
   const linksW = measureLinksLine(ctx, { font: linksFont, iconSize: 13, gap: 18 });
-  let legalY = sideBySide ? CARD_H - 24 : linksY;
-  if (!sideBySide && PAD + legalW + 24 > CARD_W - PAD - linksW) legalY = linksY - 18;
+  let legalY = sideBySide ? H - 24 : linksY;
+  if (!sideBySide && PAD + legalW + 24 > W - PAD - linksW) legalY = linksY - 18;
   ctx.fillStyle = C.muted;
   ctx.font = `400 12px ${BODY}`;
   ctx.fillText(LEGAL, PAD, legalY);
-  drawLinksLine(ctx, CARD_W - PAD, linksY, { font: linksFont, color: C.muted, accent: C.fg, iconSize: 13, gap: 18, align: 'right' });
+  drawLinksLine(ctx, W - PAD, linksY, { font: linksFont, color: C.muted, accent: C.fg, iconSize: 13, gap: 18, align: 'right' });
   // Card code: type it into the builder to rebuild this team and its gear.
   ctx.textAlign = 'right';
   ctx.font = `600 ${codeSize}px ${MONO}`;
   ctx.fillStyle = C.fg;
-  codeLines.forEach((ln, i) => ctx.fillText(ln, CARD_W - PAD, codeTop + i * lineGap));
+  codeLines.forEach((ln, i) => ctx.fillText(ln, W - PAD, codeTop + i * lineGap));
   const firstW = ctx.measureText(codeLines[0]).width;
   ctx.font = `500 11px ${MONO}`;
   ctx.fillStyle = C.muted;
-  ctx.fillText('CODE', CARD_W - PAD - firstW - 12, codeTop - 2);
+  ctx.fillText('CODE', W - PAD - firstW - 12, codeTop - 2);
   ctx.textAlign = 'left';
 
 
-  drawSilverFrame(ctx, CARD_W, CARD_H);
+  drawSilverFrame(ctx, W, H);
   return canvas;
 }
 

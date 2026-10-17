@@ -4628,3 +4628,57 @@ th[aria-sort='descending'] .th-btn {
 .detail__export .export-icon {
   margin-right: 0;
 }
+
+/* Team image layout choice (1 x 4 or 2 x 2) in the export dialog */
+.layout-pick {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.layout-pick__opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.85rem;
+  color: inherit;
+  cursor: pointer;
+}
+.layout-pick__opt.is-on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+.layout-pick__opt .muted {
+  font-size: 0.78rem;
+}
+.layout-pick__icon {
+  display: inline-grid;
+  gap: 2px;
+}
+.layout-pick__icon i {
+  display: block;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.7;
+}
+.layout-pick__icon--row {
+  grid-template-columns: repeat(4, 5px);
+}
+.layout-pick__icon--row i {
+  height: 12px;
+}
+.layout-pick__icon--grid {
+  grid-template-columns: repeat(2, 7px);
+}
+.layout-pick__icon--grid i {
+  height: 7px;
+}
+/* Tall images fit the screen instead of stretching the dialog. */
+.dialog__preview img {
+  max-height: 62vh;
+  width: auto;
+  max-width: 100%;
+}
