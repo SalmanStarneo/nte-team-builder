@@ -341,9 +341,77 @@ export const SIDE_W = 1600;
 export const SIDE_H = 1000;
 // Member panel metrics per layout (offsets from the panel top).
 const METRICS = {
-  row: { r: 58, cy: 86, shift: 0, nameFont: 22, gearFont: 15, gearLine: 19, bonusLine: 17, bonusName: 12, bonusNum: 14, alwaysTwoLines: false },
-  grid: { r: 78, cy: 110, shift: 44, nameFont: 27, gearFont: 18, gearLine: 23, bonusLine: 25, bonusName: 14, bonusNum: 16, alwaysTwoLines: true },
+  row: {
+    r: 58, cy: 86, shift: 0, nameFont: 22, gearFont: 15, gearLine: 19, bonusLine: 17, bonusName: 12, bonusNum: 14, alwaysTwoLines: false,
+    aw: { w: 34, h: 20, step: 24, font: 11, rr: 14, rStep: 34 }, elFont: 13, elIcon: 20, rank: 24, roleFont: 14, roleIcon: 16, roleGap: 0,
+    dupFont: 12, label: 11, tiles: false,
+  },
+  grid: {
+    r: 74, cy: 104, shift: 34, nameFont: 28, gearFont: 18, gearLine: 22, bonusLine: 27, bonusName: 16, bonusNum: 18, alwaysTwoLines: true,
+    aw: { w: 42, h: 25, step: 30, font: 14, rr: 17, rStep: 40 }, elFont: 17, elIcon: 26, rank: 30, roleFont: 18, roleIcon: 20, roleGap: 10,
+    dupFont: 15, label: 14, tiles: true,
+  },
 };
+
+/**
+ * Arc and Cartridge side by side as image tiles (2x2 layouts). Each column:
+ * a label with its tag, then the tile with the name (up to 2 lines) beside it.
+ * Returns the height used.
+ */
+function gearTiles(ctx, x, y, w, o) {
+  const colW = (w - 16) / 2;
+  const cols = [
+    { label: 'ARC', name: o.arc?.name, img: o.arcImg, tag: o.arcTag, extra: o.arcExtra, gold: false },
+    { label: 'CARTRIDGE', name: o.cart?.name, img: o.cartImg, tag: o.cartTag, extra: null, gold: true },
+  ];
+  cols.forEach((col, i) => {
+    const cx = x + i * (colW + 16);
+    ctx.fillStyle = C.muted;
+    ctx.font = `500 ${o.label}px ${MONO}`;
+    ctx.fillText(col.label, cx, y + 4);
+    let lx = cx + ctx.measureText(col.label).width + 8;
+    if (col.extra) {
+      ctx.fillStyle = C.fg;
+      ctx.fillText(col.extra, lx, y + 4);
+      lx += ctx.measureText(col.extra).width + 8;
+    }
+    if (col.tag) {
+      pill(ctx, lx, y - 11, col.tag === 'sig' ? 'SIG' : 'REC', {
+        bg: col.tag === 'sig' ? C.sig : '#2a3150', fg: col.tag === 'sig' ? '#1a1400' : C.accent, font: `700 12px ${MONO}`, padX: 7, h: 20,
+      });
+    }
+    const ty = y + 16;
+    const s = o.size;
+    if (col.gold) {
+      const g = ctx.createRadialGradient(cx + s / 2, ty + s / 2, 3, cx + s / 2, ty + s / 2, s * 0.7);
+      g.addColorStop(0, '#5a4422');
+      g.addColorStop(1, '#2a2416');
+      ctx.fillStyle = g;
+    } else {
+      ctx.fillStyle = C.panel2;
+    }
+    roundRect(ctx, cx, ty, s, s, 10);
+    ctx.fill();
+    if (col.img) {
+      ctx.save();
+      roundRect(ctx, cx, ty, s, s, 10);
+      ctx.clip();
+      const pad = col.gold ? 8 : 0;
+      ctx.drawImage(col.img, cx + pad, ty + pad, s - pad * 2, s - pad * 2);
+      ctx.restore();
+    }
+    ctx.strokeStyle = col.gold ? 'rgba(242, 193, 78, 0.6)' : C.line;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, cx, ty, s, s, 10);
+    ctx.stroke();
+    ctx.fillStyle = col.name ? C.fg : C.muted;
+    ctx.font = `${col.name ? 600 : 400} ${o.nameFont}px ${BODY}`;
+    const lines = wrap(ctx, col.name || '\u2014', colW - s - 12, 2);
+    const blockH = lines.length * o.lineH;
+    lines.forEach((ln, k) => ctx.fillText(ln, cx + s + 12, ty + (s - blockH) / 2 + o.lineH * (k + 1) - 5));
+  });
+  return 16 + o.size;
+}
 
 /**
  * Renders the team card and returns the canvas.
@@ -373,6 +441,10 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
   }).filter(Boolean))];
   const arcTypeIcons = Object.fromEntries(
     await Promise.all(arcTypes.map(async (t) => [t, await loadImage(`${base}icons/arc-types/${t.toLowerCase()}.webp`)])),
+  );
+  const arcArtIds = grid ? [...new Set(team.members.map((id) => id && loadoutOf(team, id).arc).filter(Boolean))] : [];
+  const arcArts = Object.fromEntries(
+    await Promise.all(arcArtIds.map(async (id) => [id, await loadImage(`${base}arcs/${id}.webp`)])),
   );
   const cartIcons = Object.fromEntries(
     await Promise.all(cartIds.map(async (id) => [id, await loadImage(`${base}icons/cartridges/${id}.webp`)])),
@@ -508,12 +580,12 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
     const gearAw = loadoutOf(team, c.id);
     const onSet = new Set(gearAw.awakenings);
     const colX = x + 14;
-    const pillW = 34;
-    const pillH = 20;
+    const pillW = M.aw.w;
+    const pillH = M.aw.h;
     for (let k = 0; k < 6; k++) {
       const id = `A${k + 1}`;
       const on = onSet.has(id);
-      const py = top + 18 + k * 24;
+      const py = top + 18 + k * M.aw.step;
       ctx.fillStyle = on ? el : 'rgba(255, 255, 255, 0.06)';
       roundRect(ctx, colX, py, pillW, pillH, 6);
       ctx.fill();
@@ -523,7 +595,7 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
         ctx.stroke();
       }
       ctx.fillStyle = on ? C.bg : C.muted;
-      ctx.font = `700 11px ${MONO}`;
+      ctx.font = `700 ${M.aw.font}px ${MONO}`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(id, colX + pillW / 2, py + pillH / 2 + 1);
@@ -532,16 +604,16 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
     ['R3', 'R6'].forEach((id, k) => {
       const on = reso[id];
       const rcx = colX + pillW / 2;
-      const rcy = top + 18 + 6 * 24 + 18 + k * 34;
+      const rcy = top + 18 + 6 * M.aw.step + M.aw.rr + 4 + k * M.aw.rStep;
       ctx.beginPath();
-      ctx.arc(rcx, rcy, 14, 0, Math.PI * 2);
+      ctx.arc(rcx, rcy, M.aw.rr, 0, Math.PI * 2);
       ctx.fillStyle = on ? el : 'rgba(255, 255, 255, 0.04)';
       ctx.fill();
       ctx.lineWidth = 2;
       ctx.strokeStyle = on ? el : C.line;
       ctx.stroke();
       ctx.fillStyle = on ? C.bg : C.muted;
-      ctx.font = `700 11px ${MONO}`;
+      ctx.font = `700 ${M.aw.font}px ${MONO}`;
       ctx.fillText(id, rcx, rcy + 1);
     });
     ctx.textAlign = 'left';
@@ -550,9 +622,9 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
     // Duplicate count, top-right corner
     if (gearAw.dupes) {
       const dText = `+${gearAw.dupes}`;
-      ctx.font = `700 12px ${MONO}`;
+      ctx.font = `700 ${M.dupFont}px ${MONO}`;
       const dW = ctx.measureText(dText).width + 16;
-      pill(ctx, x + cw - 12 - dW, top + 16, dText, { bg: C.panel2, fg: C.muted, font: `700 12px ${MONO}`, h: 22 });
+      pill(ctx, x + cw - 12 - dW, top + 16, dText, { bg: C.panel2, fg: C.muted, font: `700 ${M.dupFont}px ${MONO}`, h: M.dupFont + 10 });
     }
 
     // Name and element
@@ -561,21 +633,23 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
     const d = M.shift;
     ctx.font = `700 ${M.nameFont}px ${BODY}`;
     ctx.fillText(wrap(ctx, c.name, cw - 24, 1)[0], cx, top + 176 + d);
-    ctx.font = `500 13px ${MONO}`;
+    ctx.font = `${M.tiles ? 600 : 500} ${M.elFont}px ${MONO}`;
     ctx.fillStyle = el;
     const elName = ELEMENT_BY_ID[c.element].name.toUpperCase();
     const elW = ctx.measureText(elName).width;
     ctx.textAlign = 'left';
     const elIcon = elIcons[c.element];
-    const iconW = elIcon ? 24 : 0;
-    const startX = cx - (iconW + elW + 32) / 2;
-    if (elIcon) ctx.drawImage(elIcon, startX, top + 182 + d, 20, 20);
-    ctx.fillText(elName, startX + iconW, top + 199 + d);
-    drawRank(ctx, c.rarity, startX + iconW + elW + 8, top + 194 + d, 24);
+    const iconW = elIcon ? M.elIcon + 4 : 0;
+    const startX = cx - (iconW + elW + M.rank + 8) / 2;
+    const elY = top + 199 + d + (M.tiles ? 6 : 0);
+    if (elIcon) ctx.drawImage(elIcon, startX, elY - M.elIcon + 3, M.elIcon, M.elIcon);
+    ctx.fillText(elName, startX + iconW, elY);
+    drawRank(ctx, c.rarity, startX + iconW + elW + 8, elY - 5, M.rank);
 
     // Roles, each with its icon, centred as one line
-    ctx.font = `500 14px ${BODY}`;
-    const ROLE_ICON = 16;
+    ctx.font = `500 ${M.roleFont}px ${BODY}`;
+    const ROLE_ICON = M.roleIcon;
+    const roleY = top + 222 + d + M.roleGap;
     const parts = c.roles.map((role) => ({ role, w: ROLE_ICON + 4 + ctx.measureText(role).width }));
     const sepW = ctx.measureText('  \u00b7  ').width;
     const total = parts.reduce((sum, p) => sum + p.w, 0) + sepW * (parts.length - 1);
@@ -584,12 +658,12 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
     ctx.fillStyle = C.muted;
     parts.forEach((p, k) => {
       if (k > 0) {
-        ctx.fillText('  \u00b7  ', rx2, top + 222 + d);
+        ctx.fillText('  \u00b7  ', rx2, roleY);
         rx2 += sepW;
       }
       const icon = roleIcons[p.role];
-      if (icon) ctx.drawImage(icon, rx2, top + 209 + d, ROLE_ICON, ROLE_ICON);
-      ctx.fillText(p.role, rx2 + ROLE_ICON + 4, top + 222 + d);
+      if (icon) ctx.drawImage(icon, rx2, roleY - ROLE_ICON + 3, ROLE_ICON, ROLE_ICON);
+      ctx.fillText(p.role, rx2 + ROLE_ICON + 4, roleY);
       rx2 += p.w;
     });
     ctx.textAlign = 'left';
@@ -600,7 +674,7 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
     const cart = gear.cartridge && CARTRIDGE_BY_ID[gear.cartridge];
     const gx = x + 16;
     const gw = cw - 32;
-    let gy = top + 248 + d;
+    let gy = top + 248 + d + M.roleGap;
 
     ctx.strokeStyle = C.line;
     ctx.lineWidth = 1;
@@ -648,8 +722,16 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
       lines.forEach((ln, k) => ctx.fillText(ln, tx, gy + 24 + k * M.gearLine));
       gy += 30 + lines.length * M.gearLine;
     };
-    gearRow('ARC', arc?.name, arc ? arcTag(arc, c) : null, arc && gear.arcDupes ? `+${gear.arcDupes}` : null, arc && arcTypeIcons[arc.type]);
-    gearRow('CARTRIDGE', cart?.name, cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null, null, cart && cartIcons[cart.id]);
+    if (M.tiles) {
+      gy += gearTiles(ctx, gx, gy, gw, {
+        arc, arcImg: arc && arcArts[arc.id], arcTag: arc ? arcTag(arc, c) : null, arcExtra: arc && gear.arcDupes ? `+${gear.arcDupes}` : null,
+        cart, cartImg: cart && cartIcons[cart.id], cartTag: cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null,
+        size: 54, label: M.label, nameFont: 17, lineH: 20,
+      }) + 22;
+    } else {
+      gearRow('ARC', arc?.name, arc ? arcTag(arc, c) : null, arc && gear.arcDupes ? `+${gear.arcDupes}` : null, arc && arcTypeIcons[arc.type]);
+      gearRow('CARTRIDGE', cart?.name, cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null, null, cart && cartIcons[cart.id]);
+    }
 
     // Bonus stats: Arc + Cartridge, two columns along the bottom of the panel.
     if (hasBonus) {
@@ -657,9 +739,9 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
       const rows = 4;
       const lineH = M.bonusLine;
       const colW = (gw - 10) / 2;
-      const by = gy + 10;
+      const by = gy + 10 + (M.tiles ? 12 : 0);
       ctx.fillStyle = C.muted;
-      ctx.font = `500 11px ${MONO}`;
+      ctx.font = `500 ${M.label}px ${MONO}`;
       ctx.fillText('BONUS STATS', gx, gy - 6);
       const shown = bonus.length > rows * 2 ? bonus.slice(0, rows * 2 - 1) : bonus;
       shown.forEach((b, k) => {
@@ -743,8 +825,8 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
 
     // Awakenings A1-A6 in a row under the portrait, Resonance and duplicates below.
     const onSet = new Set(gear.awakenings);
-    const colW = r * 2 + 8;
-    const pw = Math.min(28, (colW - 5 * 4) / 6);
+    const colW = r * 2 + 16;
+    const pw = Math.min(32, (colW - 5 * 4) / 6);
     const ax0 = cx - (pw * 6 + 20) / 2;
     const ay = cy + r + 14;
     ctx.textAlign = 'center';
@@ -753,7 +835,7 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
       const on = onSet.has(`A${k + 1}`);
       const px = ax0 + k * (pw + 4);
       ctx.fillStyle = on ? el : 'rgba(255, 255, 255, 0.06)';
-      roundRect(ctx, px, ay, pw, 20, 6);
+      roundRect(ctx, px, ay, pw, 24, 6);
       ctx.fill();
       if (!on) {
         ctx.strokeStyle = C.line;
@@ -761,32 +843,32 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
         ctx.stroke();
       }
       ctx.fillStyle = on ? C.bg : C.muted;
-      ctx.font = `700 11px ${MONO}`;
-      ctx.fillText(`A${k + 1}`, px + pw / 2, ay + 11);
+      ctx.font = `700 13px ${MONO}`;
+      ctx.fillText(`A${k + 1}`, px + pw / 2, ay + 13);
     }
     const reso = activeResonance(onSet.size);
-    const ry2 = ay + 40;
+    const ry2 = ay + 44;
     ['R3', 'R6'].forEach((id, k) => {
       const on = reso[id];
-      const rcx = cx - 30 + k * 34;
+      const rcx = cx - 36 + k * 38;
       ctx.beginPath();
-      ctx.arc(rcx, ry2, 13, 0, Math.PI * 2);
+      ctx.arc(rcx, ry2, 15, 0, Math.PI * 2);
       ctx.fillStyle = on ? el : 'rgba(255, 255, 255, 0.04)';
       ctx.fill();
       ctx.lineWidth = 2;
       ctx.strokeStyle = on ? el : C.line;
       ctx.stroke();
       ctx.fillStyle = on ? C.bg : C.muted;
-      ctx.font = `700 11px ${MONO}`;
+      ctx.font = `700 13px ${MONO}`;
       ctx.fillText(id, rcx, ry2 + 1);
     });
     if (gear.dupes) {
       ctx.fillStyle = C.panel2;
-      roundRect(ctx, cx + 22, ry2 - 12, 40, 24, 12);
+      roundRect(ctx, cx + 22, ry2 - 14, 48, 28, 14);
       ctx.fill();
       ctx.fillStyle = C.muted;
-      ctx.font = `700 12px ${MONO}`;
-      ctx.fillText(`+${gear.dupes}`, cx + 42, ry2 + 1);
+      ctx.font = `700 15px ${MONO}`;
+      ctx.fillText(`+${gear.dupes}`, cx + 46, ry2 + 1);
     }
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
@@ -794,33 +876,33 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
     // Details
     const dx = x + 30 + r * 2 + 34;
     const dw = x + cw - 26 - dx;
-    let y = top + 52;
+    let y = top + 54;
     ctx.fillStyle = C.fg;
-    ctx.font = `700 30px ${BODY}`;
+    ctx.font = `700 34px ${BODY}`;
     ctx.fillText(wrap(ctx, c.name, dw, 1)[0], dx, y);
-    y += 32;
+    y += 36;
     let fx = dx;
     const elIcon = elIcons[c.element];
-    if (elIcon) ctx.drawImage(elIcon, fx, y - 17, 22, 22);
-    fx += elIcon ? 28 : 0;
-    ctx.font = `600 15px ${MONO}`;
+    if (elIcon) ctx.drawImage(elIcon, fx, y - 22, 28, 28);
+    fx += elIcon ? 34 : 0;
+    ctx.font = `600 18px ${MONO}`;
     ctx.fillStyle = el;
     const elName = ELEMENT_BY_ID[c.element].name.toUpperCase();
     ctx.fillText(elName, fx, y);
     fx += ctx.measureText(elName).width + 10;
-    drawRank(ctx, c.rarity, fx, y - 5, 24);
-    fx += 36;
-    ctx.font = `500 16px ${BODY}`;
+    drawRank(ctx, c.rarity, fx, y - 6, 30);
+    fx += 44;
+    ctx.font = `500 19px ${BODY}`;
     ctx.fillStyle = C.muted;
     c.roles.forEach((role, k) => {
       if (k > 0) {
         ctx.fillText('·', fx, y);
-        fx += 14;
+        fx += 16;
       }
       const icon = roleIcons[role];
-      if (icon) ctx.drawImage(icon, fx, y - 14, 17, 17);
-      ctx.fillText(role, fx + 21, y);
-      fx += 21 + ctx.measureText(role).width + 10;
+      if (icon) ctx.drawImage(icon, fx, y - 17, 20, 20);
+      ctx.fillText(role, fx + 25, y);
+      fx += 25 + ctx.measureText(role).width + 12;
     });
     y += 18;
     ctx.strokeStyle = C.line;
@@ -832,77 +914,53 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
 
     const arc = gear.arc && ARC_BY_ID[gear.arc];
     const cart = gear.cartridge && CARTRIDGE_BY_ID[gear.cartridge];
-    const row = (label, value, tag, extra, icon) => {
-      y += 26;
-      ctx.fillStyle = C.muted;
-      ctx.font = `500 12px ${MONO}`;
-      ctx.fillText(label, dx, y);
-      let lx = dx + ctx.measureText(label).width + 8;
-      if (extra) {
-        ctx.fillStyle = C.fg;
-        ctx.fillText(extra, lx, y);
-        lx += ctx.measureText(extra).width + 8;
-      }
-      if (tag) {
-        pill(ctx, lx, y - 13, tag === 'sig' ? 'SIG' : 'REC', {
-          bg: tag === 'sig' ? C.sig : '#2a3150', fg: tag === 'sig' ? '#1a1400' : C.accent, font: `700 10px ${MONO}`, padX: 6, h: 17,
-        });
-      }
-      y += 26;
-      const tx = icon ? dx + 28 : dx;
-      if (icon) {
-        ctx.save();
-        roundRect(ctx, dx, y - 18, 22, 22, 5);
-        ctx.clip();
-        ctx.drawImage(icon, dx, y - 18, 22, 22);
-        ctx.restore();
-      }
-      ctx.fillStyle = value ? C.fg : C.muted;
-      ctx.font = `${value ? 600 : 400} 19px ${BODY}`;
-      ctx.fillText(wrap(ctx, value || '—', dw - (tx - dx), 1)[0], tx, y);
-    };
-    row('ARC', arc?.name, arc ? arcTag(arc, c) : null, arc && gear.arcDupes ? `+${gear.arcDupes}` : null, arc && arcTypeIcons[arc.type]);
-    row('CARTRIDGE', cart?.name, cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null, null, cart && cartIcons[cart.id]);
+    y += 30;
+    y += gearTiles(ctx, dx, y, dw, {
+      arc, arcImg: arc && arcArts[arc.id], arcTag: arc ? arcTag(arc, c) : null, arcExtra: arc && gear.arcDupes ? `+${gear.arcDupes}` : null,
+      cart, cartImg: cart && cartIcons[cart.id], cartTag: cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null,
+      size: 56, label: 14, nameFont: 18, lineH: 21,
+    });
 
     // Bonus stats: three columns.
     const bonus = bonusStats(arc, gear.cartStats, consoleStats(c.id, gear.console, gear.cartridge));
     if (bonus.length) {
       y += 30;
       ctx.fillStyle = C.muted;
-      ctx.font = `500 12px ${MONO}`;
+      ctx.font = `500 14px ${MONO}`;
       ctx.fillText('BONUS STATS', dx, y);
       const cols3 = 3;
-      const rowsN = Math.max(1, Math.floor((top + ch - 16 - (y + 6)) / 21));
+      const LH = 25;
+      const rowsN = Math.max(1, Math.floor((top + ch - 12 - (y + 4)) / LH));
       const cap = cols3 * rowsN;
       const shown = bonus.length > cap ? bonus.slice(0, cap - 1) : bonus;
-      const bw = (dw - 16 * (cols3 - 1)) / cols3;
+      const bw = (dw - 18 * (cols3 - 1)) / cols3;
       shown.forEach((b, k) => {
-        const bx = dx + Math.floor(k / rowsN) * (bw + 16);
-        const yy = y + 24 + (k % rowsN) * 21;
+        const bx = dx + Math.floor(k / rowsN) * (bw + 18);
+        const yy = y + 26 + (k % rowsN) * LH;
         const v = Number.isInteger(b.value) ? String(b.value) : b.value.toFixed(2).replace(/0$/, '');
         const valText = `${v}${isPercentStat(b.stat) ? '%' : ''}`;
-        ctx.font = `700 15px ${MONO}`;
+        ctx.font = `700 17px ${MONO}`;
         const vw = ctx.measureText(valText).width;
         const name = STAT_SHORT[b.stat] ?? b.stat;
-        let fs = 13;
+        let fs = 15;
         ctx.font = `500 ${fs}px ${MONO}`;
-        while (fs > 11 && ctx.measureText(name).width > bw - vw - 6) {
+        while (fs > 12 && ctx.measureText(name).width > bw - vw - 6) {
           fs -= 0.5;
           ctx.font = `500 ${fs}px ${MONO}`;
         }
         ctx.fillStyle = C.label;
         ctx.fillText(wrap(ctx, name, bw - vw - 6, 1)[0], bx, yy);
         ctx.fillStyle = C.num;
-        ctx.font = `700 15px ${MONO}`;
+        ctx.font = `700 17px ${MONO}`;
         ctx.textAlign = 'right';
         ctx.fillText(valText, bx + bw, yy);
         ctx.textAlign = 'left';
       });
       if (shown.length < bonus.length) {
         ctx.fillStyle = C.muted;
-        ctx.font = `500 12px ${MONO}`;
+        ctx.font = `500 14px ${MONO}`;
         const k = shown.length;
-        ctx.fillText(`+${bonus.length - shown.length} more`, dx + Math.floor(k / rowsN) * (bw + 16), y + 24 + (k % rowsN) * 21);
+        ctx.fillText(`+${bonus.length - shown.length} more`, dx + Math.floor(k / rowsN) * (bw + 18), y + 26 + (k % rowsN) * LH);
       }
     }
   });
