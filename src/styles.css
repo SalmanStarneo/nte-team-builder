@@ -4769,3 +4769,30 @@ th[aria-sort='descending'] .th-btn {
     flex-wrap: wrap;
   }
 }
+
+/* Skill and awakening lists never grow wider than the screen: long tags wrap. */
+.skill-list,
+.awaken-list {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 760px) {
+  .skill-list,
+  .awaken-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.skill-list .awaken-body {
+  flex: 1;
+}
+.passive-boost {
+  white-space: normal;
+  display: inline-block;
+  max-width: 100%;
+}
+@media (max-width: 640px) {
+  /* On phones the enhancement tag sits on its own line under the passive's name. */
+  .passive-boost {
+    display: table;
+    margin: 4px 0 0;
+  }
+}
