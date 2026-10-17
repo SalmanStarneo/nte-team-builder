@@ -20,7 +20,7 @@ const slug = (name) => (name || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-'
 // renders the team card; pass `render`, `title`, `name` and `suffix` for others.
 export default function ExportDialog({ team, onClose, render, title = 'Team image', name, suffix = 'nte-team' }) {
   const label = name ?? team?.name;
-  const fileName = () => `${slug(label)}-${suffix}${layout === 'grid' ? '-2x2' : ''}.png`;
+  const fileName = () => `${slug(label)}-${suffix}${layout === 'grid' ? '-2x2' : layout === 'side' ? '-2x2-side' : ''}.png`;
   const [url, setUrl] = useState(null);
   const [blob, setBlob] = useState(null);
   const [status, setStatus] = useState('');

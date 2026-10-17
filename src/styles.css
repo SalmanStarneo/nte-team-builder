@@ -4682,3 +4682,13 @@ th[aria-sort='descending'] .th-btn {
   width: auto;
   max-width: 100%;
 }
+.layout-pick__icon--side {
+  grid-template-columns: repeat(2, 12px);
+}
+.layout-pick__icon--side i {
+  height: 7px;
+  box-shadow: inset 5px 0 0 rgba(0, 0, 0, 0.45);
+}
+.layout-pick {
+  flex-wrap: wrap;
+}

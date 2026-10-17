@@ -332,9 +332,13 @@ export async function ensureFonts() {
 export const TEAM_LAYOUTS = [
   { id: 'row', label: '1 × 4', hint: 'Wide' },
   { id: 'grid', label: '2 × 2', hint: 'Tall' },
+  { id: 'side', label: '2 × 2', hint: 'Side by side' },
 ];
 export const GRID_W = 1080;
 export const GRID_H = 1350;
+// 'side': 2x2 with each member as a wide card, portrait on the left, details on the right.
+export const SIDE_W = 1600;
+export const SIDE_H = 1000;
 // Member panel metrics per layout (offsets from the panel top).
 const METRICS = {
   row: { r: 58, cy: 86, shift: 0, nameFont: 22, gearFont: 15, gearLine: 19, bonusLine: 17, bonusName: 12, bonusNum: 14, alwaysTwoLines: false },
@@ -347,9 +351,10 @@ const METRICS = {
  * layout: 'row' (1x4, default) or 'grid' (2x2).
  */
 export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) {
-  const grid = layout === 'grid';
-  const W = grid ? GRID_W : CARD_W;
-  const H = grid ? GRID_H : CARD_H;
+  const side = layout === 'side';
+  const grid = layout === 'grid' || side;
+  const W = side ? SIDE_W : grid ? GRID_W : CARD_W;
+  const H = side ? SIDE_H : grid ? GRID_H : CARD_H;
   const M = METRICS[grid ? 'grid' : 'row'];
   await ensureFonts();
   const members = team.members.map((id) => (id ? CHARACTER_BY_ID[id] : null));
@@ -443,8 +448,8 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
   const cols = grid ? 2 : 4;
   const cw = (W - PAD * 2 - gap * (cols - 1)) / cols;
   // 2x2: two rows share the height left over by the header, reactions and footer.
-  const ch = grid ? Math.floor((H - top - gap - 180) / 2) : 416;
-  members.forEach((c, i) => {
+  const ch = grid ? Math.floor((H - top - gap - (side ? 150 : 180)) / 2) : 416;
+  (side ? [] : members).forEach((c, i) => {
     const x = PAD + (i % cols) * (cw + gap);
     const top = 136 + Math.floor(i / cols) * (ch + gap);
     if (!c) {
@@ -684,6 +689,220 @@ export async function renderTeamCard(team, { base = '/', layout = 'row' } = {}) 
         ctx.fillStyle = C.muted;
         ctx.font = `500 11px ${MONO}`;
         ctx.fillText(`+${bonus.length - shown.length} more`, gx + colW + 10, by + (rows - 1) * lineH);
+      }
+    }
+  });
+
+  // Side-by-side 2x2: portrait and awakenings on the left, details on the right.
+  if (side) members.forEach((c, i) => {
+    const x = PAD + (i % 2) * (cw + gap);
+    const top = 136 + Math.floor(i / 2) * (ch + gap);
+    if (!c) {
+      ctx.strokeStyle = C.line;
+      ctx.setLineDash([8, 6]);
+      ctx.lineWidth = 2;
+      roundRect(ctx, x + 1, top + 1, cw - 2, ch - 2, 14);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = C.muted;
+      ctx.font = `500 18px ${BODY}`;
+      ctx.textAlign = 'center';
+      ctx.fillText('Open slot', x + cw / 2, top + ch / 2);
+      ctx.textAlign = 'left';
+      return;
+    }
+    const el = EL[c.element];
+    const gear = loadoutOf(team, c.id);
+    ctx.fillStyle = C.panel;
+    roundRect(ctx, x, top, cw, ch, 14);
+    ctx.fill();
+    ctx.save();
+    roundRect(ctx, x, top, cw, ch, 14);
+    ctx.clip();
+    ctx.fillStyle = el;
+    ctx.fillRect(x, top, 6, ch);
+    ctx.restore();
+
+    // Portrait
+    const r = Math.min(92, (ch - 100) / 2);
+    const cx = x + 30 + r;
+    const cy = top + 24 + r;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = C.panel2;
+    ctx.fill();
+    ctx.clip();
+    if (images[i]) ctx.drawImage(images[i], cx - r, cy - r, r * 2, r * 2);
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = el;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Awakenings A1-A6 in a row under the portrait, Resonance and duplicates below.
+    const onSet = new Set(gear.awakenings);
+    const colW = r * 2 + 8;
+    const pw = Math.min(28, (colW - 5 * 4) / 6);
+    const ax0 = cx - (pw * 6 + 20) / 2;
+    const ay = cy + r + 14;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (let k = 0; k < 6; k++) {
+      const on = onSet.has(`A${k + 1}`);
+      const px = ax0 + k * (pw + 4);
+      ctx.fillStyle = on ? el : 'rgba(255, 255, 255, 0.06)';
+      roundRect(ctx, px, ay, pw, 20, 6);
+      ctx.fill();
+      if (!on) {
+        ctx.strokeStyle = C.line;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+      ctx.fillStyle = on ? C.bg : C.muted;
+      ctx.font = `700 11px ${MONO}`;
+      ctx.fillText(`A${k + 1}`, px + pw / 2, ay + 11);
+    }
+    const reso = activeResonance(onSet.size);
+    const ry2 = ay + 40;
+    ['R3', 'R6'].forEach((id, k) => {
+      const on = reso[id];
+      const rcx = cx - 30 + k * 34;
+      ctx.beginPath();
+      ctx.arc(rcx, ry2, 13, 0, Math.PI * 2);
+      ctx.fillStyle = on ? el : 'rgba(255, 255, 255, 0.04)';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = on ? el : C.line;
+      ctx.stroke();
+      ctx.fillStyle = on ? C.bg : C.muted;
+      ctx.font = `700 11px ${MONO}`;
+      ctx.fillText(id, rcx, ry2 + 1);
+    });
+    if (gear.dupes) {
+      ctx.fillStyle = C.panel2;
+      roundRect(ctx, cx + 22, ry2 - 12, 40, 24, 12);
+      ctx.fill();
+      ctx.fillStyle = C.muted;
+      ctx.font = `700 12px ${MONO}`;
+      ctx.fillText(`+${gear.dupes}`, cx + 42, ry2 + 1);
+    }
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+
+    // Details
+    const dx = x + 30 + r * 2 + 34;
+    const dw = x + cw - 26 - dx;
+    let y = top + 52;
+    ctx.fillStyle = C.fg;
+    ctx.font = `700 30px ${BODY}`;
+    ctx.fillText(wrap(ctx, c.name, dw, 1)[0], dx, y);
+    y += 32;
+    let fx = dx;
+    const elIcon = elIcons[c.element];
+    if (elIcon) ctx.drawImage(elIcon, fx, y - 17, 22, 22);
+    fx += elIcon ? 28 : 0;
+    ctx.font = `600 15px ${MONO}`;
+    ctx.fillStyle = el;
+    const elName = ELEMENT_BY_ID[c.element].name.toUpperCase();
+    ctx.fillText(elName, fx, y);
+    fx += ctx.measureText(elName).width + 10;
+    drawRank(ctx, c.rarity, fx, y - 5, 24);
+    fx += 36;
+    ctx.font = `500 16px ${BODY}`;
+    ctx.fillStyle = C.muted;
+    c.roles.forEach((role, k) => {
+      if (k > 0) {
+        ctx.fillText('·', fx, y);
+        fx += 14;
+      }
+      const icon = roleIcons[role];
+      if (icon) ctx.drawImage(icon, fx, y - 14, 17, 17);
+      ctx.fillText(role, fx + 21, y);
+      fx += 21 + ctx.measureText(role).width + 10;
+    });
+    y += 18;
+    ctx.strokeStyle = C.line;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(dx, y);
+    ctx.lineTo(dx + dw, y);
+    ctx.stroke();
+
+    const arc = gear.arc && ARC_BY_ID[gear.arc];
+    const cart = gear.cartridge && CARTRIDGE_BY_ID[gear.cartridge];
+    const row = (label, value, tag, extra, icon) => {
+      y += 26;
+      ctx.fillStyle = C.muted;
+      ctx.font = `500 12px ${MONO}`;
+      ctx.fillText(label, dx, y);
+      let lx = dx + ctx.measureText(label).width + 8;
+      if (extra) {
+        ctx.fillStyle = C.fg;
+        ctx.fillText(extra, lx, y);
+        lx += ctx.measureText(extra).width + 8;
+      }
+      if (tag) {
+        pill(ctx, lx, y - 13, tag === 'sig' ? 'SIG' : 'REC', {
+          bg: tag === 'sig' ? C.sig : '#2a3150', fg: tag === 'sig' ? '#1a1400' : C.accent, font: `700 10px ${MONO}`, padX: 6, h: 17,
+        });
+      }
+      y += 26;
+      const tx = icon ? dx + 28 : dx;
+      if (icon) {
+        ctx.save();
+        roundRect(ctx, dx, y - 18, 22, 22, 5);
+        ctx.clip();
+        ctx.drawImage(icon, dx, y - 18, 22, 22);
+        ctx.restore();
+      }
+      ctx.fillStyle = value ? C.fg : C.muted;
+      ctx.font = `${value ? 600 : 400} 19px ${BODY}`;
+      ctx.fillText(wrap(ctx, value || '—', dw - (tx - dx), 1)[0], tx, y);
+    };
+    row('ARC', arc?.name, arc ? arcTag(arc, c) : null, arc && gear.arcDupes ? `+${gear.arcDupes}` : null, arc && arcTypeIcons[arc.type]);
+    row('CARTRIDGE', cart?.name, cart && cartridgesFor(c).includes(cart.id) ? 'rec' : null, null, cart && cartIcons[cart.id]);
+
+    // Bonus stats: three columns.
+    const bonus = bonusStats(arc, gear.cartStats, consoleStats(c.id, gear.console, gear.cartridge));
+    if (bonus.length) {
+      y += 30;
+      ctx.fillStyle = C.muted;
+      ctx.font = `500 12px ${MONO}`;
+      ctx.fillText('BONUS STATS', dx, y);
+      const cols3 = 3;
+      const rowsN = Math.max(1, Math.floor((top + ch - 16 - (y + 6)) / 21));
+      const cap = cols3 * rowsN;
+      const shown = bonus.length > cap ? bonus.slice(0, cap - 1) : bonus;
+      const bw = (dw - 16 * (cols3 - 1)) / cols3;
+      shown.forEach((b, k) => {
+        const bx = dx + Math.floor(k / rowsN) * (bw + 16);
+        const yy = y + 24 + (k % rowsN) * 21;
+        const v = Number.isInteger(b.value) ? String(b.value) : b.value.toFixed(2).replace(/0$/, '');
+        const valText = `${v}${isPercentStat(b.stat) ? '%' : ''}`;
+        ctx.font = `700 15px ${MONO}`;
+        const vw = ctx.measureText(valText).width;
+        const name = STAT_SHORT[b.stat] ?? b.stat;
+        let fs = 13;
+        ctx.font = `500 ${fs}px ${MONO}`;
+        while (fs > 11 && ctx.measureText(name).width > bw - vw - 6) {
+          fs -= 0.5;
+          ctx.font = `500 ${fs}px ${MONO}`;
+        }
+        ctx.fillStyle = C.label;
+        ctx.fillText(wrap(ctx, name, bw - vw - 6, 1)[0], bx, yy);
+        ctx.fillStyle = C.num;
+        ctx.font = `700 15px ${MONO}`;
+        ctx.textAlign = 'right';
+        ctx.fillText(valText, bx + bw, yy);
+        ctx.textAlign = 'left';
+      });
+      if (shown.length < bonus.length) {
+        ctx.fillStyle = C.muted;
+        ctx.font = `500 12px ${MONO}`;
+        const k = shown.length;
+        ctx.fillText(`+${bonus.length - shown.length} more`, dx + Math.floor(k / rowsN) * (bw + 16), y + 24 + (k % rowsN) * 21);
       }
     }
   });
