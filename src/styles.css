@@ -4527,3 +4527,94 @@ th[aria-sort='descending'] .th-btn {
 .nowrap {
   white-space: nowrap;
 }
+
+/* Bond tab: Bond levels and favourite gifts */
+.bond-levels,
+.gift-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.bond-levels li,
+.gift-list li {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.bond-levels li.has-stage {
+  border-color: color-mix(in srgb, var(--el, var(--accent)) 45%, var(--line));
+}
+.bond-lv,
+.gift-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding-top: 2px;
+}
+.bond-lv {
+  color: var(--el, var(--accent));
+}
+.gift-value {
+  color: var(--hl-num);
+}
+.gift-value.is-unknown {
+  color: var(--muted);
+}
+.bond-body,
+.gift-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  font-size: 0.9rem;
+}
+.bond-stage {
+  font-size: 0.9rem;
+}
+.bond-stage span {
+  font-weight: 400;
+  color: var(--muted);
+}
+.bond-body i {
+  font-style: normal;
+  font-weight: 600;
+}
+.gift-body .muted {
+  font-size: 0.8rem;
+}
+.gift-list li.is-best {
+  border-color: color-mix(in srgb, var(--hl-num) 55%, var(--line));
+}
+.gift-best {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  vertical-align: 1px;
+  background: color-mix(in srgb, var(--hl-num) 18%, transparent);
+  color: var(--hl-num);
+}
+.gift-sub {
+  margin: 14px 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.bond .muted.small {
+  margin-top: 8px;
+}
+@media (min-width: 720px) {
+  .gift-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

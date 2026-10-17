@@ -7,7 +7,7 @@ import { fmt } from '../lib/format.js';
 
 const LEVELS = Array.from({ length: SKILL_MAX }, (_, i) => i + 1);
 
-// A character's combat and life skills, plus a planner for the materials
+// A character's combat skills and passives, plus a planner for the materials
 // needed to level them.
 export default function SkillsSection({ character }) {
   const data = SKILLS[character.id];
@@ -80,22 +80,6 @@ export default function SkillsSection({ character }) {
           </>
         )}
 
-        <h3 className="mini-title skill-life-title">Life skills <span>max Lv {LIFE_MAX}</span></h3>
-        {data.life.length ? (
-          <ol className="skill-list">
-            {data.life.map((sk) => (
-              <li key={sk.name}>
-                <span className="skill-type skill-type--life">{sk.type}</span>
-                <span className="awaken-body">
-                  <b>{sk.name}</b>
-                  <span><StatText>{sk.summary}</StatText></span>
-                </span>
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <p className="muted small">Life skill not published yet.</p>
-        )}
       </section>
 
       {cost && (
@@ -133,7 +117,7 @@ export default function SkillsSection({ character }) {
             </label>
             <label className="check">
               <input type="checkbox" checked={life} onChange={(e) => setLife(e.target.checked)} />
-              Include life skill (Lv 1 → {LIFE_MAX})
+              Include overworld ability (Lv 1 → {LIFE_MAX})
             </label>
           </div>
 

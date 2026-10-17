@@ -12,6 +12,7 @@ import ElementGlyph from './ElementGlyph.jsx';
 import Portrait from './Portrait.jsx';
 import AscensionPlanner from './AscensionPlanner.jsx';
 import SkillsSection from './SkillsSection.jsx';
+import BondSection from './BondSection.jsx';
 import { AWAKENINGS, RESONANCES } from '../data/awakenings.js';
 import { AWAKENING_ORDER, ORDINAL } from '../data/awakeningOrder.js';
 import RoleList from './RoleList.jsx';
@@ -226,6 +227,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
     </section>
 );
   const skills = <SkillsSection key={`skills-${c.id}`} character={c} />;
+  const bondTab = <BondSection character={c} />;
   const materials = (
     <>
       <AscensionPlanner key={c.id} character={c} />
@@ -299,6 +301,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
             { id: 'stats', label: 'Stats', content: stats },
             { id: 'awakenings', label: 'Awakenings', content: awakenings },
             { id: 'skills', label: 'Skills', content: skills },
+            { id: 'bond', label: 'Bond', content: bondTab },
             { id: 'materials', label: 'Materials', content: materials },
             myBuild && { id: 'build', label: 'My build', content: myBuild },
           ].filter(Boolean)}
@@ -311,6 +314,7 @@ export default function CharacterDetail({ character: c, activeTeam, inActiveTeam
           </div>
           {awakenings}
           {skills}
+          {bondTab}
           {materials}
           {myBuild}
         </>
